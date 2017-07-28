@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>InVID</title>
+    <meta charset="UTF-8">
+    <meta name="description" content="Contextual Verification">
+    <meta name="robots" content="index, follow"/>
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="author" content="laaposto">
+    <link href='http://fonts.googleapis.com/css?family=Bitter:400,300,700|Ubuntu:400,300,700&subset=latin,cyrillic-ext,greek-ext,greek,latin-ext,cyrillic'
+          rel='stylesheet' type='text/css'>
+
+    <link rel="shortcut icon" href="imgs/favicon.ico"/>
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/reveal.css">
+    <link rel="stylesheet" href="css/vis.css">
+    <link rel="stylesheet" href="css/datepicker.css">
+    <link rel="stylesheet" href="css/tooltipster.bundle.css">
+    <!--END CSS -->
+
+</head>
+<body>
+<a href="#" class="scrollToTop"></a>
+
+<div id="tweet"></div>
+<div id="cover"></div>
+<div id="myModal" class="reveal-modal">
+    <h1></h1>
+
+    <p></p>
+    <a class="close-reveal-modal">&#215;</a>
+</div>
+<div id="wrapper">
+    <h1>Context Aggregation and Analysis</h1>
+
+    <p class="desc_title">This is a demo platform aimed to facilitate the verification of the content derived
+        exclusively from the YouTube and Facebook platforms. The demo focuses more on the video context rather than its
+        content. To test the service, simply copy and paste a YouTube or Facebook* URL into the box, then click
+        "Verify"</p>
+
+    <p class="note">*Right click on the Facebook video and copy the video URL</p>
+
+    <p class="desc">Contact: <span class="bolded">{olgapapa,papadop}@iti.gr</span></p>
+
+
+    <div class="input_title">Input Video:
+    </div>
+    <ul class="input_box">
+        <li>
+            <input id="video_verify" type="text"
+                   placeholder="Copy a URL or Drag &amp; drop a video from YouTube or Facebook"
+                   ondrop="detect_video_drop(event);" ondragover="return false;">
+            <button type="button" onclick="verify_video_text();return false;" class="btn">
+                Verify
+            </button>
+        </li>
+    </ul>
+    <p class="back"><a href="index.html">Back to examples</a></p>
+
+</div>
+<p class="desc_p">or have a look at some explanatory examples below</p>
+<hr>
+<h3 class="title_example">FACEBOOK</h3>
+<ul class="tiles" id="video_examples_facebook">
+    <div class="video">
+        <img src="imgs/facebook-placeholder.jpg">
+        <iframe width="360" height="305" frameborder="0"
+                src="https://www.facebook.com/v2.3/plugins/video.php?allowfullscreen=true&autoplay=false&container_width=360&height=305&href=https://www.facebook.com/781769295231917/videos/1022349734507204/&locale=en_US&sdk=joey">
+        </iframe>
+        <p class="video_desc">Snowboarder Girl Chased By Bear. The video has been edited by adding the bear in it.</p>
+        <button type="button"
+                onclick="verify_example('https://www.facebook.com/781769295231917/videos/1022349734507204/');return false;"
+                class="btn btn_small">
+            Verify
+        </button>
+    </div>
+    <div class="video">
+        <img src="imgs/facebook-placeholder.jpg">
+        <iframe width="360" height="305" frameborder="0"
+                src="https://www.facebook.com/v2.3/plugins/video.php?allowfullscreen=true&autoplay=false&container_width=360&height=305&href=https://www.facebook.com/Dawahofislamuk/videos/796804540380035/&locale=en_US&sdk=joey">
+        </iframe>
+        <p class="video_desc">The "Syrian boy" video claiming to depict a heroic act, was actually filmed in a
+            studio.</p>
+        <button type="button"
+                onclick="verify_example('https://www.facebook.com/Dawahofislamuk/videos/796804540380035/');return false;"
+                class="btn btn_small">
+            Verify
+        </button>
+    </div>
+    <div class="video">
+        <img src="imgs/facebook-placeholder.jpg">
+        <iframe width="360" height="305" frameborder="0"
+                src="https://www.facebook.com/v2.3/plugins/video.php?allowfullscreen=true&autoplay=false&container_width=360&height=305&href=https://www.facebook.com/uniladmag/videos/2293398324016547/&locale=en_US&sdk=joey">
+        </iframe>
+        <p class="video_desc">Lion Takes Revenge On Trophy Hunter. Video has been edited by Woolshed Company as part of
+            the viral experiment project.</p>
+        <button type="button"
+                onclick="verify_example('https://www.facebook.com/uniladmag/videos/2293398324016547/');return false;"
+                class="btn btn_small">
+            Verify
+        </button>
+    </div>
+</ul>
+<hr>
+<h3 class="title_example">YOUTUBE</h3>
+
+<ul class="tiles" id="video_examples">
+    <div class="video">
+        <img src="imgs/youtube-placeholder.jpg">
+        <iframe width="360" height="305" frameborder="0" src="https://www.youtube.com/embed/MsrcqbQeLUA">
+        </iframe>
+        <p class="video_desc">Video depicting youths vandalizing a car in a metro station in Brussels. The cry "Allahu
+            akhbar" has been digitally added to give the impression that the youth are muslim extremists.</p>
+        <button type="button" onclick="verify_example('https://www.youtube.com/watch?v=MsrcqbQeLUA');return false;"
+                class="btn btn_small">
+            Verify
+        </button>
+    </div>
+    <div class="video">
+        <img src="imgs/youtube-placeholder.jpg">
+        <iframe width="360" height="305" frameborder="0" src="https://www.youtube.com/embed/nkQ-ij3LTTM">
+        </iframe>
+        <p class="video_desc">Video claiming to depict a Hezbollah sniper killing ISIS combatants. In truth, this is a
+            gameplay video from the Medal of Honor game.</p>
+        <button type="button" onclick="verify_example('https://www.youtube.com/watch?v=nkQ-ij3LTTM');return false;"
+                class="btn btn_small">
+            Verify
+        </button>
+    </div>
+    <div class="video">
+        <img src="imgs/youtube-placeholder.jpg">
+        <iframe width="360" height="305" frameborder="0" src="https://www.youtube.com/embed/65vcSu93MUE">
+        </iframe>
+        <p class="video_desc">The "Syrian boy" video claiming to depict a heroic act, was actually filmed in a
+            studio.</p>
+        <button type="button" onclick="verify_example('https://www.youtube.com/watch?v=65vcSu93MUE');return false;"
+                class="btn btn_small">
+            Verify
+        </button>
+    </div>
+    <div class="video">
+        <img src="imgs/youtube-placeholder.jpg">
+        <iframe width="360" height="305" frameborder="0" src="https://www.youtube.com/embed/mZes8-tzZ0w">
+        </iframe>
+        <p class="video_desc">CCTV Footage claimed to depict the 2016 Brussels Airport explosion. The video is in truth
+            from a 2011 attack in Moscow.</p>
+        <button type="button" onclick="verify_example('https://www.youtube.com/watch?v=mZes8-tzZ0w');return false;"
+                class="btn btn_small">
+            Verify
+        </button>
+    </div>
+    <div class="video">
+        <img src="imgs/youtube-placeholder.jpg">
+        <iframe width="360" height="305" frameborder="0" src="https://www.youtube.com/embed/mSFf2mzCrTg">
+        </iframe>
+        <p class="video_desc">Another CCTV Footage, also claimed to depict the 2016 Brussels Airport explosion but in
+            truth originating from a 2011 attack in Moscow.</p>
+        <button type="button" onclick="verify_example('https://www.youtube.com/watch?v=mSFf2mzCrTg');return false;"
+                class="btn btn_small">
+            Verify
+        </button>
+    </div>
+    <div class="video">
+        <img src="imgs/youtube-placeholder.jpg">
+        <iframe width="360" height="305" frameborder="0" src="https://www.youtube.com/embed/FPfPNwhB7Ec">
+        </iframe>
+        <p class="video_desc">Video claiming to depict an airstrike against an oil storage near Khafsa Kabir. The
+            bombing actually took place around 50km away from the location claimed.</p>
+        <button type="button" onclick="verify_example('https://www.youtube.com/watch?v=FPfPNwhB7Ec');return false;"
+                class="btn btn_small">
+            Verify
+        </button>
+    </div>
+    <div class="video">
+        <img src="imgs/youtube-placeholder.jpg">
+        <iframe width="360" height="305" frameborder="0" src="https://www.youtube.com/embed/wOgJQ6Lcsds">
+        </iframe>
+        <p class="video_desc">Video claiming to depict an airstrike against an ISIS command centre near Aleppo. The
+            location claimed is wrong, and does not correspond to ISIS territory.</p>
+        <button type="button" onclick="verify_example('https://www.youtube.com/watch?v=wOgJQ6Lcsds');return false;"
+                class="btn btn_small">
+            Verify
+        </button>
+    </div>
+    <div class="video">
+        <img src="imgs/youtube-placeholder.jpg">
+        <iframe width="360" height="305" frameborder="0" src="https://www.youtube.com/embed/e-WJOHfwpEM">
+        </iframe>
+        <p class="video_desc">Video claiming to depict an airstrike in the Lattakia province. The location reported is
+            wrong.</p>
+        <button type="button" onclick="verify_example('https://www.youtube.com/watch?v=e-WJOHfwpEM');return false;"
+                class="btn btn_small">
+            Verify
+        </button>
+    </div>
+    <div class="video">
+        <img src="imgs/youtube-placeholder.jpg">
+        <iframe width="360" height="305" frameborder="0" src="https://www.youtube.com/embed/vT_PNKg3v7s">
+        </iframe>
+        <p class="video_desc">Video claiming to depict a snowboarder chased by a bear. The bear has been added digitally
+            to the video.</p>
+        <button type="button" onclick="verify_example('https://www.youtube.com/watch?v=vT_PNKg3v7s');return false;"
+                class="btn btn_small">
+            Verify
+        </button>
+    </div>
+    <div class="video">
+        <img src="imgs/youtube-placeholder.jpg">
+        <iframe width="360" height="305" frameborder="0" src="https://www.youtube.com/embed/UTeqpMQKZaY">
+        </iframe>
+        <p class="video_desc">Another instance of the "Syrian boy" video.</p>
+        <button type="button" onclick="verify_example('https://www.youtube.com/watch?v=UTeqpMQKZaY');return false;"
+                class="btn btn_small">
+            Verify
+        </button>
+    </div>
+</ul>
+<div id="user_video">
+    <iframe id="iframe" width="360" height="305" frameborder="0">
+    </iframe>
+    <p class="twitter_p">Search in Twitter<img src="imgs/twitter_icon.png"></p>
+</div>
+<div class="tab">
+    <ul class="tabs active">
+        <li><a href="#">GENERAL</a></li>
+        <li><a href="#">COMMENTS</a></li>
+        <li><a href="#">THUMBNAILS</a></li>
+        <li><a href="#">WEATHER CONTEXT</a></li>
+        <li><a href="#">TWITTER CONTEXT</a></li>
+    </ul>
+</div>
+<div id="container">
+    <div style="position: relative">
+        <div class="container_loading" id="loading_info">
+            <div class="circle"></div>
+            <p>Loading general...</p>
+        </div>
+        <div id="cover_info"></div>
+        <div class="section_title" style="margin-bottom: 20px;">GENERAL<img src="imgs/info.png" class="tooltip"
+                                                                            data-tooltip-content="#tooltip_general"/>
+        </div>
+        <p class="table_title">VIDEO</p>
+        <table class="table">
+            <thead>
+            <tr>
+                <th>Name</th>
+                <th>Value</th>
+            </tr>
+            </thead>
+            <tbody id="table_video"></tbody>
+        </table>
+        <p class="table_title">CHANNEL</p>
+        <table class="table">
+            <thead>
+            <tr>
+                <th>Name</th>
+                <th>Value</th>
+            </tr>
+            </thead>
+            <tbody id="table_channel"></tbody>
+        </table>
+        <div class="section_title">COMMENTS <img src="imgs/info.png" class="tooltip"
+                                                 data-tooltip-content="#tooltip_comments"/></div>
+        <div class="controls">
+            <div class="filter" id="all"></div>
+            <div class="filter active" id="verified">
+            </div>
+        </div>
+        <ul class="tiles" id="comments_info"></ul>
+        <div class="more">
+            <div>More Comments...</div>
+        </div>
+        <div class="section_title">THUMBNAILS <img src="imgs/info.png" class="tooltip"
+                                                   data-tooltip-content="#tooltip_thumbnails"/></div>
+        <ul class="tiles" id="thumb_info"></ul>
+        <div class="section_title">WEATHER CONTEXT <img src="imgs/info.png" class="tooltip"
+                                                        data-tooltip-content="#tooltip_weather"/></div>
+        <div id="weather">
+            <div id="weather_input">
+                <div id="location">
+                    <div class="weather_title">Location:</div>
+                    <input id="location_input" type="text" placeholder="Enter a location">
+
+                    <div id="locations">
+                        <p class="location_title">Possible Values:</p>
+                    </div>
+                    <div id="loc_error">No details available for input: <span style="color:black"></span></div>
+                </div>
+                <div style="display: inline-block">
+                    <div class="weather_title">Date:<span>Exact time
+                 <div class="exact_time">
+                     <input type="checkbox" value="None" id="exact_time" name="check"/>
+                     <label for="exact_time"></label>
+                 </div>
+
+                </span></div>
+                    <input id="date_input" type="text" placeholder="Select date">
+                    <input id="time_input" type="text" placeholder="Select time">
+
+                    <div id="times">
+                        <p class="location_title">Possible Values:</p>
+                    </div>
+                </div>
+                <br><br>
+                <button type="button" onclick="get_weather();return false;" class="btn disable_btn" id="weather_btn">
+                    SET
+                </button>
+                <div id="weather_error"></div>
+                <div class="container_loading_relative" id="loading_weather">
+                    <div class="circle" style="margin-left: 90px;"></div>
+                    <p>Loading weather context...</p>
+                </div>
+            </div>
+            <article class="widget">
+                <div class="weatherIcon"></div>
+                <div class="weatherData">
+                    <h2 class="description"></h2>
+
+                    <h3 class="precip"></h3>
+                    <ul class="weather_statistics statistics">
+                        <li style="height: 40px">
+                            <div class="number" id="visibility"></div>
+                            <div class="title">Visibility<img src="imgs/info.png" class="tooltip"
+                                                              data-tooltip-content="#tooltip_visibility"/></div>
+                        </li>
+                        <li style="height: 40px">
+                            <div class="number" id="cloud"></div>
+                            <div class="title">Cloud Cover<img src="imgs/info.png" class="tooltip"
+                                                               data-tooltip-content="#tooltip_cloud_cover"/></div>
+                        </li>
+                        <li style="height: 40px;border-right: 0">
+                            <div class="number" id="wind"></div>
+                            <div class="title">Wind Speed<img src="imgs/info.png" class="tooltip"
+                                                              data-tooltip-content="#tooltip_wind_speed"/></div>
+                        </li>
+                    </ul>
+                    <p class="powered"><a href="https://darksky.net/forecast/40.6403,22.9439/si24/en" target="_blank">Powered
+                        by Dark Sky</a></p>
+                </div>
+                <div class="date">
+                    <h4 class="month" id="month"></h4>
+                    <h5 class="day" id="day"></h5>
+                </div>
+            </article>
+
+        </div>
+    </div>
+    <div style="position: relative">
+        <div class="container_loading" id="loading_timeline">
+            <div class="circle"></div>
+            <p>Loading twitter context...</p>
+        </div>
+        <div id="cover_timeline"></div>
+        <div class="section_title">TWITTER CONTEXT <img src="imgs/info.png" class="tooltip"
+                                                        data-tooltip-content="#tooltip_twitter"/></div>
+        <div id="timeline">
+            <div id="visualization">
+                <div class="box-pad-header"><span>Timeline of Tweets <img src="imgs/info.png" class="tooltip"
+                                                                          data-tooltip-content="#tooltip_timeline"/></span>
+                </div>
+                <div id="navigation">
+                    <img src="imgs/arrow-left.png" id="left_arrow" class="arrow">
+                    <img src="imgs/arrow-left.png" id="right_arrow" class="arrow"><br>
+                    <img src="imgs/add.png" id="plus" class="zoom">
+                    <img src="imgs/minus.png" id="minus" class="zoom">
+
+                    <p>Reset</p>
+                </div>
+                <div id="ff-search">
+                    <img class="icon-search" src="imgs/search-12.png" alt="search-icon">
+                    <input id="query" name="q" type="text" size="40" placeholder="Search..." autocomplete="off"><br>
+
+                    <p class="icon-clear">Clear search<img src="imgs/close-black.png" alt="close-icon"></p>
+                </div>
+                <div class="container">
+                    <section>
+                        <div class="tweets_bar">
+                            <div class="verticalLine"><span>50%</span></div>
+                            <div id="fake_tweet_bar" class="features"><span
+                                    class="featuresArea">Total tweets: <span id="total_tweets">0</span></span></div>
+                            <span id="fake_tweets"><p class="circle_red"></p><span
+                                    class="tweet_title">Unreliable tweets: <span
+                                    id="fake_tweets_num">0 (0%)</span></span></span>
+                            <span id="real_tweets"><p class="circle_green"></p><span
+                                    class="tweet_title">Reliable tweets: <span
+                                    id="real_tweets_num">0 (0%)</span></span></span>
+                        </div>
+                    </section>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="container_loading" id="loading_all">
+    <div class="circle"></div>
+    <p>Loading results...</p>
+</div>
+<div id="empty">This video cannot be found!</div>
+<div class="tooltip_templates">
+    <span id="tooltip_wind_speed">
+        <p>Wind speed is caused by air moving from high pressure to low pressure, usually due to changes in
+            temperature.</p>
+        <p style="font-weight: bold;margin: 5px 0">Beaufort: <span id="beaufort_num"></span></p>
+        <a href="https://en.wikipedia.org/wiki/Beaufort_scale" target="_blank">More</a>
+    </span>
+    <span id="tooltip_cloud_cover">
+        <p style="margin-bottom: 5px">Cloud cover values only vary by 0.03 from year to year, whereas the local, day to
+            day variability in cloud
+            amount typically rises to 0.3 over the globe. Most data sets agree on the fact that the land is covered by
+            0.10-0.15 less cloud than the oceans</p>
+        <a href="https://en.wikipedia.org/wiki/Cloud_cover" target="_blank">More</a>
+    </span>
+    <span id="tooltip_visibility">
+        <p style="margin-bottom: 5px"> The international definition of fog is a visibility of less than 1 kilometre
+            (3,300 ft); mist is a
+            visibility of between 1 kilometre (0.62 mi) and 2 kilometres (1.2 mi) and haze from 2 kilometres (1.2 mi) to
+            5 kilometres (3.1 mi). Visibility of less than 100 metres (330 ft) is usually reported as zero</p>
+        <a href="https://en.wikipedia.org/wiki/Visibility" target="_blank">More</a>
+    </span>
+    <span id="tooltip_general">
+        <p> General information about the video and the channel it was uploaded, extracted from its YouTube context. For
+            values that are not provided, the corresponding fields are left blank.<br> <b>NOTE:</b> Video Upload Time is
+            in
+            GMT.</p>
+    </span>
+    <span id="tooltip_comments">
+        <p> User comments for the video. User name and date/time are provided. "Verification" tweets are those that
+            include verification-related keywords (e.g. "Fake", "real" etc).</p>
+    </span>
+    <span id="tooltip_thumbnails">
+        <p> Thumbnails from various times in the video, as produced by YouTube. Click the "Reverse image search" link to
+            run an image-based search through Google.</p>
+    </span>
+    <span id="tooltip_weather">
+        <p> Weather information, provided by <a href="https://darksky.net/" style=" color: #AF0E09;font-weight: bold;"
+                                                target="_blank">Dark
+            Sky</a>. You can contrast the historical weather
+            data for the time the video was supposedly shot, to the weather displayed in the video. Suggested location
+            names and date-times are extracted from the contextual information, but if these values are not correct, you
+            can manually provide your own. If the exact time is not given, you can use the coarser, daily
+            information.</p>
+    </span>
+    <span id="tooltip_twitter">
+        <p> Provides information on twitter traffic around the video, and aggregate verification information on any
+            Tweets sharing the video, calculated using CERTH's <a href="http://reveal-mklab.iti.gr/reveal/fake/"
+                                                                  style=" color: #AF0E09;font-weight: bold;"
+                                                                  target="_blank">Tweet Verification Assistant</a>.</p>
+    </span>
+    <span id="tooltip_timeline">
+        <p> This is an interactive visualization of all Tweets sharing the video. Click on any one Tweet to see the
+            original post.</p>
+    </span>
+    <span id="tooltip_statistics">
+        <p> Statistics of the credibility scores of Tweets sharing the video.</p>
+    </span>
+</div>
+<!-- JS -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+<script src="js/jquery.imagesloaded.js"></script>
+<script src="js/jquery.wookmark.js"></script>
+<script src="js/main_timeline.js"></script>
+<script src="js/main.js"></script>
+<script src="js/datepicker.js"></script>
+<script src="js/timepicker.js"></script>
+<script src="js/ajax_abort.js"></script>
+<script src="js/jquery.reveal.js"></script>
+<script src="js/vis.js"></script>
+<script src="https://platform.twitter.com/widgets.js"></script>
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDOOPffhARnRWiCM2TyhJbHkmbDbpxrWec&libraries=places&callback=initMap"
+        async defer></script>
+<script src="js/tooltipster.bundle.js"></script>
+<!-- Piwik -->
+<script type="text/javascript">
+    var _paq = _paq || [];
+    /* tracker methods like "setCustomDimension" should be called before "trackPageView" */
+    _paq.push(["setCookieDomain", "*.caa.iti.gr"]);
+    _paq.push(['trackPageView']);
+    _paq.push(['enableLinkTracking']);
+    (function () {
+        var u = "//160.40.51.26/projects/piwik/";
+        _paq.push(['setTrackerUrl', u + 'piwik.php']);
+        _paq.push(['setSiteId', '3']);
+        var d = document, g = d.createElement('script'), s = d.getElementsByTagName('script')[0];
+        g.type = 'text/javascript';
+        g.async = true;
+        g.defer = true;
+        g.src = u + 'piwik.js';
+        s.parentNode.insertBefore(g, s);
+    })();
+</script>
+<noscript><p><img src="//160.40.51.26/projects/piwik/piwik.php?idsite=3&rec=1" style="border:0;" alt=""/></p></noscript>
+<!-- End Piwik Code -->
+
+</body>
+
+</html>
