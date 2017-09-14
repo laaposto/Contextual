@@ -1,5 +1,37 @@
 var video_verify = gup('video');
+var arabic = /[\u0600-\u06FF]/;
 $(function () {
+    $('.tab ul.tabs li a').click(function (g) {
+        var tab = $(this).closest('.tab'),
+            index = $(this).closest('li').index();
+
+        tab.find('ul.tabs > li').removeClass('current');
+        $(this).closest('li').addClass('current');
+
+        tab.find('.tab_content').find('div.tabs_item').not('div.tabs_item:eq(' + index + ')').stop().slideUp();
+        tab.find('.tab_content').find('div.tabs_item:eq(' + index + ')').stop().slideDown();
+
+
+        $('html, body').animate({
+            scrollTop: $(".section_title").eq($(this).parent().index()).offset().top
+        }, 1500);
+
+        g.preventDefault();
+    });
+    //Check to see if the window is top if not then display button
+    $(window).scroll(function () {
+        if ($(this).scrollTop() > 100) {
+            $('.scrollToTop').fadeIn();
+        } else {
+            $('.scrollToTop').fadeOut();
+        }
+    });
+
+    //Click event to scroll to top
+    $('.scrollToTop').click(function () {
+        $('html, body').animate({scrollTop: 0}, 800);
+        return false;
+    });
     var options_thumbs = {
         autoResize: true,
         container: $('#video_examples'),
@@ -9,7 +41,7 @@ $(function () {
     };
     $('#video_examples').find('.video').wookmark(options_thumbs);
 
-    var options_thumbs = {
+    options_thumbs = {
         autoResize: true,
         container: $('#video_examples_facebook'),
         offset: 15,
@@ -20,7 +52,7 @@ $(function () {
 
     $('.video').show();
     var count = 1;
-    $("#table_video").on("click", "#imgtab", function () {
+    $("#video_fb_table").on("click", "#imgtab", function () {
         var $this = $(this);
         $this.removeClass('small, large', 400);
         $this.addClass((count == 1) ? 'large' : 'small', 400);
@@ -28,15 +60,14 @@ $(function () {
     });
 });
 
-
 if (video_verify !== "") {
-    $('#video_examples,.desc_p,hr,.title_example').remove();
+    $('#video_examples,#video_examples_facebook,.desc_p,hr,.title_example').remove();
     $("#video_verify").val(video_verify);
     $('.back,.section_title,#loading_all,#cover,.tab').show();
     if (video_verify.indexOf('facebook.com') > -1) {
         var iframe_url = "https://www.facebook.com/v2.3/plugins/video.php?allowfullscreen=true&autoplay=false&container_width=360&height=305&href=" + video_verify + "&locale=en_US&sdk=joey";
         $('#iframe').attr('src', iframe_url);
-        $('#cover_timeline,#loading_timeline,#container > div:last-child,.tabs li:last-child,.twitter_p').remove();
+        $('.twitter_p').remove();
         $('.table_title').eq(1).text("USER");
         start_video_calls_facebook();
     }
@@ -47,15 +78,15 @@ if (video_verify !== "") {
     }
 }
 else {
-    $('#video_examples,.desc_p,#video_examples_facebook').show();
+    $('#video_examples,.desc_p,#video_examples_facebook,hr,.title_example').show();
 }
-function detect_video_drop(evt) {
+
+function detect_video_drop(evt) {alert("DAS");
     evt.stopPropagation();
     evt.preventDefault();
     video_verify = evt.dataTransfer.getData('text');
-    console.log(evt.dataTransfer.getData('text/html'));
     if (video_verify.length < 300) {
-        //window.location.href = 'http://' + window.location.hostname + ':' + window.location.port + window.location.pathname + '?video=' + video_verify;
+        window.location.href = 'http://' + window.location.hostname + ':' + window.location.port + window.location.pathname + '?video=' + video_verify;
     } else {
         $('#myModal h1').html("Oops! Something went wrong");
         $('#myModal p').html("The provived video URL is <b>" + video_verify.length + "</b> characters long<br/>We can not handle such big URL");
@@ -67,17 +98,19 @@ function verify_video_text() {
         window.location.href = 'http://' + window.location.hostname + ':' + window.location.port + window.location.pathname + '?video=' + $("#video_verify").val();
     }
 }
+
 $("#video_verify").keyup(function (e) {
     if (e.keyCode === 13) {
         verify_video_text();
     }
 });
+
 var global_json;
 var verification_comments = [];
 function start_video_calls_youtube() {
     $.ajax({
         type: 'GET',
-        url: 'http://caa.iti.gr:8090/verify_video?source=youtube&id=' + youtube_parser(video_verify),
+        url: 'http://caa.iti.gr:8008/verify_videoV2?url=' + video_verify,
         dataType: 'text',
         async: true
     });
@@ -90,19 +123,24 @@ function start_video_calls_youtube() {
 function start_video_calls_facebook() {
     $.ajax({
         type: 'GET',
-        url: 'http://caa.iti.gr:8090/verify_video?source=facebook&id=' + facebook_parser(video_verify),
+        url: 'http://caa.iti.gr:8008/verify_videoV2?url=' + video_verify,
         dataType: 'text',
         async: true
     });
     setTimeout(function () {
         load_facebook();
+        load_twitter();
     }, 1000);
 
 }
-$("#table_channel,#thumb_info,#table_video").on("click", ".link", function () {
+
+$("#channel_yt_table,#thumb_info,#user_fb_table").on("click", ".link", function () {
     window.open($(this).attr('data-url'), '_blank');
 });
-
+$("#user_fb_table").on("click", ".link button", function (e) {
+    e.stopPropagation();
+    window.open($(this).attr('data-url'), '_blank');
+});
 function gup(name) {
     name = name.replace(/[\[]/, "\\\[").replace(/[\]]/, "\\\]");
     var regexS = "[\\?&]" + name + "=([^&#]*)";
@@ -125,53 +163,51 @@ function facebook_parser(url) {
     return url.match(/([^\/]*)\/*$/)[1];
 }
 
-function nFormatter(num) {
-    if (num >= 1000000) {
-        return (num / 1000000).toFixed(0).replace(/\.0$/, '') + 'M';
-    }
-    if (num >= 1000) {
-        return (num / 1000).toFixed(0).replace(/\.0$/, '') + 'K';
-    }
-    return num;
-}
 $('.twitter_p').click(function () {
     window.open($(this).attr('data-url'), '_blank');
 });
 
-
-var all, num_comments;
-function comments(empty) {
+var all;
+function comments() {
     var $tiles_comments = $('#comments_info');
     var verified;
-    if (empty) {
-        $tiles_comments.empty();
-        all = 0;
-        num_comments = 10;
-    }
+    all = parseInt($('#comments_info .ca-item').last().attr('data-index')) + 1 || 0;
     for (all, verified = 0; ((all < global_json.video_comments.length) && (verified < 10)); all++) {
         var time = global_json.video_publishedAt_comments[all];
-         var format_time = time.substring(8, 10) + '/' + time.substring(5, 7) + '/' + time.substring(0, 4) + ', ' + time.substring(12, 14) + ':' + time.substring(15, 17);
+        var format_time = time.substring(8, 10) + '/' + time.substring(5, 7) + '/' + time.substring(0, 4) + ', ' + time.substring(12, 14) + ':' + time.substring(15, 17);
 
         if ($.inArray(global_json.video_comments[all], verification_comments) !== -1) {
 
             var src_str = global_json.video_comments[all];
-            var term = "fake";
-            term = term.replace(/(\s+)/, "(<[^>]+>)*$1(<[^>]+>)*");
-            var pattern = new RegExp("(" + term + ")", "gi");
-
-            src_str = src_str.replace(pattern, "<span class='highlight'>$1</span>");
-            src_str = src_str.replace(/(<mark>[^<>]*)((<[^>]+>)+)([^<>]*<\/mark>)/, "$1</span>$2<span>$4");
-
-            $tiles_comments.append('<div class="ca-item verified" ><div class="ca-item-main" style="background-color: #8AA399"><span class="value">' + src_str + '</span><p class="user_comment"><span style="font-weight: normal;font-size: 12px">by  </span><a href="' + global_json.video_author_url_comments[all] + '" target="_blank">' + global_json.video_author_comments[all] + '</a></p><p class="time_comment">' + format_time + '</p></div></div>');
+            var fake_terms = " fake , lies , fake , wrong , lie , confirm , where , location , lying , false , incorrect , misleading , propaganda , liar , mensonges , faux , errone , mensonge , confirme , lieu , mentir , faux , inexact , trompeur , propagande , menteur , mentiras , falso , incorrecto , mentira , confirmado , donde , lugar , mitiendo , falso , incorrecto , enganoso , propaganda , mentiroso , \u03C8\u03AD\u03BC\u03B1\u03C4\u03B1 , \u03C8\u03B5\u03CD\u03C4\u03B9\u03BA\u03BF , \u03BB\u03AC\u03B8\u03BF\u03C2 , \u03C8\u03AD\u03BC\u03B1 , \u03B5\u03C0\u03B9\u03B2\u03B5\u03B2\u03B1\u03B9\u03CE\u03BD\u03C9 , \u03C0\u03BF\u03C5 , \u03C4\u03BF\u03C0\u03BF\u03B8\u03B5\u03C3\u03AF\u03B1 , \u03C8\u03B5\u03C5\u03B4\u03AE\u03C2 , \u03B5\u03C3\u03C6\u03B1\u03BB\u03BC\u03AD\u03BD\u03BF , \u03BB\u03B1\u03BD\u03B8\u03B1\u03C3\u03BC\u03AD\u03BD\u03BF , \u03C0\u03B1\u03C1\u03B1\u03C0\u03BB\u03B1\u03BD\u03B7\u03C4\u03B9\u03BA\u03CC , \u03C0\u03C1\u03BF\u03C0\u03B1\u03B3\u03AC\u03BD\u03B4\u03B1 , \u03C8\u03B5\u03CD\u03C4\u03B7\u03C2 , \u0623\u0643\u0627\u0630\u064A\u0628 , \u0623\u0643\u0627\u0630\u064A\u0628 , \u063A\u0644\u0637\u0627\u0646 , \u0623\u0643\u0630\u0648\u0628\u0629\u060C \u0643\u0630\u0628 , \u0645\u0624\u0643\u062F , \u0623\u064A\u0646 , \u0645\u0643\u0627\u0646 , \u0643\u0630\u0628 , \u062E\u0627\u0637\u0626 , \u063A\u064A\u0631 \u0635\u062D\u064A\u062D , \u0645\u0636\u0644\u0644 , \u062F\u0639\u0627\u064A\u0629 , \u0643\u0627\u0630\u0628 , \u062F\u0631\u0648\u063A , \u062C\u0639\u0644\u06CC , \u0627\u0634\u062A\u0628\u0627\u0647 , \u062F\u0631\u0648\u063A , \u062A\u0623\u064A\u064A\u062F \u0634\u062F\u0647 , \u0643\u062C\u0627 , \u0645\u062D\u0644\u060C \u0645\u0643\u0627\u0646 , \u062F\u0631\u0648\u063A \u06AF\u0648 , \u063A\u0644\u0637\u060C \u0627\u0634\u062A\u0628\u0627\u0647\u060C \u062F\u0631\u0648\u063A\u06CC\u0646 , \u063A\u0644\u0637\u060C \u0627\u0634\u062A\u0628\u0627\u0647 , \u06AF\u0645\u0631\u0627\u0647 \u200C \u0643\u0646\u0646\u062F\u0647 , \u062A\u0628\u0644\u06CC\u063A\u0627\u062A \u0633\u06CC\u0627\u0633\u06CC\u060C \u067E\u0631\u0648\u067E\u0627\u06AF\u0627\u0646\u062F\u0627 , \u06A9\u0630\u0627\u0628".split(',');
+            var term;
+            var pattern;
+            for (var i = 0; i < fake_terms.length; i++) {
+                term = fake_terms[i].trim().replace(/(\s+)/, "(<[^>]+>)*$1(<[^>]+>)*");
+                pattern = new RegExp("(" + term + ")", "gi");
+                src_str = src_str.replace(pattern, "<span class='highlight'>$1</span>");
+                src_str = src_str.replace(/(<mark>[^<>]*)((<[^>]+>)+)([^<>]*<\/mark>)/, "$1</span>$2<span>$4");
+            }
+            if(arabic.test(src_str)){
+                $tiles_comments.append('<div data-index="' + all + '" class="ca-item verified" ><div class="ca-item-main" style="background-color: #8AA399"><span style="direction:rtl;text-align: right" class="value">' + src_str + '</span><p class="user_comment"><span style="font-weight: normal;font-size: 12px">by  </span><a href="' + global_json.video_author_url_comments[all] + '" target="_blank">' + global_json.video_author_comments[all] + '</a></p><p class="time_comment">' + format_time + '</p></div></div>');
+            }
+            else{
+                $tiles_comments.append('<div data-index="' + all + '" class="ca-item verified" ><div class="ca-item-main" style="background-color: #8AA399"><span class="value">' + src_str + '</span><p class="user_comment"><span style="font-weight: normal;font-size: 12px">by  </span><a href="' + global_json.video_author_url_comments[all] + '" target="_blank">' + global_json.video_author_comments[all] + '</a></p><p class="time_comment">' + format_time + '</p></div></div>');
+            }
             verified++;
         }
         else if ($('.filter.active').attr('id') === "all") {
-            $tiles_comments.append('<div class="ca-item no-verified" ><div class="ca-item-main"><span class="value">' + global_json.video_comments[all] + '</span><p class="user_comment"><span style="font-weight: normal;font-size: 12px">by  </span><a href="' + global_json.video_author_url_comments[all] + '" target="_blank">' + global_json.video_author_comments[all] + '</a></p><p class="time_comment">' + format_time + '</p></div></div>');
+            if(arabic.test(global_json.video_comments[all])){
+                $tiles_comments.append('<div data-index="' + all + '" class="ca-item no-verified" ><div class="ca-item-main"><span style="direction:rtl;text-align: right" class="value">' + global_json.video_comments[all] + '</span><p class="user_comment"><span style="font-weight: normal;font-size: 12px">by  </span><a href="' + global_json.video_author_url_comments[all] + '" target="_blank">' + global_json.video_author_comments[all] + '</a></p><p class="time_comment">' + format_time + '</p></div></div>');
+            }
+            else{
+                $tiles_comments.append('<div data-index="' + all + '" class="ca-item no-verified" ><div class="ca-item-main"><span class="value">' + global_json.video_comments[all] + '</span><p class="user_comment"><span style="font-weight: normal;font-size: 12px">by  </span><a href="' + global_json.video_author_url_comments[all] + '" target="_blank">' + global_json.video_author_comments[all] + '</a></p><p class="time_comment">' + format_time + '</p></div></div>');
+            }
             verified++;
         }
     }
     if ($('.filter.active').attr('id') === "all") {
-        if (num_comments < global_json.video_comments.length) {
+        if (global_json.video_comments.length > $('#comments_info .ca-item').length) {
             $('.more').show();
         }
         else {
@@ -179,7 +215,7 @@ function comments(empty) {
         }
     }
     else {
-        if (num_comments < verification_comments.length) {
+        if (verification_comments.length > $('#comments_info .ca-item').length) {
             $('.more').show();
         }
         else {
@@ -203,266 +239,432 @@ $('.filter').click(function () {
     if (!($(this).hasClass(('active')))) {
         $('.controls').find('.filter').removeClass('active');
         $(this).addClass('active');
-        comments(true);
+        $('#comments_info').empty();
+        comments();
     }
 });
-
 $('.more').click(function () {
-    num_comments += 10;
-    comments(false);
+    comments();
 });
+
 function verify_example(video_url) {
     window.location.href = 'http://' + window.location.hostname + ':' + window.location.port + window.location.pathname + '?video=' + video_url;
 }
 function load_youtube() {
-    $.ajax({
-        type: 'GET',
-        url: 'http://caa.iti.gr:8090/get_ytverification?id=' + youtube_parser(video_verify),
-        dataType: 'json',
-        success: function (json) {
-            $('#time_input').wickedpicker();
-            $('#date_input').datetimepicker({
-                timepicker: false,
-                mask: '31/12/2017',
-                format: 'd/m/Y',
-                maxDate: '+1970/01/01'
-            });
-            global_json = json;
-            var $table_video = $('#table_video');
-            var $table_channel = $('#table_channel');
-            var $tiles_thumbs = $('#thumb_info');
-            if (json.hasOwnProperty("message")) {
-                $('#empty').show();
-                $('#loading_all,#cover,#cover_info,#loading_info,#cover_timeline,#loading_timeline,.controls,.table,.table_title,#weather_input').remove();
-            }
-            else {
-                var empty_location = true;
-                if (json.video_recording_location_description !== "") {
-                    empty_location = false;
-                    if (json.video_description_mentioned_locations.length > 0) {
-                        $('#locations').append('<p class="location_name" data-name="' + json.video_recording_location_description + '"><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>' + json.video_recording_location_description + ',</p>')
-                    }
-                    else {
-                        $('#locations').append('<p class="location_name" data-name="' + json.video_recording_location_description + '"><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>' + json.video_recording_location_description + '</p>')
-
-                    }
-                }
-                for (var l = 0; l < json.video_description_mentioned_locations.length; l++) {
-                    empty_location = false;
-                    if (l === json.video_description_mentioned_locations.length - 1) {
-                        $('#locations').append('<p class="location_name" data-name="' + json.video_description_mentioned_locations[l] + '"><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>' + json.video_description_mentioned_locations[l] + '</p>')
-                    }
-                    else {
-                        $('#locations').append('<p class="location_name" data-name="' + json.video_description_mentioned_locations[l] + '"><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>' + json.video_description_mentioned_locations[l] + ',</p>')
-                    }
-                }
-                if (empty_location) {
-                    $('#locations').append('<p class="location_name" style="cursor: default">-</p>')
-                }
-
-                var empty_time = true;
-                if (json.video_upload_time !== "") {
-                    empty_time = false;
-                    var time = json.video_upload_time;
-                    var format_time = time.substring(8, 10) + '/' + time.substring(5, 7) + '/' + time.substring(0, 4) + ' ' + time.substring(12, 14) + ':' + time.substring(15, 17);
-                    if (json.video_recording_time !== "") {
-                        $('#times').append('<p class="location_name" data-time="' + format_time + '"><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>' + format_time + ',</p>')
-                    }
-                    else {
-                        $('#times').append('<p class="location_name" data-time="' + format_time + '"><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>' + format_time + '</p>')
-                    }
-                }
-                if (json.video_recording_time !== "") {
-                    empty_time = false;
-                    var time = json.video_recording_time;
-                    var format_time = time.substring(8, 10) + '/' + time.substring(5, 7) + '/' + time.substring(0, 4) + ' ' + time.substring(12, 14) + ':' + time.substring(15, 17);
-
-                    $('#times').append('<p class="location_name" data-time="' + format_time + '"><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>' + format_time + '</p>')
-                }
-                if (empty_time) {
-                    $('#times').append('<p class="location_name" style="cursor: default">-</p>')
-                }
-
-
-                $('#user_video').show();
-                $('.twitter_p').attr('data-url', json.twitter_search_url);
-                $table_video.append(' <tr><td>Video ID</td><td>' + json.video_id + '</td></tr>');
-                $table_video.append(' <tr><td>Video Title</td><td>' + json.video_title + '</td></tr>');
-                $table_video.append(' <tr><td>Video Description</td><td>' + json.video_description + '</td></tr>');
-                $table_video.append(' <tr><td>Video Description Mentioned Locations</td><td>' + json.video_description_mentioned_locations + '</td></tr>');
-                $table_video.append(' <tr><td>Video Upload Time</td><td>' + json.video_upload_time + ' (GMT)</td></tr>');
-                $table_video.append(' <tr><td>Video View Count</td><td>' + nFormatter(json.video_view_count) + '</td></tr>');
-                $table_video.append(' <tr><td>Video Like Count</td><td>' + nFormatter(json.video_like_count) + '</td></tr>');
-                $table_video.append(' <tr><td>Video Dislike Count</td><td>' + nFormatter(json.video_dislike_count) + '</td></tr>');
-                $table_video.append(' <tr><td>Video Comment Count</td><td>' + nFormatter(json.video_comment_count) + '</td></tr>');
-                $table_video.append(' <tr><td>Video Duration</td><td>' + json.video_duration + '</td></tr>');
-                $table_video.append(' <tr><td>Video Dimension</td><td>' + json.video_dimension + '</td></tr>');
-                $table_video.append(' <tr><td>Video Definition</td><td>' + json.video_definition + '</td></tr>');
-                $table_video.append(' <tr><td>Video Licensed Content</td><td>' + json.video_licensed_content + '</td></tr>');
-                $table_video.append(' <tr><td>Video Recording Location Description</td><td>' + json.video_recording_location_description + '</td></tr>');
-                $table_video.append(' <tr><td>Video Recording Time</td><td>' + json.video_recording_time + '</td></tr>');
-
-                $table_channel.append(' <tr><td>ID</td><td>' + json.channel_id + '</td></tr>');
-                $table_channel.append(' <tr><td>Description</td><td>' + json.channel_description + '</td></tr>');
-                $table_channel.append(' <tr><td>Description Mentioned Locations</td><td>' + json.channel_description_mentioned_locations + '</td></tr>');
-                $table_channel.append(' <tr><td>Created Time</td><td>' + json.channel_created_time + ' (GMT)</td></tr>');
-                $table_channel.append(' <tr><td>Location</td><td>' + json.channel_location + '</td></tr>');
-                $table_channel.append(' <tr><td>View Count</td><td>' + nFormatter(json.channel_view_count) + '</td></tr>');
-                $table_channel.append(' <tr><td>Comment Count</td><td>' + nFormatter(json.channel_comment_count) + '</td></tr>');
-                $table_channel.append(' <tr><td>Subscriber Count</td><td>' + nFormatter(json.channel_subscriber_count) + '</td></tr>');
-                $table_channel.append(' <tr><td>Video Count</td><td>' + nFormatter(json.channel_video_count) + '</td></tr>');
-                $table_channel.append(' <tr><td>Videos Per Month</td><td>' + nFormatter(json.channel_videos_per_month) + '</td></tr>');
-                $table_channel.append(' <tr><td>Url</td><td class="link" data-url="' + json.channel_url + '">' + json.channel_url + '<img src="imgs/link_icon.png"></td></tr>');
-                $table_channel.append(' <tr><td>About Page</td><td class="link" data-url="' + json.channel_about_page + '">' + json.channel_about_page + '<img src="imgs/link_icon.png"></td></tr>');
-
-                for (var i = 0; i < json.video_thumbnails.length; i++) {
-                    $tiles_thumbs.append('<div class="ca-item" style="width:230px"><div class="ca-item-main"><img src="' + json.video_thumbnails[i] + '" style="width: 230px;"><p class="link google" data-url="' + json.reverse_image_thumbnails_search_url[i] + '">Reverse image search<img src="imgs/link_icon.png"></p></div></div>');
-                }
-
-                $('#verified').html('VERIFICATION (' + json.num_verification_comments + ')');
-                $('#all').html('ALL (' + json.video_comments.length + ')');
-                verification_comments = [];
-                for (var k = 0; k < json.verification_comments.length; k++) {
-                    verification_comments.push(json.verification_comments[k]);
-                }
-                comments(true);
-                $tiles_thumbs.imagesLoaded(function () {
-                    var options_thumbs = {
-                        autoResize: true,
-                        container: $tiles_thumbs,
-                        offset: 15,
-                        itemWidth: 230,
-                        outerOffset: 0
-                    };
-                    $tiles_thumbs.find('.ca-item').wookmark(options_thumbs);
-                });
-                $('#loading_all,#cover,#cover_info,#loading_info').remove();
-                if (!($('.vis-timeline').length)) {
-                    $('#cover_timeline,#loading_timeline').show();
-                }
-                $('.controls,.table,.table_title,#weather_input').show();
-            }
-        },
-        error: function () {
-
-        },
-        async: true
+    var first_call = true;
+    $('#time_input').wickedpicker();
+    $('#date_input').datetimepicker({
+        timepicker: false,
+        mask: '31/12/2017',
+        format: 'd/m/Y',
+        maxDate: '+1970/01/01'
     });
+    var $tiles_thumbs = $('#thumb_info');
+    var interval_youtube = setInterval(function () {
+        $.ajax({
+            type: 'GET',
+            url:'http://caa.iti.gr:8008/get_verificationV2?url=' + video_verify,
+            dataType: 'json',
+            success: function (json) {
+                $('#alert_comments').stop().slideDown();
+                if (json.processing_status === "done") {
+                    clearInterval(interval_youtube);
+                    $('#alert_comments').stop().slideUp();
+                }
+                global_json = json;
+                if (json.hasOwnProperty("message")) {
+                    clearInterval(interval_youtube);
+                    $('#alert_comments').stop().slideUp();
+                    $('#empty').show();
+                    $('#loading_all,#cover,#cover_info,#loading_info,#cover_timeline,#loading_timeline,.controls,.table,.table_title,#weather_input').remove();
+                }
+                else {
+                    $('#locations .location_name').remove();
+                    var empty_location = true;
+                    if (json.video_recording_location_description !== "") {
+                        empty_location = false;
+                        if (json.video_description_mentioned_locations.length > 0) {
+                            $('#locations').append('<p class="location_name" data-name="' + json.video_recording_location_description + '"><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>' + json.video_recording_location_description + ',</p>')
+                        }
+                        else {
+                            $('#locations').append('<p class="location_name" data-name="' + json.video_recording_location_description + '"><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>' + json.video_recording_location_description + '</p>')
+                        }
+                    }
+                    for (var l = 0; l < json.video_description_mentioned_locations.length; l++) {
+                        empty_location = false;
+                        if (l === json.video_description_mentioned_locations.length - 1) {
+                            $('#locations').append('<p class="location_name" data-name="' + json.video_description_mentioned_locations[l].split('@')[0].slice(0, -1) + '"><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>' + json.video_description_mentioned_locations[l].split('@')[0].slice(0, -1) + '</p>')
+                        }
+                        else {
+                            $('#locations').append('<p class="location_name" data-name="' + json.video_description_mentioned_locations[l].split('@')[0].slice(0, -1) + '"><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>' + json.video_description_mentioned_locations[l].split('@')[0].slice(0, -1) + ',</p>')
+                        }
+                    }
+                    if (empty_location) {
+                        $('#locations').append('<p class="location_name" style="cursor: default">-</p>')
+                    }
+
+                    $('#times .location_name').remove();
+                    var empty_time = true;
+                    if (json.video_upload_time !== "") {
+                        empty_time = false;
+                        var time = json.video_upload_time;
+                        var format_time = time.substring(8, 10) + '/' + time.substring(5, 7) + '/' + time.substring(0, 4) + ' ' + time.substring(12, 14) + ':' + time.substring(15, 17);
+
+                        $('#times .location_title').after('<p class="location_name" data-time="' + format_time + '"><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>' + format_time + '</p>')
+                    }
+                    if (json.video_recording_time !== "") {
+                        empty_time = false;
+                        var time = json.video_recording_time;
+                        var format_time = time.substring(8, 10) + '/' + time.substring(5, 7) + '/' + time.substring(0, 4) + ' ' + time.substring(12, 14) + ':' + time.substring(15, 17);
+
+                        $('#times .location_title').after('<p class="location_name" data-time="' + format_time + '"><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>' + format_time + '</p>')
+                    }
+                    if (empty_time) {
+                        $('#times .location_title').after('<p class="location_name" style="cursor: default">-</p>')
+                    }
+
+                    $("[id^='tooltip_video_location_']").remove();
+                    $("[id^='tooltip_channel_location_']").remove();
+                    var video_locations = "", channel_locations = "";
+                    for (var v = 0; v < json.video_description_mentioned_locations.length; v++) {
+                        if (v === json.video_description_mentioned_locations.length - 1) {
+                            video_locations += "<span class='tooltip_location' data-tooltip-content='#tooltip_video_location_" + v + "'>" + json.video_description_mentioned_locations[v] + "</span>";
+                        }
+                        else {
+                            video_locations += "<span class='tooltip_location' data-tooltip-content='#tooltip_video_location_" + v + "'>" + json.video_description_mentioned_locations[v] + "</span>, ";
+                        }
+                        var highlight_video_location = json.video_description_mentioned_locations_sentence[v];
+                        var fake_terms_video_location = json.video_description_mentioned_locations_words[v].split(',').map(function (e) {
+                            return e.trim();
+                        });
+                        var term_video_location;
+                        var pattern_video_location;
+                        for (var f = 0; f < fake_terms_video_location.length; f++) {
+                            term_video_location = fake_terms_video_location[f].replace(/(\s+)/, "(<[^>]+>)*$1(<[^>]+>)*");
+                            pattern_video_location = new RegExp("(" + term_video_location + ")", "gi");
+                            highlight_video_location = highlight_video_location.replace(pattern_video_location, "<span class='highlight'>$1</span>");
+                            highlight_video_location = highlight_video_location.replace(/(<mark>[^<>]*)((<[^>]+>)+)([^<>]*<\/mark>)/, "$1</span>$2<span>$4");
+                        }
+                        $('.tooltip_templates').append('<span id="tooltip_video_location_' + v + '"><p>' + highlight_video_location + '</p></span>');
+                    }
+
+                    for (var c = 0; c < json.channel_description_mentioned_locations.length; c++) {
+                        if (c === json.channel_description_mentioned_locations.length - 1) {
+                            channel_locations += "<span class='tooltip_location' data-tooltip-content='#tooltip_channel_location_" + c + "'>" + json.channel_description_mentioned_locations[c] + "</span>";
+                        }
+                        else {
+                            channel_locations += "<span class='tooltip_location' data-tooltip-content='#tooltip_channel_location_" + c + "'>" + json.channel_description_mentioned_locations[c] + "</span>, ";
+                        }
+                        var highlight_channel_location = json.channel_description_mentioned_locations_sentence[c];
+                        var fake_terms_channel_location = json.channel_description_mentioned_locations_word[c].split(',').map(function (e) {
+                            return e.trim();
+                        });
+                        var term_channel_location;
+                        var pattern_channel_location;
+                        for (var f = 0; f < fake_terms_channel_location.length; f++) {
+                            term_channel_location = fake_terms_channel_location[f].replace(/(\s+)/, "(<[^>]+>)*$1(<[^>]+>)*");
+                            pattern_channel_location = new RegExp("(" + term_channel_location + ")", "gi");
+                            highlight_channel_location = highlight_channel_location.replace(pattern_channel_location, "<span class='highlight'>$1</span>");
+                            highlight_channel_location = highlight_channel_location.replace(/(<mark>[^<>]*)((<[^>]+>)+)([^<>]*<\/mark>)/, "$1</span>$2<span>$4");
+                        }
+                        $('.tooltip_templates').append('<span id="tooltip_channel_location_' + c + '"><p>' + highlight_channel_location + '</p></span>');
+                    }
+
+                    $('#user_video').show();
+                    $('.twitter_p').attr('data-url', json.twitter_search_url);
+
+                    $('#video_id').text(json.video_id);
+
+                    $('#video_title').text(json.video_title);
+                    if(arabic.test(json.video_title)){
+                        $('#video_title').css({'direction':'rtl','text-align':'right'});
+                    }
+
+                    $('#video_description').text(json.video_description);
+                    if(arabic.test(json.video_title)){
+                        $('#video_description').css({'direction':'rtl','text-align':'right'});
+                    }
+                    $('#video_locations').html(video_locations);
+                    $('#video_upload_time').text(json.video_upload_time);
+                    $('#video_view_count').text(json.video_view_count);
+                    $('#video_like_count').text(json.video_like_count);
+                    $('#video_dislike_count').text(json.video_dislike_count);
+                    $('#video_comment_count').text(json.video_comment_count);
+                    $('#video_duration').text(json.video_duration);
+                    $('#video_dimension').text(json.video_dimension);
+                    $('#video_definition').text(json.video_definition);
+                    $('#video_licensed_content').text(json.video_licensed_content);
+                    $('#video_recording_location_description').text(json.video_recording_location_description);
+                    $('#video_recording_time').text(json.video_recording_time);
+
+                    $('#channel_id').text(json.channel_id);
+                    $('#channel_description').text(json.channel_description);
+                    if(arabic.test(json.channel_description)){
+                        $('#channel_description').css({'direction':'rtl','text-align':'right'});
+                    }
+                    $('#channel_locations').html(channel_locations);
+                    $('#channel_created_time').text(json.channel_created_time);
+                    $('#channel_location').text(json.channel_location);
+                    $('#channel_view_count').text(json.channel_view_count);
+                    $('#channel_comment_count').text(json.channel_comment_count);
+                    $('#channel_subscriber_count').text(json.channel_subscriber_count);
+                    $('#channel_video_count').text(json.channel_video_count);
+                    $('#channel_videos_per_month').text(json.channel_videos_per_month);
+                    $('#channel_url').html(json.channel_url + '<img src="imgs/link_icon.png">').attr('data-url', json.channel_url);
+                    $('#channel_about_page').html(json.channel_about_page + '<img src="imgs/link_icon.png">').attr('data-url', json.channel_about_page);
+
+                    for (var i = $('#thumb_info .ca-item').length; i < json.video_thumbnails.length; i++) {
+                        $tiles_thumbs.append('<div class="ca-item" style="width:230px"><div class="ca-item-main"><img src="' + json.video_thumbnails[i] + '" style="width: 230px;"><p class="link google" data-url="' + json.reverse_image_thumbnails_search_url[i] + '">Reverse image search<img src="imgs/link_icon.png"></p></div></div>');
+                    }
+
+                    $tiles_thumbs.imagesLoaded(function () {
+                        var options_thumbs = {
+                            autoResize: true,
+                            container: $tiles_thumbs,
+                            offset: 15,
+                            itemWidth: 230,
+                            outerOffset: 0
+                        };
+                        $tiles_thumbs.find('.ca-item').wookmark(options_thumbs);
+                    });
+
+                    $('#verified').html('VERIFICATION (' + json.verification_comments.length + ')');
+                    $('#all').html('ALL (' + json.video_comments.length + ')');
+                    verification_comments = [];
+                    for (var k = 0; k < json.verification_comments.length; k++) {
+                        verification_comments.push(json.verification_comments[k]);
+                    }
+                    if ($('.filter.active').attr('id') === "all") {
+                        if (global_json.video_comments.length > $('#comments_info .ca-item').length) {
+                            $('.more').show();
+                        }
+                        else {
+                            $('.more').hide();
+                        }
+                    }
+                    else {
+                        if (verification_comments.length > $('#comments_info .ca-item').length) {
+                            $('.more').show();
+                        }
+                        else {
+                            $('.more').hide();
+                        }
+                    }
+                    if ((first_call) && (json.verification_comments.length > 0)) {
+                        comments();
+                        first_call = false
+                    }
+
+                    $('#loading_all,#cover,#cover_info,#loading_info').remove();
+                    if (!($('.vis-timeline').length)) {
+                        $('#cover_timeline,#loading_timeline').show();
+                    }
+                    $('.controls,.table_title,#weather_input,#channel_yt_table,#video_yt_table').show();
+                    $('.tooltip_location').tooltipster({theme: 'tooltipster-shadow'});
+                }
+            },
+            error: function (e) {
+                console.log(e);
+            },
+            async: true
+        });
+    }, 1000);
 }
 function load_facebook() {
-    $.ajax({
-        type: 'GET',
-        url: 'http://caa.iti.gr:8090/get_fbverification?id=' + facebook_parser(video_verify),
-        dataType: 'json',
-        success: function (json) {
-            $('#time_input').wickedpicker();
-            $('#date_input').datetimepicker({
-                timepicker: false,
-                mask: '31/12/2017',
-                format: 'd/m/Y',
-                maxDate: '+1970/01/01'
-            });
-            global_json = json;
-            var $table_video = $('#table_video');
-            var $table_channel = $('#table_channel');
-            var $tiles_thumbs = $('#thumb_info');
-            if (json.hasOwnProperty("message")) {
-                $('#empty').show();
-                $('#loading_all,#cover,#cover_info,#loading_info,.controls,.table,.table_title,#weather_input').remove();
-            }
-            else {
-                var empty_location = true;
-                if (json.from_location_city !== "") {
-                    empty_location = false;
-                    $('#locations').append('<p class="location_name" data-name="' + json.from_location_city + '"><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>' + json.from_location_city + '</p>')
-
+    var first_call = true;
+    $('#time_input').wickedpicker();
+    $('#date_input').datetimepicker({
+        timepicker: false,
+        mask: '31/12/2017',
+        format: 'd/m/Y',
+        maxDate: '+1970/01/01'
+    });
+    var $tiles_thumbs = $('#thumb_info');
+    var interval_facebook = setInterval(function () {
+        $.ajax({
+            type: 'GET',
+            url:'http://caa.iti.gr:8008/get_verificationV2?url=' + video_verify,
+            dataType: 'json',
+            success: function (json) {
+                $('#alert_comments').stop().slideDown();
+                global_json = json;
+                if (json.processing_status === "done") {
+                    clearInterval(interval_facebook);
+                    $('#alert_comments').stop().slideUp();
                 }
-                if (empty_location) {
-                    $('#locations').append('<p class="location_name" style="cursor: default">-</p>')
+                if (json.hasOwnProperty("message")) {
+                    clearInterval(interval_facebook);
+                    $('#alert_comments').stop().slideUp();
+                    $('#empty').show();
+                    $('#loading_all,#cover,#cover_info,#loading_info,.controls,.table,.table_title,#weather_input').remove();
                 }
+                else {
 
-                var empty_time = true;
-                if (json.created_time !== "") {
-                    empty_time = false;
-                    var time = json.created_time;
-                    var format_time = time.substring(8, 10) + '/' + time.substring(5, 7) + '/' + time.substring(0, 4) + ' ' + time.substring(12, 14) + ':' + time.substring(15, 17);
+                    $('#locations .location_name').remove();
+                    var empty_location = true;
+                    if (json.from_location_city !== "") {
+                        empty_location = false;
+                        if (json.video_description_mentioned_locations.length > 0) {
+                            $('#locations').append('<p class="location_name" data-name="' + json.from_location_city + '"><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>' + json.from_location_city + ',</p>')
+                        }
+                        else {
+                            $('#locations').append('<p class="location_name" data-name="' + json.from_location_city + '"><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>' + json.from_location_city + '</p>')
+                        }
+                    }
+                    for (var l = 0; l < json.video_description_mentioned_locations.length; l++) {
+                        empty_location = false;
+                        if (l === json.video_description_mentioned_locations.length - 1) {
+                            $('#locations').append('<p class="location_name" data-name="' + json.video_description_mentioned_locations[l].split('@')[0].slice(0, -1) + '"><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>' + json.video_description_mentioned_locations[l].split('@')[0].slice(0, -1) + '</p>')
+                        }
+                        else {
+                            $('#locations').append('<p class="location_name" data-name="' + json.video_description_mentioned_locations[l].split('@')[0].slice(0, -1) + '"><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>' + json.video_description_mentioned_locations[l].split('@')[0].slice(0, -1) + ',</p>')
+                        }
+                    }
+                    if (empty_location) {
+                        $('#locations').append('<p class="location_name" style="cursor: default">-</p>')
+                    }
+
+                    var empty_time = true;
+                    $('#times .location_name').remove();
+                    if (json.created_time !== "") {
+                        empty_time = false;
+                        var time = json.created_time;
+                        var format_time = time.substring(8, 10) + '/' + time.substring(5, 7) + '/' + time.substring(0, 4) + ' ' + time.substring(12, 14) + ':' + time.substring(15, 17);
+
+                        $('#times .location_title').after('<p class="location_name" data-time="' + format_time + '"><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>' + format_time + '</p>');
+
+                    }
                     if (json.updated_time !== "") {
-                        $('#times').append('<p class="location_name" data-time="' + format_time + '"><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>' + format_time + ',</p>'); //add ,
+                        empty_time = false;
+                        var time = json.updated_time;
+                        var format_time = time.substring(8, 10) + '/' + time.substring(5, 7) + '/' + time.substring(0, 4) + ' ' + time.substring(12, 14) + ':' + time.substring(15, 17);
+                        $('#times .location_title').after('<p class="location_name" data-time="' + format_time + '"><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>' + format_time + '</p>')
+                    }
+                    if (empty_time) {
+                        $('#times .location_title').after('<p class="location_name" style="cursor: default">-</p>')
+                    }
+
+
+                    var video_locations = "";
+                    $("[id^='tooltip_video_location_']").remove();
+                    for (var v = 0; v < json.video_description_mentioned_locations.length; v++) {
+                        if (v === json.video_description_mentioned_locations.length - 1) {
+                            video_locations += "<span class='tooltip_location' data-tooltip-content='#tooltip_video_location_" + v + "'>" + json.video_description_mentioned_locations[v] + "</span>";
+                        }
+                        else {
+                            video_locations += "<span class='tooltip_location' data-tooltip-content='#tooltip_video_location_" + v + "'>" + json.video_description_mentioned_locations[v] + "</span>, ";
+                        }
+                        var highlight_video_location = json.video_description_mentioned_locations_sentence[v];
+                        var fake_terms_video_location = json.video_description_mentioned_locations_words[v].split(',').map(function (e) {
+                            return e.trim();
+                        });
+                        var term_video_location;
+                        var pattern_video_location;
+                        for (var f = 0; f < fake_terms_video_location.length; f++) {
+                            term_video_location = fake_terms_video_location[f].replace(/(\s+)/, "(<[^>]+>)*$1(<[^>]+>)*");
+                            pattern_video_location = new RegExp("(" + term_video_location + ")", "gi");
+                            highlight_video_location = highlight_video_location.replace(pattern_video_location, "<span class='highlight'>$1</span>");
+                            highlight_video_location = highlight_video_location.replace(/(<mark>[^<>]*)((<[^>]+>)+)([^<>]*<\/mark>)/, "$1</span>$2<span>$4");
+                        }
+                        $('.tooltip_templates').append('<span id="tooltip_video_location_' + v + '"><p>' + highlight_video_location + '</p></span>');
+                    }
+
+                    $('#user_video').show();
+                    $('#fb_video_title').text(json.title);
+                    $('#fb_video_id').text(json.video_id);
+                    $('#fb_content_category').text(json.content_category);
+                    $('#fb_content_tags').text(json.content_tags);
+                    $('#fb_video_description').text(json.video_description);
+                    if(arabic.test(json.video_description)){
+                        $('#fb_video_description').css({'direction':'rtl','text-align':'right'});
+                    }
+                    $('#fb_video_locations').html(video_locations);
+                    $('#fb_created_time').text(json.created_time);
+                    $('#fb_updated_time').text(json.updated_time);
+                    $('#fb_total_comment_count').text(json.total_comment_count);
+                    $('#fb_embeddable').text(json.embeddable);
+                    $('#fb_length').text(json.length);
+                    $('#fb_picture').html('<img id="imgtab" class="small" src="' + json.picture + '">');
+                    $('#fb_privacy').text(json.privacy);
+
+                    $('#fb_source').text(json.from);
+                    $('#fb_about').text(json.from_about);
+                    $('#fb_category').text(json.from_category);
+                    $('#fb_fan_count').text(json.from_fan_count);
+                    $('#fb_link').html(json.from_link + '<img src="imgs/link_icon.png">').attr('class', 'link').attr('data-url', json.from_link);
+                    $('#fb_verified').text(json.from_is_verified);
+                    $('#fb_description').text(json.from_description);
+                    if(arabic.test(json.from_description)){
+                        $('#fb_description').css({'direction':'rtl','text-align':'right'});
+                    }
+                    $('#fb_city').text(json.from_location_city);
+                    $('#fb_country').text(json.from_location_country);
+                    if (json.from_website != "") {
+                        $('#fb_website').html(json.from_website + '<img src="imgs/link_icon.png"><button class="btn btn_small btn_whois" data-url="https://who.is/whois/' + json.from_website + '">Who/who.is</button>').attr('class', 'link').attr('data-url', json.from_website);
+                    }
+
+                    for (var i = $('#thumb_info .ca-item').length; i < json.video_thumbnails.length; i++) {
+                        $tiles_thumbs.append('<div class="ca-item" style="width:230px"><div class="ca-item-main"><img src="' + json.video_thumbnails[i] + '" style="width: 230px;"><p class="link google" data-url="' + json.reverse_image_thumbnails_search_url[i] + '">Reverse image search<img src="imgs/link_icon.png"></p></div></div>');
+                    }
+
+                    $tiles_thumbs.imagesLoaded(function () {
+                        var options_thumbs = {
+                            autoResize: true,
+                            container: $tiles_thumbs,
+                            offset: 15,
+                            itemWidth: 230,
+                            outerOffset: 0
+                        };
+                        $tiles_thumbs.find('.ca-item').wookmark(options_thumbs);
+                    });
+
+                    $('#verified').html('VERIFICATION (' + json.verification_comments.length + ')');
+                    $('#all').html('ALL (' + json.video_comments.length + ')');
+                    verification_comments = [];
+                    for (var k = 0; k < json.verification_comments.length; k++) {
+                        verification_comments.push(json.verification_comments[k]);
+                    }
+
+                    if ($('.filter.active').attr('id') === "all") {
+                        if (global_json.video_comments.length > $('#comments_info .ca-item').length) {
+                            $('.more').show();
+                        }
+                        else {
+                            $('.more').hide();
+                        }
                     }
                     else {
-                        $('#times').append('<p class="location_name" data-time="' + format_time + '"><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>' + format_time + '</p>');
+                        if (verification_comments.length > $('#comments_info .ca-item').length) {
+                            $('.more').show();
+                        }
+                        else {
+                            $('.more').hide();
+                        }
                     }
+                    if ((first_call) && (json.verification_comments.length > 0)) {
+                        comments();
+                        first_call = false
+                    }
+
+                    $('#loading_all,#cover,#cover_info,#loading_info').remove();
+                    if (!($('.vis-timeline').length)) {
+                        $('#cover_timeline,#loading_timeline').show();
+                    }
+                    $('.controls,.table_title,#weather_input,#video_fb_table,#user_fb_table').show();
+                    $('.tooltip_location').tooltipster({theme: 'tooltipster-shadow'});
                 }
-                if (json.updated_time !== "") {
-                    empty_time = false;
-                    var time = json.updated_time;
-                    var format_time = time.substring(8, 10) + '/' + time.substring(5, 7) + '/' + time.substring(0, 4) + ' ' + time.substring(12, 14) + ':' + time.substring(15, 17);
-                    $('#times').append('<p class="location_name" data-time="' + format_time + '"><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>' + format_time + '</p>')
-                }
-                if (empty_time) {
-                    $('#times').append('<p class="location_name" style="cursor: default">-</p>')
-                }
+            },
+            error: function () {
 
-                $('#user_video').show();
-                $table_video.append(' <tr><td>Video Title</td><td>' + json.title + '</td></tr>');
-                $table_video.append(' <tr><td>Video ID</td><td>' + json.video_id + '</td></tr>');
-                $table_video.append(' <tr><td>Video Content Category</td><td>' + json.content_category + '</td></tr>');
-                $table_video.append(' <tr><td>Video Content Tags</td><td>' + json.content_tags.join(", ") + '</td></tr>');
-                $table_video.append(' <tr><td>Video Desctiption</td><td>' + json.video_description + '</td></tr>');
-                $table_video.append(' <tr><td>Video Created Time</td><td>' + json.created_time + '</td></tr>');
-                $table_video.append(' <tr><td>Video Updated Time</td><td>' + json.updated_time + '</td></tr>');
-                $table_video.append(' <tr><td>Video Comments</td><td>' + json.total_comment_count + '</td></tr>');
-                $table_video.append(' <tr><td>Video Embeddable</td><td>' + json.embeddable + '</td></tr>');
-                $table_video.append(' <tr><td>Video Length</td><td>' + json.length + '</td></tr>');
-                $table_video.append(' <tr><td>Video Picture</td><td ><img id="imgtab" class="small" src="' + json.picture + '"></td></tr>');
-                $table_video.append(' <tr><td>Video Privacy</td><td>' + json.privacy + '</td></tr>');
+            },
+            async: true
+        });
+    }, 1000);
 
-                $table_channel.append(' <tr><td>Source</td><td>' + json.from + '</td></tr>');
-                $table_channel.append(' <tr><td>About</td><td>' + json.from_about + '</td></tr>');
-                $table_channel.append(' <tr><td>Category</td><td>' + json.from_category + '</td></tr>');
-                $table_channel.append(' <tr><td>Fan Count</td><td>' + json.from_fan_count + '</td></tr>');
-                $table_channel.append(' <tr><td>Link</td><td class="link" data-url="' + json.from_link + '">' + json.from_link + '<img src="imgs/link_icon.png"></td></tr>');
-                $table_channel.append(' <tr><td>Verified</td><td>' + json.from_is_verified + '</td></tr>');
-                $table_channel.append(' <tr><td>Description</td><td>' + json.description + '</td></tr>');
-                $table_channel.append(' <tr><td>City</td><td>' + json.from_location_city + '</td></tr>');
-                $table_channel.append(' <tr><td>Country</td><td>' + json.from_location_country + '</td></tr>');
-                $table_channel.append(' <tr><td>Website</td><td class="link" data-url="' + json.from_website + '">' + json.from_website + '<img src="imgs/link_icon.png"></td></tr>');
-
-
-                for (var i = 0; i < json.video_thumbnails.length; i++) {
-                    $tiles_thumbs.append('<div class="ca-item" style="width:230px"><div class="ca-item-main"><img src="' + json.video_thumbnails[i] + '" style="width: 230px;"><p class="link google" data-url="' + json.reverse_image_thumbnails_search_url[i] + '">Reverse image search<img src="imgs/link_icon.png"></p></div></div>');
-                }
-                $tiles_thumbs.imagesLoaded(function () {
-                    var options_thumbs = {
-                        autoResize: true,
-                        container: $tiles_thumbs,
-                        offset: 15,
-                        itemWidth: 230,
-                        outerOffset: 0
-                    };
-                    $tiles_thumbs.find('.ca-item').wookmark(options_thumbs);
-                });
-                $('#verified').html('VERIFICATION (' + json.num_verification_comments + ')');
-                $('#all').html('ALL (' + json.video_comments.length + ')');
-                verification_comments = [];
-                for (var k = 0; k < json.verification_comments.length; k++) {
-                    verification_comments.push(json.verification_comments[k]);
-                }
-                comments(true);
-
-                $('#loading_all,#cover,#cover_info,#loading_info').remove();
-                $('.controls,.table,.table_title,#weather_input').show();
-            }
-        },
-        error: function () {
-
-        },
-        async: true
-    });
 }
 function get_weather() {
     if (!($('#weather_btn').hasClass("disable_btn"))) {
-        $('#weather_error').slideUp();
+        $('#weather_error').stop().slideUp();
         var dateParts, dateObject, time, checked = false;
 
         if ($('#exact_time').is(":checked")) {
@@ -482,18 +684,18 @@ function get_weather() {
         }
         $.ajax({
             type: 'GET',
-            url: 'http://caa.iti.gr:8090/weather?time=' + time + '&location=' + $('#location_input').val(),
+            url: 'http://caa.iti.gr:8008/weatherV2?time=' + time + '&location=' + $('#location_input').val(),
             dataType: 'json',
             success: function (json) {
                 if (json.hasOwnProperty("message")) {
-                    $('#weather_error').html(json.message).slideDown();
+                    $('#weather_error').html(json.message).stop().slideDown();
                     $('.widget').hide().removeClass('widget_blur');
                 }
                 else {
                     var summary, visibility, preciptype, icon, cloud_cover, wind_speed, temp, min_temp, max_temp, day_indi;
                     if (checked) {
                         if (!(json.hourly.data_exist)) {
-                            $('#weather_error').html("No Weather Data for this Location/Timestamp").slideDown();
+                            $('#weather_error').html("No Weather Data for this Location/Timestamp").stop().slideDown();
                             $('.widget').hide().removeClass('widget_blur');
                         }
                         else {
@@ -563,7 +765,7 @@ function get_weather() {
                     }
                     else {
                         if (!(json.daily.data_exist)) {
-                            $('#weather_error').html("No Weather Data for this Location/Timestamp").slideDown();
+                            $('#weather_error').html("No Weather Data for this Location/Timestamp").stop().slideDown();
                             $('.widget').hide().removeClass('widget_blur');
                         }
                         else {
@@ -656,7 +858,7 @@ function initMap() {
             // User entered the name of a Place that was not suggested and
             // pressed the Enter key, or the Place Details request failed.
             $('#loc_error').find('span').html(place.name);
-            $('#loc_error').slideDown();
+            $('#loc_error').stop().slideDown();
             $('#location_input').val("");
             return;
         }
@@ -698,7 +900,7 @@ $('#exact_time').change(function () {
 
 });
 $('#location_input').change(function () {
-    $('#loc_error,#weather_error').slideUp();
+    $('#loc_error,#weather_error').stop().slideUp();
     if ($(this).val() !== "") {
         if ($('#exact_time').is(":checked")) {
             if (($('#date_input').val() !== "") && ($('#date_input').val() !== "__/__/____") && ($('#time_input').val() !== "") && ($('#time_input').val() !== "__:__")) {
@@ -744,7 +946,6 @@ $('#date_input').change(function () {
         $('#weather_btn').addClass('disable_btn');
     }
 });
-
 $('#time_input').change(function () {
     if (($(this).val() !== "") && ($(this).val() !== "__:__")) {
         if (($('#location_input').val() !== "") && ($('#date_input').val() !== "") && ($('#date_input').val() !== "__/__/____")) {
@@ -757,40 +958,6 @@ $('#time_input').change(function () {
     else {
         $('#weather_btn').addClass('disable_btn');
     }
-});
-
-$(function () {
-    $('.tab ul.tabs li a').click(function (g) {
-        var tab = $(this).closest('.tab'),
-            index = $(this).closest('li').index();
-
-        tab.find('ul.tabs > li').removeClass('current');
-        $(this).closest('li').addClass('current');
-
-        tab.find('.tab_content').find('div.tabs_item').not('div.tabs_item:eq(' + index + ')').slideUp();
-        tab.find('.tab_content').find('div.tabs_item:eq(' + index + ')').slideDown();
-
-
-        $('html, body').animate({
-            scrollTop: $(".section_title").eq($(this).parent().index()).offset().top
-        }, 1500);
-
-        g.preventDefault();
-    });
-    //Check to see if the window is top if not then display button
-    $(window).scroll(function () {
-        if ($(this).scrollTop() > 100) {
-            $('.scrollToTop').fadeIn();
-        } else {
-            $('.scrollToTop').fadeOut();
-        }
-    });
-
-    //Click event to scroll to top
-    $('.scrollToTop').click(function () {
-        $('html, body').animate({scrollTop: 0}, 800);
-        return false;
-    });
 });
 
 function capitalizeFirstLetter(string) {

@@ -36,10 +36,14 @@
 <div id="wrapper">
     <h1>Context Aggregation and Analysis</h1>
 
-    <p class="desc_title">This is a demo platform aimed to facilitate the verification of the content derived
-        exclusively from the YouTube and Facebook platforms. The demo focuses more on the video context rather than its
-        content. To test the service, simply copy and paste a YouTube or Facebook* URL into the box, then click
-        "Verify"</p>
+    <p class="desc_title">This is a demo platform aimed to facilitate
+        the verification of UGC video content posted on YouTube and Facebook. In
+        contrast to other approaches, which attempt to analyze the videos themselves
+        for traces of forgery, this platform analyzes the video context: The
+        characteristics of the poster, any relevant user comments, the local weather
+        reports at the time of the event, and other contextual pieces of information are
+        aggregated and presented to the user for analysis. To test the service, simply
+        copy and paste a YouTube or Facebook* URL into the box, then click &quot;Verify&quot;</p>
 
     <p class="note">*Right click on the Facebook video and copy the video URL</p>
 
@@ -63,16 +67,16 @@
 </div>
 <p class="desc_p">or have a look at some explanatory examples below</p>
 <hr>
-<h3 class="title_example">FACEBOOK</h3>
+<h3 class="title_example">FACEBOOK EXAMPLES</h3>
 <ul class="tiles" id="video_examples_facebook">
     <div class="video">
         <img src="imgs/facebook-placeholder.jpg">
         <iframe width="360" height="305" frameborder="0"
                 src="https://www.facebook.com/v2.3/plugins/video.php?allowfullscreen=true&autoplay=false&container_width=360&height=305&href=https://www.facebook.com/781769295231917/videos/1022349734507204/&locale=en_US&sdk=joey">
         </iframe>
-        <p class="video_desc">Snowboarder Girl Chased By Bear. The video has been edited by adding the bear in it.</p>
+        <p class="video_desc">A ball that retrieves itself! One of the greatest rugby inventions we have seen!</p>
         <button type="button"
-                onclick="verify_example('https://www.facebook.com/781769295231917/videos/1022349734507204/');return false;"
+                onclick="verify_example('https://www.facebook.com/RugbyHighlights/videos/1142035565882529/');return false;"
                 class="btn btn_small">
             Verify
         </button>
@@ -105,7 +109,7 @@
     </div>
 </ul>
 <hr>
-<h3 class="title_example">YOUTUBE</h3>
+<h3 class="title_example">YOUTUBE EXAMPLES</h3>
 
 <ul class="tiles" id="video_examples">
     <div class="video">
@@ -126,17 +130,6 @@
         <p class="video_desc">Video claiming to depict a Hezbollah sniper killing ISIS combatants. In truth, this is a
             gameplay video from the Medal of Honor game.</p>
         <button type="button" onclick="verify_example('https://www.youtube.com/watch?v=nkQ-ij3LTTM');return false;"
-                class="btn btn_small">
-            Verify
-        </button>
-    </div>
-    <div class="video">
-        <img src="imgs/youtube-placeholder.jpg">
-        <iframe width="360" height="305" frameborder="0" src="https://www.youtube.com/embed/65vcSu93MUE">
-        </iframe>
-        <p class="video_desc">The "Syrian boy" video claiming to depict a heroic act, was actually filmed in a
-            studio.</p>
-        <button type="button" onclick="verify_example('https://www.youtube.com/watch?v=65vcSu93MUE');return false;"
                 class="btn btn_small">
             Verify
         </button>
@@ -243,27 +236,255 @@
                                                                             data-tooltip-content="#tooltip_general"/>
         </div>
         <p class="table_title">VIDEO</p>
-        <table class="table">
+        <table class="table" id="video_yt_table">
             <thead>
             <tr>
                 <th>Name</th>
                 <th>Value</th>
             </tr>
             </thead>
-            <tbody id="table_video"></tbody>
+            <tbody>
+            <tr>
+                <td>Video ID</td>
+                <td id="video_id"></td>
+            </tr>
+            <tr>
+                <td>Video Title</td>
+                <td id="video_title"></td>
+            </tr>
+            <tr>
+                <td>Video Description</td>
+                <td id="video_description"></td>
+            </tr>
+            <tr>
+                <td>Video Description Mentioned Locations<p class="note" style="width: auto">*Hover to reveal retrieval
+                    process</p></td>
+                <td id="video_locations"></td>
+            </tr>
+            <tr>
+                <td>Video Upload Time</td>
+                <td id="video_upload_time"></td>
+            </tr>
+            <tr>
+                <td>Video View Count</td>
+                <td id="video_view_count"></td>
+            </tr>
+            <tr>
+                <td>Video Like Count</td>
+                <td id="video_like_count"></td>
+            </tr>
+            <tr>
+                <td>Video Dislike Count</td>
+                <td id="video_dislike_count"></td>
+            </tr>
+            <tr>
+                <td>Video Comment Count</td>
+                <td id="video_comment_count"></td>
+            </tr>
+            <tr>
+                <td>Video Duration</td>
+                <td id="video_duration"></td>
+            </tr>
+            <tr>
+                <td>Video Dimension</td>
+                <td id="video_dimension"></td>
+            </tr>
+            <tr>
+                <td>Video Definition</td>
+                <td id="video_definition"></td>
+            </tr>
+            <tr>
+                <td>Video Licensed Content</td>
+                <td id="video_licensed_content"></td>
+            </tr>
+            <tr>
+                <td>Video Recording Location Description</td>
+                <td id="video_recording_location_description"></td>
+            </tr>
+            <tr>
+                <td>Video Recording Time</td>
+                <td id="video_recording_time"></td>
+            </tr>
+            </tbody>
+        </table>
+        <table class="table" id="video_fb_table">
+            <thead>
+            <tr>
+                <th>Name</th>
+                <th>Value</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td>Video Title</td>
+                <td id="fb_video_title"></td>
+            </tr>
+            <tr>
+                <td>Video ID</td>
+                <td id="fb_video_id"></td>
+            </tr>
+            <tr>
+                <td>Video Content Category</td>
+                <td id="fb_content_category"></td>
+            </tr>
+            <tr>
+                <td>Video Content Tags</td>
+                <td id="fb_content_tags"></td>
+            </tr>
+            <tr>
+                <td>Video Desctiption</td>
+                <td id="fb_video_description"></td>
+            </tr>
+            <tr>
+                <td>Video Description Mentioned Locations<p class="note" style="width: auto">*Hover to reveal retrieval
+                    process</p></td>
+                <td id="fb_video_locations"></td>
+            </tr>
+            <tr>
+                <td>Video Created Time</td>
+                <td id="fb_created_time"></td>
+            </tr>
+            <tr>
+                <td>Video Updated Time</td>
+                <td id="fb_updated_time"></td>
+            </tr>
+            <tr>
+                <td>Video Comments</td>
+                <td id="fb_total_comment_count"></td>
+            </tr>
+            <tr>
+                <td>Video Embeddable</td>
+                <td id="fb_embeddable"></td>
+            </tr>
+            <tr>
+                <td>Video Length</td>
+                <td id="fb_length"></td>
+            </tr>
+            <tr>
+                <td>Video Picture</td>
+                <td id="fb_picture"></td>
+            </tr>
+            <tr>
+                <td>Video Privacy</td>
+                <td id="fb_privacy"></td>
+            </tr>
+            </tbody>
         </table>
         <p class="table_title">CHANNEL</p>
-        <table class="table">
+        <table class="table" id="channel_yt_table">
             <thead>
             <tr>
                 <th>Name</th>
                 <th>Value</th>
             </tr>
             </thead>
-            <tbody id="table_channel"></tbody>
+            <tbody>
+            <tr>
+                <td>ID</td>
+                <td id="channel_id"></td>
+            </tr>
+            <tr>
+                <td>Description</td>
+                <td id="channel_description"></td>
+            </tr>
+            <tr>
+                <td>Description Mentioned Locations<p class="note" style="width: auto">*Hover to reveal retrieval
+                    process</p></td>
+                <td id="channel_locations"></td>
+            </tr>
+            <tr>
+                <td>Created Time</td>
+                <td id="channel_created_time"></td>
+            </tr>
+            <tr>
+                <td>Location</td>
+                <td id="channel_location"></td>
+            </tr>
+            <tr>
+                <td>View Count</td>
+                <td id="channel_view_count"></td>
+            </tr>
+            <tr>
+                <td>Comment Count</td>
+                <td id="channel_comment_count"></td>
+            </tr>
+            <tr>
+                <td>Subscriber Count</td>
+                <td id="channel_subscriber_count"></td>
+            </tr>
+            <tr>
+                <td>Video Count</td>
+                <td id="channel_video_count"></td>
+            </tr>
+            <tr>
+                <td>Video Per Month</td>
+                <td id="channel_videos_per_month"></td>
+            </tr>
+            <tr>
+                <td>Url</td>
+                <td class="link" id="channel_url"></td>
+            </tr>
+            <tr>
+                <td>About Page</td>
+                <td class="link" id="channel_about_page"></td>
+            </tr>
+            </tbody>
+        </table>
+        <table class="table" id="user_fb_table">
+            <thead>
+            <tr>
+                <th>Name</th>
+                <th>Value</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td>Source</td>
+                <td id="fb_source"></td>
+            </tr>
+            <tr>
+                <td>About</td>
+                <td id="fb_about"></td>
+            </tr>
+            <tr>
+                <td>Category</td>
+                <td id="fb_category"></td>
+            </tr>
+            <tr>
+                <td>Fan Count</td>
+                <td id="fb_fan_count"></td>
+            </tr>
+            <tr>
+                <td>Link</td>
+                <td id="fb_link"></td>
+            </tr>
+            <tr>
+                <td>Verified</td>
+                <td id="fb_verified"></td>
+            </tr>
+            <tr>
+                <td>Description</td>
+                <td id="fb_description"></td>
+            </tr>
+            <tr>
+                <td>City</td>
+                <td id="fb_city"></td>
+            </tr>
+            <tr>
+                <td>Country</td>
+                <td id="fb_country"></td>
+            </tr>
+            <tr>
+                <td>Website</td>
+                <td id="fb_website"></td>
+            </tr>
+            </tbody>
         </table>
         <div class="section_title">COMMENTS <img src="imgs/info.png" class="tooltip"
                                                  data-tooltip-content="#tooltip_comments"/></div>
+        <div class="alert" id="alert_comments">
+            <strong>Info!</strong> Fetching more comments...
+        </div>
         <div class="controls">
             <div class="filter" id="all"></div>
             <div class="filter active" id="verified">
@@ -302,6 +523,8 @@
 
                     <div id="times">
                         <p class="location_title">Possible Values:</p>
+
+                        <p class="italic_text">All values are in UTC</p>
                     </div>
                 </div>
                 <br><br>
@@ -356,11 +579,13 @@
         <div id="cover_timeline"></div>
         <div class="section_title">TWITTER CONTEXT <img src="imgs/info.png" class="tooltip"
                                                         data-tooltip-content="#tooltip_twitter"/></div>
+        <div class="alert" id="alert_twitter">
+            <strong>Info!</strong> Fetching more tweets...<p class="note" style="width: auto">*Tweets may be added outside viewport. Click Reset to inspect full range. </p>
+        </div>
         <div id="timeline">
             <div id="visualization">
                 <div class="box-pad-header"><span>Timeline of Tweets <img src="imgs/info.png" class="tooltip"
-                                                                          data-tooltip-content="#tooltip_timeline"/></span>
-                </div>
+                                                                          data-tooltip-content="#tooltip_timeline"/></span> </div>
                 <div id="navigation">
                     <img src="imgs/arrow-left.png" id="left_arrow" class="arrow">
                     <img src="imgs/arrow-left.png" id="right_arrow" class="arrow"><br>
@@ -380,7 +605,9 @@
                         <div class="tweets_bar">
                             <div class="verticalLine"><span>50%</span></div>
                             <div id="fake_tweet_bar" class="features"><span
-                                    class="featuresArea">Total tweets: <span id="total_tweets">0</span></span></div>
+                                    class="featuresArea">Total tweets: <span id="total_tweets">0</span><img
+                                    src="imgs/info.png" class="tooltip"
+                                    data-tooltip-content="#tweet_bar"/></span></div>
                             <span id="fake_tweets"><p class="circle_red"></p><span
                                     class="tweet_title">Unreliable tweets: <span
                                     id="fake_tweets_num">0 (0%)</span></span></span>
@@ -427,12 +654,17 @@
             GMT.</p>
     </span>
     <span id="tooltip_comments">
-        <p> User comments for the video. User name and date/time are provided. "Verification" tweets are those that
-            include verification-related keywords (e.g. "Fake", "real" etc).</p>
+        <p> These are all the comments that appear under the
+            video. User name and date/time are provided. Comments are further filtered
+            into Verification-related comments based on the presence of verification-
+            related keywords, such as “fake”, “confirm”, or “location”.</p>
     </span>
     <span id="tooltip_thumbnails">
-        <p> Thumbnails from various times in the video, as produced by YouTube. Click the "Reverse image search" link to
-            run an image-based search through Google.</p>
+        <p> These thumbnails are produced automatically by
+            the video platform (YouTube or Facebook, respectively). There is a fixed
+            number of them, as decided by the platform, extracted by regular time
+            intervals through the video. Click the &quot;Reverse image search&quot; link to run an
+            image-based search through Google.</p>
     </span>
     <span id="tooltip_weather">
         <p> Weather information, provided by <a href="https://darksky.net/" style=" color: #AF0E09;font-weight: bold;"
@@ -440,8 +672,8 @@
             Sky</a>. You can contrast the historical weather
             data for the time the video was supposedly shot, to the weather displayed in the video. Suggested location
             names and date-times are extracted from the contextual information, but if these values are not correct, you
-            can manually provide your own. If the exact time is not given, you can use the coarser, daily
-            information.</p>
+            can manually provide your own. If a specific time is given, the service provides the weather at that time.
+            Otherwise, it provides an overall report for that day”.</p>
     </span>
     <span id="tooltip_twitter">
         <p> Provides information on twitter traffic around the video, and aggregate verification information on any
@@ -456,19 +688,28 @@
     <span id="tooltip_statistics">
         <p> Statistics of the credibility scores of Tweets sharing the video.</p>
     </span>
+    <span id="tweet_bar">
+        <p> We have developed a
+            machine learning algorithm for tweet verification, based on linguistic patterns
+            from the text and features from the user profile, and trained on a large
+            number of fake and real tweets. We apply the algorithm to all tweets sharing
+            the video and, depending on the number of such tweets that the algorithm
+            labels as “fake”, we can draw an overall conclusion on the probability that the
+            video itself contains false information.</p>
+    </span>
 </div>
 <!-- JS -->
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
-<script src="js/jquery.imagesloaded.js"></script>
-<script src="js/jquery.wookmark.js"></script>
 <script src="js/main_timeline.js"></script>
 <script src="js/main.js"></script>
+<script src="js/jquery.imagesloaded.js"></script>
+<script src="js/jquery.wookmark.js"></script>
 <script src="js/datepicker.js"></script>
 <script src="js/timepicker.js"></script>
-<script src="js/ajax_abort.js"></script>
 <script src="js/jquery.reveal.js"></script>
 <script src="js/vis.js"></script>
 <script src="https://platform.twitter.com/widgets.js"></script>
+
 <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDOOPffhARnRWiCM2TyhJbHkmbDbpxrWec&libraries=places&callback=initMap"
         async defer></script>
 <script src="js/tooltipster.bundle.js"></script>

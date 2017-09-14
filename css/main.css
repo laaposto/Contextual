@@ -90,6 +90,12 @@ body, html {
     background-color: rgb(229, 0, 0);
 }
 
+#fake_tweet_bar .tooltip {
+    margin-top: -14px;
+    float: left;
+    margin-left: 120px;
+}
+
 .tweet_title {
     margin-left: 13px;
     font-weight: bold
@@ -175,6 +181,13 @@ body, html {
     height: 30px;
     font-size: 15px;
     width: 80px;
+}
+
+.btn_whois {
+    width: 85px;
+    height: 24px;
+    font-size: 13px;
+    margin-left: 20px;
 }
 
 #container {
@@ -324,7 +337,6 @@ ul li {
 .highlight {
     font-weight: bold;
     background: rgba(211, 211, 211, 0.3);
-    padding: 0 3px;
 }
 
 .table {
@@ -385,6 +397,7 @@ ul li {
     text-align: left;
     display: none;
     margin: 5px auto 30px;
+    display: none;
 }
 
 .back {
@@ -400,6 +413,9 @@ ul li {
     text-decoration: none;
     color: #808080;
 }
+hr{
+    display: none;
+}
 
 .video {
     background: #A3A380;
@@ -409,6 +425,7 @@ ul li {
 .title_example {
     text-align: center;
     color: #888;
+    display: none;
 }
 
 .video_desc {
@@ -1514,7 +1531,7 @@ ul.weather_statistics li div.title {
 
 .tooltipster-content p {
     margin: 0;
-    width: 350px;
+    max-width: 350px;
 }
 
 .tooltipster-content a {
@@ -1652,6 +1669,33 @@ ul.weather_statistics li div.title {
 .bolded {
     color: #AF0E09;
     font-weight: bold;
+}
+
+.italic_text {
+    font-size: 12px;
+    color: #888;
+    font-style: italic;
+    margin: 0;
+    font-weight: bold;
+}
+
+.hovered span {
+    cursor: pointer;
+}
+
+.alert {
+    padding: 15px 35px 15px 15px;
+    border: 1px solid #bce8f1;
+    border-radius: 4px;
+    color: #31708f;
+    background-color: #d9edf7;
+    max-width: 250px;
+    margin: 0 auto;
+    display: none;
+}
+
+#video_yt_table, #video_fb_table, #channel_yt_table, #user_fb_table {
+    display: none;
 }
 
 @-webkit-keyframes pan {
