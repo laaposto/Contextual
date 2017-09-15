@@ -413,7 +413,8 @@ ul li {
     text-decoration: none;
     color: #808080;
 }
-hr{
+
+hr {
     display: none;
 }
 
@@ -712,14 +713,18 @@ iframe {
     color: white;
     padding-bottom: 0 !important;
     margin: 15px 0 0;
+    padding-left: 0;
 }
 
 ul.weather_statistics li {
     border-right: 1px solid #555;
+    display: inline-block;
+    padding: 18px;
 }
 
 ul.weather_statistics li div.number {
     text-align: center;
+    font-size: 26px;
 }
 
 ul.weather_statistics li div.title {
@@ -1521,12 +1526,19 @@ ul.weather_statistics li div.title {
 }
 
 .tooltip {
-    margin-left: 5px;
+    margin-left: 5px !important;
     width: 12px;
 }
 
 .tooltip_templates {
     display: none;
+}
+
+.tooltipster-content a {
+    display: block;
+    margin-top: 5px;
+    color: #AF0E09;
+    font-weight: bold;
 }
 
 .tooltipster-content p {

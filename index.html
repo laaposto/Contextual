@@ -294,7 +294,8 @@
                 <td id="video_definition"></td>
             </tr>
             <tr>
-                <td>Video Licensed Content</td>
+                <td>Video Licensed Content<img src="imgs/info_color.png" class="tooltip"
+                                               data-tooltip-content="#tooltip_licensed"/></td>
                 <td id="video_licensed_content"></td>
             </tr>
             <tr>
@@ -459,7 +460,8 @@
                 <td id="fb_link"></td>
             </tr>
             <tr>
-                <td>Verified</td>
+                <td>Verified <img src="imgs/info_color.png" class="tooltip"
+                                  data-tooltip-content="#tooltip_verified"/></td>
                 <td id="fb_verified"></td>
             </tr>
             <tr>
@@ -580,12 +582,14 @@
         <div class="section_title">TWITTER CONTEXT <img src="imgs/info.png" class="tooltip"
                                                         data-tooltip-content="#tooltip_twitter"/></div>
         <div class="alert" id="alert_twitter">
-            <strong>Info!</strong> Fetching more tweets...<p class="note" style="width: auto">*Tweets may be added outside viewport. Click Reset to inspect full range. </p>
+            <strong>Info!</strong> Fetching more tweets...<p class="note" style="width: auto">*Tweets may be added
+            outside viewport. Click Reset to inspect full range. </p>
         </div>
         <div id="timeline">
             <div id="visualization">
                 <div class="box-pad-header"><span>Timeline of Tweets <img src="imgs/info.png" class="tooltip"
-                                                                          data-tooltip-content="#tooltip_timeline"/></span> </div>
+                                                                          data-tooltip-content="#tooltip_timeline"/></span>
+                </div>
                 <div id="navigation">
                     <img src="imgs/arrow-left.png" id="left_arrow" class="arrow">
                     <img src="imgs/arrow-left.png" id="right_arrow" class="arrow"><br>
@@ -627,76 +631,95 @@
 </div>
 <div id="empty">This video cannot be found!</div>
 <div class="tooltip_templates">
-    <span id="tooltip_wind_speed">
-        <p>Wind speed is caused by air moving from high pressure to low pressure, usually due to changes in
-            temperature.</p>
-        <p style="font-weight: bold;margin: 5px 0">Beaufort: <span id="beaufort_num"></span></p>
+    <p id="tooltip_wind_speed">
+        Wind speed is caused by air moving from high pressure to low pressure, usually due to changes in
+        temperature.
+        <span style="font-weight: bold;margin: 5px 0;display: block">Beaufort: <span id="beaufort_num"></span></span>
         <a href="https://en.wikipedia.org/wiki/Beaufort_scale" target="_blank">More</a>
-    </span>
-    <span id="tooltip_cloud_cover">
-        <p style="margin-bottom: 5px">Cloud cover values only vary by 0.03 from year to year, whereas the local, day to
-            day variability in cloud
-            amount typically rises to 0.3 over the globe. Most data sets agree on the fact that the land is covered by
-            0.10-0.15 less cloud than the oceans</p>
+    </p>
+
+    <p id="tooltip_cloud_cover">
+        Cloud cover values only vary by 0.03 from year to year, whereas the local, day to
+        day variability in cloud
+        amount typically rises to 0.3 over the globe. Most data sets agree on the fact that the land is covered by
+        0.10-0.15 less cloud than the oceans
         <a href="https://en.wikipedia.org/wiki/Cloud_cover" target="_blank">More</a>
-    </span>
-    <span id="tooltip_visibility">
-        <p style="margin-bottom: 5px"> The international definition of fog is a visibility of less than 1 kilometre
-            (3,300 ft); mist is a
-            visibility of between 1 kilometre (0.62 mi) and 2 kilometres (1.2 mi) and haze from 2 kilometres (1.2 mi) to
-            5 kilometres (3.1 mi). Visibility of less than 100 metres (330 ft) is usually reported as zero</p>
+    </p>
+
+    <p id="tooltip_visibility">
+        The international definition of fog is a visibility of less than 1 kilometre
+        (3,300 ft); mist is a
+        visibility of between 1 kilometre (0.62 mi) and 2 kilometres (1.2 mi) and haze from 2 kilometres (1.2 mi) to
+        5 kilometres (3.1 mi). Visibility of less than 100 metres (330 ft) is usually reported as zero.
         <a href="https://en.wikipedia.org/wiki/Visibility" target="_blank">More</a>
-    </span>
-    <span id="tooltip_general">
-        <p> General information about the video and the channel it was uploaded, extracted from its YouTube context. For
-            values that are not provided, the corresponding fields are left blank.<br> <b>NOTE:</b> Video Upload Time is
-            in
-            GMT.</p>
-    </span>
-    <span id="tooltip_comments">
-        <p> These are all the comments that appear under the
-            video. User name and date/time are provided. Comments are further filtered
-            into Verification-related comments based on the presence of verification-
-            related keywords, such as “fake”, “confirm”, or “location”.</p>
-    </span>
-    <span id="tooltip_thumbnails">
-        <p> These thumbnails are produced automatically by
-            the video platform (YouTube or Facebook, respectively). There is a fixed
-            number of them, as decided by the platform, extracted by regular time
-            intervals through the video. Click the &quot;Reverse image search&quot; link to run an
-            image-based search through Google.</p>
-    </span>
-    <span id="tooltip_weather">
-        <p> Weather information, provided by <a href="https://darksky.net/" style=" color: #AF0E09;font-weight: bold;"
-                                                target="_blank">Dark
-            Sky</a>. You can contrast the historical weather
-            data for the time the video was supposedly shot, to the weather displayed in the video. Suggested location
-            names and date-times are extracted from the contextual information, but if these values are not correct, you
-            can manually provide your own. If a specific time is given, the service provides the weather at that time.
-            Otherwise, it provides an overall report for that day”.</p>
-    </span>
-    <span id="tooltip_twitter">
-        <p> Provides information on twitter traffic around the video, and aggregate verification information on any
-            Tweets sharing the video, calculated using CERTH's <a href="http://reveal-mklab.iti.gr/reveal/fake/"
-                                                                  style=" color: #AF0E09;font-weight: bold;"
-                                                                  target="_blank">Tweet Verification Assistant</a>.</p>
-    </span>
-    <span id="tooltip_timeline">
-        <p> This is an interactive visualization of all Tweets sharing the video. Click on any one Tweet to see the
-            original post.</p>
-    </span>
-    <span id="tooltip_statistics">
-        <p> Statistics of the credibility scores of Tweets sharing the video.</p>
-    </span>
-    <span id="tweet_bar">
-        <p> We have developed a
-            machine learning algorithm for tweet verification, based on linguistic patterns
-            from the text and features from the user profile, and trained on a large
-            number of fake and real tweets. We apply the algorithm to all tweets sharing
-            the video and, depending on the number of such tweets that the algorithm
-            labels as “fake”, we can draw an overall conclusion on the probability that the
-            video itself contains false information.</p>
-    </span>
+    </p>
+
+    <p id="tooltip_general">
+        General information about the video and the channel it was uploaded, extracted from its YouTube context. For
+        values that are not provided, the corresponding fields are left blank.<br> <b>NOTE:</b> Video Upload Time is
+        in
+        GMT.
+    </p>
+
+    <p id="tooltip_comments">
+        These are all the comments that appear under the
+        video. User name and date/time are provided. Comments are further filtered
+        into Verification-related comments based on the presence of verification-
+        related keywords, such as “fake”, “confirm”, or “location”.
+    </p>
+
+    <p id="tooltip_thumbnails">
+        These thumbnails are produced automatically by
+        the video platform (YouTube or Facebook, respectively). There is a fixed
+        number of them, as decided by the platform, extracted by regular time
+        intervals through the video. Click the &quot;Reverse image search&quot; link to run an
+        image-based search through Google.
+    </p>
+
+    <p id="tooltip_weather">
+        Weather information, provided by <a href="https://darksky.net/" style=" display: inline-block;margin: 0;"
+                                            target="_blank">Dark
+        Sky</a>. You can contrast the historical weather
+        data for the time the video was supposedly shot, to the weather displayed in the video. Suggested location
+        names and date-times are extracted from the contextual information, but if these values are not correct, you
+        can manually provide your own. If a specific time is given, the service provides the weather at that time.
+        Otherwise, it provides an overall report for that day”.
+    </p>
+
+    <p id="tooltip_twitter">
+        Provides information on twitter traffic around the video, and aggregate verification information on any
+        Tweets sharing the video, calculated using CERTH's <a href="http://reveal-mklab.iti.gr/reveal/fake/"
+                                                              target="_blank">Tweet Verification Assistant</a>
+    </p>
+
+    <p id="tooltip_timeline">
+        This is an interactive visualization of all Tweets sharing the video. Click on any one Tweet to see the
+        original post.
+    </p>
+
+    <p id="tooltip_statistics">
+        Statistics of the credibility scores of Tweets sharing the video.
+    </p>
+
+    <p id="tweet_bar">
+        We have developed a
+        machine learning algorithm for tweet verification, based on linguistic patterns
+        from the text and features from the user profile, and trained on a large
+        number of fake and real tweets. We apply the algorithm to all tweets sharing
+        the video and, depending on the number of such tweets that the algorithm
+        labels as “fake”, we can draw an overall conclusion on the probability that the
+        video itself contains false information.
+    </p>
+
+    <p id="tooltip_licensed">
+        Indicates whether the video represents licensed content, which means that the content was uploaded to a
+        channel linked to a YouTube content partner and then claimed by that partner.
+    </p>
+
+    <p id="tooltip_verified">
+        Pages with a large number of followers can be manually verified by Facebook as having an authentic
+        identity. This field indicates whether the page is verified by this process.
+    </p>
 </div>
 <!-- JS -->
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
