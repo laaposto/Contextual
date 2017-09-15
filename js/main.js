@@ -600,7 +600,7 @@ function load_facebook() {
                     $('#fb_city').text(json.from_location_city);
                     $('#fb_country').text(json.from_location_country);
                     if (json.from_website != "") {
-                        $('#fb_website').html(json.from_website + '<img src="imgs/link_icon.png"><button class="btn btn_small btn_whois" data-url="https://who.is/whois/' + json.from_website + '">Who/who.is</button>').attr('class', 'link').attr('data-url', json.from_website);
+                        $('#fb_website').html(json.from_website + '<img src="imgs/link_icon.png"><button class="btn btn_small btn_whois" data-url="https://who.is/whois/' + json.from_website.replace(/(^\w+:|^)\/\//, '') + '">Who/who.is</button>').attr('class', 'link').attr('data-url', json.from_website);
                     }
 
                     for (var i = $('#thumb_info .ca-item').length; i < json.video_thumbnails.length; i++) {
