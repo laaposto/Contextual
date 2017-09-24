@@ -1660,12 +1660,12 @@ ul.weather_statistics li div.title {
 }
 
 .note {
-    font-size: 12px;
-    color: #888;
+    font-size: 13px;
+    color: black;
     font-style: italic;
     text-align: left;
     width: 70%;
-    margin: 0 auto;
+    margin: 5px auto 0;
 }
 
 .small {
@@ -1700,8 +1700,9 @@ ul.weather_statistics li div.title {
     border: 1px solid #bce8f1;
     border-radius: 4px;
     color: #31708f;
+    font-size: 17px;
     background-color: #d9edf7;
-    max-width: 250px;
+    max-width: 350px;
     margin: 0 auto;
     display: none;
 }
