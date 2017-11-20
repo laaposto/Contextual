@@ -6,11 +6,6 @@ function load_twitter() {
             type: 'GET',
             url: 'http://caa.iti.gr:8008/get_twverificationV2?url=' + video_verify,
             success: function (json) {
-                $('#alert_twitter').slideDown();
-                if (json.processing_status === "done") {
-                    clearInterval(interval_twitter);
-                    $('#alert_twitter').slideUp();
-                }
                 if (json.hasOwnProperty("message")) {
                     clearInterval(interval_twitter);
                     $('#alert_twitter').slideUp();
@@ -18,6 +13,7 @@ function load_twitter() {
                     $('#loading_all,#cover,#cover_info,#loading_info,#cover_timeline,#loading_timeline').remove();
                 }
                 else {
+                    $('#alert_twitter').slideDown();
                     if (json.tweets.length > 0) {
                         if (first_call) {
                             first_call = false;
@@ -79,7 +75,7 @@ function load_twitter() {
                                             }
                                         }
                                         else {
-                                            if (properties.event.target.offsetParent.attributes[2].value === "fake") {
+                                            if (properties.event.target.offsetParent.attributes[1].value === "fake") {
                                                 $('#tweet').css('border-color', 'rgb(229,0,0)');
                                                 $('#tweet').css({
                                                     left: properties.event.srcEvent.clientX + 75 - properties.event.srcEvent.layerX,
@@ -388,6 +384,10 @@ function load_twitter() {
                             $('.tweets_bar').css('background-color', 'gray');
                         }
                     }
+                }
+                if (json.processing_status === "done") {
+                    clearInterval(interval_twitter);
+                    $('#alert_twitter').slideUp();
                 }
             },
             error: function (e) {

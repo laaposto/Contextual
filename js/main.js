@@ -1,4 +1,5 @@
 var video_verify = gup('video');
+var reprocess= gup('reprocess');
 var arabic = /[\u0600-\u06FF]/;
 $(function () {
     $('.tab ul.tabs li a').click(function (g) {
@@ -58,18 +59,39 @@ $(function () {
         $this.addClass((count == 1) ? 'large' : 'small', 400);
         count = 1 - count;
     });
+
+    $("#user_tw_table").on("click", "#imgtab2", function () {
+        var $this = $(this);
+        $this.removeClass('small, large', 400);
+        $this.addClass((count == 1) ? 'large' : 'small', 400);
+        count = 1 - count;
+    });
 });
 
 if (video_verify !== "") {
+    if(reprocess==="true"){
+        $('#reprocess_check').attr('checked', true);
+    }
     $('#video_examples,#video_examples_facebook,.desc_p,hr,.title_example').remove();
     $("#video_verify").val(video_verify);
     $('.back,.section_title,#loading_all,#cover,.tab').show();
-    if (video_verify.indexOf('facebook.com') > -1) {
+    if ((video_verify.indexOf('facebook.com') > -1) || (video_verify.indexOf('fb.me') > -1)) {
         var iframe_url = "https://www.facebook.com/v2.3/plugins/video.php?allowfullscreen=true&autoplay=false&container_width=360&height=305&href=" + video_verify + "&locale=en_US&sdk=joey";
         $('#iframe').attr('src', iframe_url);
         $('.twitter_p').remove();
         $('.table_title').eq(1).text("USER");
         start_video_calls_facebook();
+    }
+    else if (video_verify.indexOf('twitter.com') > -1) {
+        $('#user_video').empty().css({'width': '360px', 'margin': '30px auto 0'});
+        twttr.widgets.createVideo(video_verify.split('/').pop(), document.getElementById("user_video"),
+            {})
+            .then(function () {
+
+            });
+        $('.table_title').eq(0).text("TWEET");
+        $('.table_title').eq(1).text("USER");
+        start_video_calls_twitter();
     }
     else {
         var iframe_url = "https://www.youtube.com/embed/" + youtube_parser(video_verify);
@@ -82,12 +104,15 @@ else {
 }
 
 function detect_video_drop(evt) {
-    alert("DAS");
     evt.stopPropagation();
     evt.preventDefault();
     video_verify = evt.dataTransfer.getData('text');
     if (video_verify.length < 300) {
-        window.location.href = 'http://' + window.location.hostname + ':' + window.location.port + window.location.pathname + '?video=' + video_verify;
+        var reprocess_param="";
+        if($('#reprocess_check').is(":checked")){
+            reprocess_param="&reprocess=true";
+        }
+        window.location.href = 'http://' + window.location.hostname + ':' + window.location.port + window.location.pathname + '?video=' + video_verify+reprocess_param;
     } else {
         $('#myModal h1').html("Oops! Something went wrong");
         $('#myModal p').html("The provived video URL is <b>" + video_verify.length + "</b> characters long<br/>We can not handle such big URL");
@@ -95,8 +120,12 @@ function detect_video_drop(evt) {
     }
 }
 function verify_video_text() {
+    var reprocess_param="";
+    if($('#reprocess_check').is(":checked")){
+        reprocess_param="&reprocess=true";
+    }
     if ($("#video_verify").val() !== "") {
-        window.location.href = 'http://' + window.location.hostname + ':' + window.location.port + window.location.pathname + '?video=' + $("#video_verify").val();
+        window.location.href = 'http://' + window.location.hostname + ':' + window.location.port + window.location.pathname + '?video=' + $("#video_verify").val()+reprocess_param;
     }
 }
 
@@ -109,9 +138,13 @@ $("#video_verify").keyup(function (e) {
 var global_json;
 var verification_comments = [];
 function start_video_calls_youtube() {
+    var reprocess_param="";
+    if($('#reprocess_check').is(":checked")){
+        reprocess_param="&reprocess=1";
+    }
     $.ajax({
         type: 'GET',
-        url: 'http://caa.iti.gr:8008/verify_videoV2?url=' + video_verify,
+        url: 'http://caa.iti.gr:8008/verify_videoV2?url=' + video_verify+reprocess_param,
         dataType: 'text',
         async: true
     });
@@ -122,9 +155,13 @@ function start_video_calls_youtube() {
 
 }
 function start_video_calls_facebook() {
+    var reprocess_param="";
+    if($('#reprocess_check').is(":checked")){
+        reprocess_param="&reprocess=1";
+    }
     $.ajax({
         type: 'GET',
-        url: 'http://caa.iti.gr:8008/verify_videoV2?url=' + video_verify,
+        url: 'http://caa.iti.gr:8008/verify_videoV2?url=' + video_verify+reprocess_param,
         dataType: 'text',
         async: true
     });
@@ -135,7 +172,25 @@ function start_video_calls_facebook() {
 
 }
 
-$("#channel_yt_table,#thumb_info,#user_fb_table").on("click", ".link", function () {
+function start_video_calls_twitter() {
+    var reprocess_param="";
+    if($('#reprocess_check').is(":checked")){
+        reprocess_param="&reprocess=1";
+    }
+    $.ajax({
+        type: 'GET',
+        url: 'http://caa.iti.gr:8008/verify_videoV2?url=' + video_verify+reprocess_param,
+        dataType: 'text',
+        async: true
+    });
+    setTimeout(function () {
+        load_twitter_video();
+        load_twitter();
+    }, 1000);
+
+}
+
+$("#thumb_info").on("click", ".link", function () {
     window.open($(this).attr('data-url'), '_blank');
 });
 $("#user_fb_table").on("click", ".link button", function (e) {
@@ -153,15 +208,14 @@ function gup(name) {
 function youtube_parser(url) {
     var regExp = /^.*(youtu\.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
     var match = url.match(regExp);
+    if (match) {
+        match[2] = match[2].replace(/\//g, '').replace(/%20/g, '');
+    }
     if (match && match[2].length == 11) {
         return match[2];
     } else {
         return "error"
     }
-}
-function facebook_parser(url) {
-    url = url.split('?')[0];
-    return url.match(/([^\/]*)\/*$/)[1];
 }
 
 $('.twitter_p').click(function () {
@@ -235,28 +289,108 @@ function comments() {
         $tiles_comments.find('.ca-item').wookmark(options_comments);
     }, 10);
 }
+function replies() {
+    var $tiles_comments = $('#comments_info');
+    var verified;
+    all = parseInt($('#comments_info .ca-item').last().attr('data-index')) + 1 || 0;
+    for (all, verified = 0; ((all < global_json.replies.length) && (verified < 10)); all++) {
+        var time = global_json.replies_created_at[all];
+        var format_time = time.substring(8, 10) + '/' + time.substring(5, 7) + '/' + time.substring(0, 4) + ', ' + time.substring(12, 14) + ':' + time.substring(15, 17);
+
+        if ($.inArray(global_json.replies[all], verification_comments) !== -1) {
+
+            var src_str = global_json.replies[all];
+            var fake_terms = " fake , lies , fake , wrong , lie , confirm , where , location , lying , false , incorrect , misleading , propaganda , liar , mensonges , faux , errone , mensonge , confirme , lieu , mentir , faux , inexact , trompeur , propagande , menteur , mentiras , falso , incorrecto , mentira , confirmado , donde , lugar , mitiendo , falso , incorrecto , enganoso , propaganda , mentiroso , \u03C8\u03AD\u03BC\u03B1\u03C4\u03B1 , \u03C8\u03B5\u03CD\u03C4\u03B9\u03BA\u03BF , \u03BB\u03AC\u03B8\u03BF\u03C2 , \u03C8\u03AD\u03BC\u03B1 , \u03B5\u03C0\u03B9\u03B2\u03B5\u03B2\u03B1\u03B9\u03CE\u03BD\u03C9 , \u03C0\u03BF\u03C5 , \u03C4\u03BF\u03C0\u03BF\u03B8\u03B5\u03C3\u03AF\u03B1 , \u03C8\u03B5\u03C5\u03B4\u03AE\u03C2 , \u03B5\u03C3\u03C6\u03B1\u03BB\u03BC\u03AD\u03BD\u03BF , \u03BB\u03B1\u03BD\u03B8\u03B1\u03C3\u03BC\u03AD\u03BD\u03BF , \u03C0\u03B1\u03C1\u03B1\u03C0\u03BB\u03B1\u03BD\u03B7\u03C4\u03B9\u03BA\u03CC , \u03C0\u03C1\u03BF\u03C0\u03B1\u03B3\u03AC\u03BD\u03B4\u03B1 , \u03C8\u03B5\u03CD\u03C4\u03B7\u03C2 , \u0623\u0643\u0627\u0630\u064A\u0628 , \u0623\u0643\u0627\u0630\u064A\u0628 , \u063A\u0644\u0637\u0627\u0646 , \u0623\u0643\u0630\u0648\u0628\u0629\u060C \u0643\u0630\u0628 , \u0645\u0624\u0643\u062F , \u0623\u064A\u0646 , \u0645\u0643\u0627\u0646 , \u0643\u0630\u0628 , \u062E\u0627\u0637\u0626 , \u063A\u064A\u0631 \u0635\u062D\u064A\u062D , \u0645\u0636\u0644\u0644 , \u062F\u0639\u0627\u064A\u0629 , \u0643\u0627\u0630\u0628 , \u062F\u0631\u0648\u063A , \u062C\u0639\u0644\u06CC , \u0627\u0634\u062A\u0628\u0627\u0647 , \u062F\u0631\u0648\u063A , \u062A\u0623\u064A\u064A\u062F \u0634\u062F\u0647 , \u0643\u062C\u0627 , \u0645\u062D\u0644\u060C \u0645\u0643\u0627\u0646 , \u062F\u0631\u0648\u063A \u06AF\u0648 , \u063A\u0644\u0637\u060C \u0627\u0634\u062A\u0628\u0627\u0647\u060C \u062F\u0631\u0648\u063A\u06CC\u0646 , \u063A\u0644\u0637\u060C \u0627\u0634\u062A\u0628\u0627\u0647 , \u06AF\u0645\u0631\u0627\u0647 \u200C \u0643\u0646\u0646\u062F\u0647 , \u062A\u0628\u0644\u06CC\u063A\u0627\u062A \u0633\u06CC\u0627\u0633\u06CC\u060C \u067E\u0631\u0648\u067E\u0627\u06AF\u0627\u0646\u062F\u0627 , \u06A9\u0630\u0627\u0628".split(',');
+            var term;
+            var pattern;
+            for (var i = 0; i < fake_terms.length; i++) {
+                term = fake_terms[i].trim().replace(/(\s+)/, "(<[^>]+>)*$1(<[^>]+>)*");
+                pattern = new RegExp("(" + term + ")", "gi");
+                src_str = src_str.replace(pattern, "<span class='highlight'>$1</span>");
+                src_str = src_str.replace(/(<mark>[^<>]*)((<[^>]+>)+)([^<>]*<\/mark>)/, "$1</span>$2<span>$4");
+            }
+            if (arabic.test(src_str)) {
+                $tiles_comments.append('<div data-index="' + all + '" class="ca-item verified" ><div class="ca-item-main" style="background-color: #8AA399"><span style="direction:rtl;text-align: right" class="value">' + src_str + '</span><p class="user_comment"><span style="font-weight: normal;font-size: 12px">by  </span><a href="https://twitter.com/' + global_json.replies_screen_name_url[all] + '" target="_blank">' + global_json.replies_screen_name_url[all] + '</a></p><p class="time_comment">' + format_time + '</p></div></div>');
+            }
+            else {
+                $tiles_comments.append('<div data-index="' + all + '" class="ca-item verified" ><div class="ca-item-main" style="background-color: #8AA399"><span class="value">' + src_str + '</span><p class="user_comment"><span style="font-weight: normal;font-size: 12px">by  </span><a href="https://twitter.com/' + global_json.replies_screen_name_url[all] + '" target="_blank">' + global_json.replies_screen_name_url[all] + '</a></p><p class="time_comment">' + format_time + '</p></div></div>');
+            }
+            verified++;
+        }
+        else if ($('.filter.active').attr('id') === "all") {
+            if (arabic.test(global_json.replies[all])) {
+                $tiles_comments.append('<div data-index="' + all + '" class="ca-item no-verified" ><div class="ca-item-main"><span style="direction:rtl;text-align: right" class="value">' + global_json.replies[all] + '</span><p class="user_comment"><span style="font-weight: normal;font-size: 12px">by  </span><a href="https://twitter.com/' + global_json.replies_screen_name_url[all] + '" target="_blank">' + global_json.replies_screen_name_url[all] + '</a></p><p class="time_comment">' + format_time + '</p></div></div>');
+            }
+            else {
+                $tiles_comments.append('<div data-index="' + all + '" class="ca-item no-verified" ><div class="ca-item-main"><span class="value">' + global_json.replies[all] + '</span><p class="user_comment"><span style="font-weight: normal;font-size: 12px">by  </span><a href="https://twitter.com/' + global_json.replies_screen_name_url[all] + '" target="_blank">' + global_json.replies_screen_name_url[all] + '</a></p><p class="time_comment">' + format_time + '</p></div></div>');
+            }
+            verified++;
+        }
+    }
+    if ($('.filter.active').attr('id') === "all") {
+        if (global_json.replies.length > $('#comments_info .ca-item').length) {
+            $('.more').show();
+        }
+        else {
+            $('.more').hide();
+        }
+    }
+    else {
+        if (verification_comments.length > $('#comments_info .ca-item').length) {
+            $('.more').show();
+        }
+        else {
+            $('.more').hide();
+        }
+    }
+
+    var options_comments = {
+        autoResize: true,
+        container: $tiles_comments,
+        offset: 15,
+        itemWidth: 330,
+        outerOffset: 0
+    };
+    setTimeout(function () {
+        $tiles_comments.find('.ca-item').wookmark(options_comments);
+    }, 10);
+}
 
 $('.filter').click(function () {
     if (!($(this).hasClass(('active')))) {
         $('.controls').find('.filter').removeClass('active');
         $(this).addClass('active');
         $('#comments_info').empty();
-        comments();
+        if($('.table_title').eq(0).text()==="TWEET"){
+            replies();
+        }
+        else{
+            comments();
+        }
+
     }
 });
 $('.more').click(function () {
-    comments();
+    if($('.table_title').eq(0).text()==="TWEET"){
+        replies();
+    }
+    else{
+        comments();
+    }
 });
 
 function verify_example(video_url) {
-    window.location.href = 'http://' + window.location.hostname + ':' + window.location.port + window.location.pathname + '?video=' + video_url;
+    var reprocess_param="";
+    if($('#reprocess_check').is(":checked")){
+        reprocess_param="&reprocess=true";
+    }
+    window.location.href = 'http://' + window.location.hostname + ':' + window.location.port + window.location.pathname + '?video=' + video_url+reprocess_param;
 }
 function load_youtube() {
     var first_call = true;
     $('#time_input').wickedpicker();
     $('#date_input').datetimepicker({
         timepicker: false,
-        mask: '31/12/2017',
         format: 'd/m/Y',
         maxDate: '+1970/01/01'
     });
@@ -382,11 +516,11 @@ function load_youtube() {
                     $('#channel_subscriber_count').text(json.channel_subscriber_count);
                     $('#channel_video_count').text(json.channel_video_count);
                     $('#channel_videos_per_month').text(json.channel_videos_per_month);
-                    $('#channel_url').html(json.channel_url + '<img src="imgs/link_icon.png">').attr('data-url', json.channel_url);
-                    $('#channel_about_page').html(json.channel_about_page + '<img src="imgs/link_icon.png">').attr('data-url', json.channel_about_page);
+                    $('#channel_url').html('<a target="_blank" href="' + json.channel_url + '">' + json.channel_url + '</a>');
+                    $('#channel_about_page').html('<a target="_blank" href="' + json.channel_about_page + '">' + json.channel_about_page + '</a>');
 
                     for (var i = $('#thumb_info .ca-item').length; i < json.video_thumbnails.length; i++) {
-                        $tiles_thumbs.append('<div class="ca-item" style="width:230px"><div class="ca-item-main"><img src="' + json.video_thumbnails[i] + '" style="width: 230px;"><p class="link google" data-url="' + json.reverse_image_thumbnails_search_url[i] + '">Reverse image search<img src="imgs/link_icon.png"></p></div></div>');
+                        $tiles_thumbs.append('<div class="ca-item" style="width:230px"><div class="ca-item-main"><img src="' + json.video_thumbnails[i] + '" style="width: 230px;"><p class="google">Reverse image search by:</p><ul class="reverse_list"><li class="link" data-url="' + json.reverse_image_thumbnails_search_url[i] + '">Google</li><li class="link" data-url="' + json.reverse_image_thumbnails_search_url[i] + '">Yandex</li></ul></div></div>');
                     }
 
                     $tiles_thumbs.imagesLoaded(function () {
@@ -446,7 +580,6 @@ function load_facebook() {
     $('#time_input').wickedpicker();
     $('#date_input').datetimepicker({
         timepicker: false,
-        mask: '31/12/2017',
         format: 'd/m/Y',
         maxDate: '+1970/01/01'
     });
@@ -548,7 +681,7 @@ function load_facebook() {
                     $('#fb_about').text(json.from_about);
                     $('#fb_category').text(json.from_category);
                     $('#fb_fan_count').text(json.from_fan_count);
-                    $('#fb_link').html(json.from_link + '<img src="imgs/link_icon.png">').attr('class', 'link').attr('data-url', json.from_link);
+                    $('#fb_link').html('<a target="_blank" href="' + json.from_link + '">' + json.from_link + '</a>');
                     $('#fb_verified').text(json.from_is_verified);
                     $('#fb_description').text(json.from_description);
                     if (arabic.test(json.from_description)) {
@@ -557,11 +690,11 @@ function load_facebook() {
                     $('#fb_city').text(json.from_location_city);
                     $('#fb_country').text(json.from_location_country);
                     if (json.from_website != "") {
-                        $('#fb_website').html(json.from_website + '<img src="imgs/link_icon.png"><button class="btn btn_small btn_whois" data-url="https://who.is/whois/' + json.from_website.replace(/(^\w+:|^)\/\//, '') + '">Who/who.is</button>').attr('class', 'link').attr('data-url', json.from_website);
+                        $('#fb_website').html('<a target="_blank" href="' + json.from_website + '">' + json.from_website + '</a><button class="btn btn_small btn_whois" data-url="https://who.is/whois/' + json.from_website.replace(/(^\w+:|^)\/\//, '') + '">Who/who.is</button>');
                     }
 
                     for (var i = $('#thumb_info .ca-item').length; i < json.video_thumbnails.length; i++) {
-                        $tiles_thumbs.append('<div class="ca-item" style="width:230px"><div class="ca-item-main"><img src="' + json.video_thumbnails[i] + '" style="width: 230px;"><p class="link google" data-url="' + json.reverse_image_thumbnails_search_url[i] + '">Reverse image search<img src="imgs/link_icon.png"></p></div></div>');
+                        $tiles_thumbs.append('<div class="ca-item" style="width:230px"><div class="ca-item-main"><img src="' + json.video_thumbnails[i] + '" style="width: 230px;"><p class="google">Reverse image search by:</p><ul class="reverse_list"><li class="link" data-url="' + json.reverse_image_thumbnails_search_url[i] + '">Google</li><li class="link" data-url="' + json.reverse_image_thumbnails_search_url[i] + '">Yandex</li></ul></div></div>');
                     }
 
                     $tiles_thumbs.imagesLoaded(function () {
@@ -608,6 +741,249 @@ function load_facebook() {
                         $('#cover_timeline,#loading_timeline').show();
                     }
                     $('.controls,.table_title,#weather_input,#video_fb_table,#user_fb_table').show();
+                }
+            },
+            error: function () {
+
+            },
+            async: true
+        });
+    }, 1000);
+
+}
+function load_twitter_video() {
+    var first_call = true;
+    $('#time_input').wickedpicker();
+    $('#date_input').datetimepicker({
+        timepicker: false,
+        format: 'd/m/Y',
+        maxDate: '+1970/01/01'
+    });
+    var $tiles_thumbs = $('#thumb_info');
+    var interval_twitter = setInterval(function () {
+        $.ajax({
+            type: 'GET',
+            url: 'http://caa.iti.gr:8008/get_verificationV2?url=' + video_verify,
+            dataType: 'json',
+            success: function (json) {
+                $('#alert_comments').stop().slideDown();
+                global_json = json;
+                if (json.processing_status === "done") {
+                    clearInterval(interval_twitter);
+                    $('#alert_comments').stop().slideUp();
+                }
+                if (json.hasOwnProperty("message")) {
+                    clearInterval(interval_twitter);
+                    $('#alert_comments').stop().slideUp();
+                    $('#empty').show();
+                    $('#loading_all,#cover,#cover_info,#loading_info,.controls,.table,.table_title,#weather_input').remove();
+                }
+                else {
+                    $('#locations .location_name').remove();
+                    var empty_location = true;
+                    if (json.user_location !== "") {
+                        empty_location = false;
+                        if ((json.user_description_mentioned_locations.length > 0) || (json.tweet_text_mentioned_locations.length > 0)) {
+                            $('#locations').append('<p class="location_name" data-name="' + json.user_location + '"><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>' + json.user_location + ',</p>')
+                        }
+                        else {
+                            $('#locations').append('<p class="location_name" data-name="' + json.user_location + '"><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>' + json.user_location + '</p>')
+                        }
+                    }
+                    for (var l = 0; l < json.user_description_mentioned_locations.length; l++) {
+                        empty_location = false;
+                        if (l === json.user_description_mentioned_locations.length - 1) {
+                            if (json.tweet_text_mentioned_locations.length > 0) {
+                                $('#locations').append('<p class="location_name" data-name="' + json.user_description_mentioned_locations[l] + '"><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>' + json.user_description_mentioned_locations[l] + ',</p>')
+                            }
+                            else {
+                                $('#locations').append('<p class="location_name" data-name="' + json.user_description_mentioned_locations[l] + '"><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>' + json.user_description_mentioned_locations[l] + '</p>')
+                            }
+                        }
+                        else {
+                            $('#locations').append('<p class="location_name" data-name="' + json.user_description_mentioned_locations[l] + '"><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>' + json.user_description_mentioned_locations[l] + ',</p>')
+                        }
+                    }
+                    for (var l = 0; l < json.tweet_text_mentioned_locations.length; l++) {
+                        empty_location = false;
+                        if (l === json.tweet_text_mentioned_locations.length - 1) {
+                            $('#locations').append('<p class="location_name" data-name="' + json.tweet_text_mentioned_locations[l] + '"><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>' + json.tweet_text_mentioned_locations[l] + '</p>')
+                        }
+                        else {
+                            $('#locations').append('<p class="location_name" data-name="' + json.tweet_text_mentioned_locations[l] + '"><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>' + json.tweet_text_mentioned_locations[l] + ',</p>')
+                        }
+                    }
+                    if (empty_location) {
+                        $('#locations').append('<p class="location_name" style="cursor: default">-</p>')
+                    }
+
+
+                    $('#times .location_name').remove();
+                    if (json.created_at !== "") {
+                        var time = json.created_at;
+                        var format_time = time.substring(8, 10) + '/' + time.substring(5, 7) + '/' + time.substring(0, 4) + ' ' + time.substring(12, 14) + ':' + time.substring(15, 17);
+
+                        $('#times .location_title').after('<p class="location_name" data-time="' + format_time + '"><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>' + format_time + '</p>');
+
+                    }
+                    else {
+                        $('#times .location_title').after('<p class="location_name" style="cursor: default">-</p>')
+                    }
+
+
+                    var tweet_text_locations = "";
+                    for (var v = 0; v < json.tweet_text_mentioned_locations.length; v++) {
+                        if (v === json.tweet_text_mentioned_locations.length - 1) {
+                            tweet_text_locations += "<span>" + json.tweet_text_mentioned_locations[v] + "</span>";
+                        }
+                        else {
+                            tweet_text_locations += "<span>" + json.tweet_text_mentioned_locations[v] + "</span>, ";
+                        }
+                    }
+
+                    var user_description_locations = "";
+                    for (v = 0; v < json.user_description_mentioned_locations.length; v++) {
+                        if (v === json.user_description_mentioned_locations.length - 1) {
+                            user_description_locations += "<span>" + json.user_description_mentioned_locations[v] + "</span>";
+                        }
+                        else {
+                            user_description_locations += "<span>" + json.user_description_mentioned_locations[v] + "</span>, ";
+                        }
+                    }
+
+                    var hashtags = "";
+                    for (v = 0; v < json.hashtags.length; v++) {
+                        if (v === json.hashtags.length - 1) {
+                            hashtags += "<span>#" + json.hashtags[v] + "</span>";
+                        }
+                        else {
+                            hashtags += "<span>#" + json.hashtags[v] + "</span>, ";
+                        }
+                    }
+
+                    var urls = "";
+                    for (v = 0; v < json.urls.length; v++) {
+                        if (v === json.urls.length - 1) {
+                            urls += '<a target="_blank" href="' + json.urls[v] + '">' + json.urls[v] + '</a>';
+                        }
+                        else {
+                            urls += '<a target="_blank" href="' + json.urls[v] + '">' + json.urls[v] + '</a>, ';
+                        }
+                    }
+
+                    var users_mentions = "";
+                    for (v = 0; v < json.user_mentions.length; v++) {
+                        if (v === json.user_mentions.length - 1) {
+                            users_mentions += "<span>@" + json.user_mentions[v] + "</span>";
+                        }
+                        else {
+                            users_mentions += "<span>@" + json.user_mentions[v] + "</span>, ";
+                        }
+                    }
+
+                    var video_urls = "";
+                    for (v = 0; v < json.video_info_url.length; v++) {
+                        if (v === json.video_info_url.length - 1) {
+                            video_urls += '<a target="_blank" href="' + json.video_info_url[v] + '">' + json.video_info_url[v] + '</a>';
+                        }
+                        else {
+                            video_urls += '<a target="_blank" href="' + json.video_info_url[v] + '">' + json.video_info_url[v] + '</a>, ';
+                        }
+                    }
+
+                    var bitrate = "";
+                    for (v = 0; v < json.video_info_bitrate.length; v++) {
+                        if (v === json.video_info_bitrate.length - 1) {
+                            bitrate += "<span>" + json.video_info_bitrate[v] + "</span>";
+                        }
+                        else {
+                            bitrate += "<span>" + json.video_info_bitrate[v] + "</span>, ";
+                        }
+                    }
+
+                    $('#user_video').show();
+                    $('#tw_tweet_id').text(json.id_str);
+                    $('#tw_tweet_text').text(json.full_text);
+                    $('#tw_tweet_created_time').text(json.created_at);
+                    $('#tw_tweet_source').html(json.source);
+                    $('#tw_tweet_mentioned_locations').html(tweet_text_locations);
+                    $('#tw_tweet_rt').text(json.retweet_count);
+                    $('#tw_tweet_fav').text(json.favorite_count);
+                    $('#tw_tweet_hashtags').html(hashtags);
+                    $('#tw_tweet_urls').html(urls);
+                    $('#tw_tweet_users_mentions').html(users_mentions);
+                    $('#tw_tweet_lang').text(json.lang);
+                    $('#tw_tweet_aspect').text(json.video_info_aspect_ratio);
+                    $('#tw_tweet_duration').text(json.video_info_duration);
+                    $('#tw_tweet_url').html(video_urls);
+                    $('#tw_tweet_bitrate').html(bitrate);
+                    $('#tw_tweet_verification').text(json.tweet_verification_label);
+
+                    $('#tw_user_username').text(json.user_name);
+                    $('#tw_user_screenname').text(json.user_screen_name);
+                    $('#tw_user_location').text(json.user_location);
+                    $('#tw_user_description_locations').html(user_description_locations);
+                    $('#tw_user_url').html('<a href="' + json.user_url + '" target="_blank">' + json.user_url + '</a>');
+                    $('#tw_user_desc').text(json.user_description);
+                    $('#tw_user_protected').text(json.user_protected);
+                    $('#tw_user_verified').text(json.user_verified);
+                    $('#tw_user_followers').text(json.user_followers_count);
+                    $('#tw_user_friends').text(json.user_friends_count);
+                    $('#tw_user_listed').text(json.user_listed_count);
+                    $('#tw_user_favourites').text(json.user_favourites_count);
+                    $('#tw_user_statuses').text(json.user_statuses_count);
+                    $('#tw_user_lang').text(json.user_lang);
+                    $('#tw_user_created').text(json.user_created_at);
+                    $('#tw_user_profile_img').html('<img id="imgtab2" class="small" src="' + json.user_profile_image_url_https_bigger + '">');
+
+                    if($('#thumb_info .ca-item').length===0){
+                        $tiles_thumbs.append('<div class="ca-item" style="width:230px"><div class="ca-item-main"><img src="' + json.media_url + '" style="width: 230px;"><p class="google">Reverse image search by:</p><ul class="reverse_list"><li class="link" data-url="' + json.reverse_image_thumbnails_search_url_google + '">Google</li><li class="link" data-url="' + json.reverse_image_thumbnails_search_url_yandex + '">Yandex</li></ul></div></div>');
+                    }
+
+                    $tiles_thumbs.imagesLoaded(function () {
+                        var options_thumbs = {
+                            autoResize: true,
+                            container: $tiles_thumbs,
+                            offset: 15,
+                            itemWidth: 230,
+                            outerOffset: 0
+                        };
+                        $tiles_thumbs.find('.ca-item').wookmark(options_thumbs);
+                    });
+
+                    $('#verified').html('VERIFICATION (' + json.verification_replies.length + ')');
+                    $('#all').html('ALL (' + json.replies.length + ')');
+                    verification_comments = [];
+                    for (var k = 0; k < json.verification_replies.length; k++) {
+                        verification_comments.push(json.verification_replies[k]);
+                    }
+
+                    if ($('.filter.active').attr('id') === "all") {
+                        if (global_json.replies.length > $('#comments_info .ca-item').length) {
+                            $('.more').show();
+                        }
+                        else {
+                            $('.more').hide();
+                        }
+                    }
+                    else {
+                        if (verification_comments.length > $('#comments_info .ca-item').length) {
+                            $('.more').show();
+                        }
+                        else {
+                            $('.more').hide();
+                        }
+                    }
+                    if ((first_call) && (json.verification_replies.length > 0)) {
+                        replies();
+                        first_call = false
+                    }
+
+                    $('#loading_all,#cover,#cover_info,#loading_info').remove();
+                    if (!($('.vis-timeline').length)) {
+                        $('#cover_timeline,#loading_timeline').show();
+                    }
+                    $('.controls,.table_title,#weather_input,#tweet_tw_table,#user_tw_table').show();
                 }
             },
             error: function () {

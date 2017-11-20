@@ -125,10 +125,10 @@ body, html {
 
 .input_title {
     width: 876px;
-    margin: 0 auto;
     text-align: left;
     font-family: 'Bitter', sans-serif;
     font-weight: bold;
+    margin: 0 auto -23px;
 }
 
 .input_box {
@@ -325,13 +325,21 @@ ul li {
 }
 
 .link {
+    text-decoration: underline;
+    color: #AF0E09;
+    font-weight: bold;
     cursor: pointer;
 }
 
+.link a {
+    color: #AF0E09;
+}
+
 .google {
-    margin: 0;
     font-size: 14px;
-    cursor: pointer;
+    margin: -4px 0 0;
+    border-bottom: 1px solid gray;
+    padding: 5px 0 2px;
 }
 
 .highlight {
@@ -397,7 +405,6 @@ ul li {
     text-align: left;
     display: none;
     margin: 5px auto 30px;
-    display: none;
 }
 
 .back {
@@ -1653,7 +1660,7 @@ ul.weather_statistics li div.title {
     background: #40798C url(https://codyhouse.co/demo/back-to-top/img/cd-top-arrow.svg) no-repeat center 50%;
 }
 
-#imgtab {
+#imgtab,#imgtab2 {
     cursor: pointer;
     margin-left: 0;
     padding-bottom: 0;
@@ -1707,10 +1714,93 @@ ul.weather_statistics li div.title {
     display: none;
 }
 
-#video_yt_table, #video_fb_table, #channel_yt_table, #user_fb_table {
+#video_yt_table, #video_fb_table, #tweet_tw_table, #channel_yt_table, #user_fb_table, #user_tw_table {
     display: none;
 }
 
+.reverse_list {
+    padding: 0 0 5px;
+    margin-top: 4px;
+}
+
+.reverse_list li {
+    display: inline;
+    padding: 0 10px;
+    color: #AF0E09;
+    font-weight: bold;
+    font-size: 14px;
+    border-right: 1px solid gray;
+}
+
+.reverse_list li:last-child {
+    border-right: none;
+}
+.control-group {
+    display: inline-block;
+    vertical-align: top;
+    background: #fff;
+    text-align: left;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+    padding: 30px;
+    width: 200px;
+    height: 210px;
+    margin: 10px;
+}
+.control {
+    display: block;
+    position: relative;
+    margin-bottom: 5px;
+    cursor: pointer;
+    font-size: 15px;
+    line-height: 23px;
+    font-weight: bold;
+}
+.control input {
+    position: absolute;
+    z-index: -1;
+    opacity: 0;
+}
+.control__indicator {
+    position: absolute;
+    top: 4px;
+    right: 125px;
+    height: 15px;
+    width: 15px;
+    background: white;
+    border-radius: 50%;
+}
+.control--radio .control__indicator {
+    border-radius: 50%;
+}
+.control input:checked ~ .control__indicator {
+    background: #2aa1c0;
+}
+.control:hover input:not([disabled]):checked ~ .control__indicator,
+.control input:checked:focus ~ .control__indicator {
+    background: #0e647d;
+}
+.control__indicator:after {
+    content: '';
+    position: absolute;
+    display: none;
+}
+.control input:checked ~ .control__indicator:after {
+    display: block;
+}
+.control--checkbox .control__indicator:after {
+    left: 6px;
+    top: 3px;
+    width: 2px;
+    height: 6px;
+    border: solid #fff;
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+}
+.checkbox_wrapper{
+    width: 960px;
+    text-align: right;
+    margin: 0 auto;
+}
 @-webkit-keyframes pan {
     0%,
     100% {

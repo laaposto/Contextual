@@ -37,7 +37,7 @@
     <h1>Context Aggregation and Analysis</h1>
 
     <p class="desc_title">This is a demo platform aimed to facilitate
-        the verification of UGC video content posted on YouTube and Facebook. In
+        the verification of UGC video content posted on YouTube, Twitter and Facebook. In
         contrast to other approaches, which attempt to analyze the videos themselves
         for traces of forgery, this platform analyzes the video context: The
         characteristics of the poster, any relevant user comments, the local weather
@@ -52,10 +52,14 @@
 
     <div class="input_title">Input Video:
     </div>
+    <div class="checkbox_wrapper"><label class="control control--checkbox">Force Reprocess
+        <input type="checkbox" id="reprocess_check">
+        <div class="control__indicator"></div>
+    </label></div>
     <ul class="input_box">
         <li>
             <input id="video_verify" type="text"
-                   placeholder="Copy a URL or Drag &amp; drop a video from YouTube or Facebook"
+                   placeholder="Copy a URL or Drag &amp; drop a video from YouTube, Twitter or Facebook"
                    ondrop="detect_video_drop(event);" ondragover="return false;">
             <button type="button" onclick="verify_video_text();return false;" class="btn">
                 Verify
@@ -204,6 +208,7 @@
     </iframe>
     <p class="twitter_p">Search in Twitter<img src="imgs/twitter_icon.png"></p>
 </div>
+<div id="empty">This video cannot be found!</div>
 <div class="tab">
     <ul class="tabs active">
         <li><a href="#">GENERAL</a></li>
@@ -273,11 +278,13 @@
                 <td id="video_duration"></td>
             </tr>
             <tr>
-                <td>Video Dimension</td>
+                <td>Video Dimension<img src="imgs/info_color.png" class="tooltip"
+                                        data-tooltip-content="#tooltip_dimension"/></td>
                 <td id="video_dimension"></td>
             </tr>
             <tr>
-                <td>Video Definition</td>
+                <td>Video Definition<img src="imgs/info_color.png" class="tooltip"
+                                         data-tooltip-content="#tooltip_definition"/></td>
                 <td id="video_definition"></td>
             </tr>
             <tr>
@@ -354,6 +361,80 @@
             <tr>
                 <td>Video Privacy</td>
                 <td id="fb_privacy"></td>
+            </tr>
+            </tbody>
+        </table>
+        <table class="table" id="tweet_tw_table">
+            <thead>
+            <tr>
+                <th>Name</th>
+                <th>Value</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td>Tweet ID</td>
+                <td id="tw_tweet_id"></td>
+            </tr>
+            <tr>
+                <td>Tweet Text</td>
+                <td id="tw_tweet_text"></td>
+            </tr>
+            <tr>
+                <td>Tweet Created Time</td>
+                <td id="tw_tweet_created_time"></td>
+            </tr>
+            <tr>
+                <td>Tweet Source</td>
+                <td id="tw_tweet_source" class="link"></td>
+            </tr>
+            <tr>
+                <td>Tweet Text Mentioned Locations</td>
+                <td id="tw_tweet_mentioned_locations"></td>
+            </tr>
+            <tr>
+                <td>Tweet Retweet Count</td>
+                <td id="tw_tweet_rt"></td>
+            </tr>
+            <tr>
+                <td>Tweet Favorite Count</td>
+                <td id="tw_tweet_fav"></td>
+            </tr>
+            <tr>
+                <td>Tweet Hashtags</td>
+                <td id="tw_tweet_hashtags"></td>
+            </tr>
+            <tr>
+                <td>Tweet URLs</td>
+                <td id="tw_tweet_urls" class="link"></td>
+            </tr>
+            <tr>
+                <td>Tweet Users Mentions</td>
+                <td id="tw_tweet_users_mentions"></td>
+            </tr>
+            <tr>
+                <td>Tweet Language</td>
+                <td id="tw_tweet_lang"></td>
+            </tr>
+            <tr>
+                <td>Tweet Video Aspect Ratio</td>
+                <td id="tw_tweet_aspect"></td>
+            </tr>
+            <tr>
+                <td>Tweet Video Duration</td>
+                <td id="tw_tweet_duration"></td>
+            </tr>
+            <tr>
+                <td>Tweet Video Url</td>
+                <td id="tw_tweet_url" class="link"></td>
+            </tr>
+            <tr>
+                <td>Tweet Video Bitrate</td>
+                <td id="tw_tweet_bitrate"></td>
+            </tr>
+            <tr>
+                <td>Tweet Verification Label</td>
+                <td id="tw_tweet_verification"></td>
             </tr>
             </tbody>
         </table>
@@ -442,7 +523,7 @@
             </tr>
             <tr>
                 <td>Link</td>
-                <td id="fb_link"></td>
+                <td id="fb_link" class="link"></td>
             </tr>
             <tr>
                 <td>Verified <img src="imgs/info_color.png" class="tooltip"
@@ -463,7 +544,81 @@
             </tr>
             <tr>
                 <td>Website</td>
-                <td id="fb_website"></td>
+                <td id="fb_website" class="link"></td>
+            </tr>
+            </tbody>
+        </table>
+        <table class="table" id="user_tw_table">
+            <thead>
+            <tr>
+                <th>Name</th>
+                <th>Value</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+                <td>Username</td>
+                <td id="tw_user_username"></td>
+            </tr>
+            <tr>
+                <td>User Screen Name</td>
+                <td id="tw_user_screenname"></td>
+            </tr>
+            <tr>
+                <td>User Location</td>
+                <td id="tw_user_location"></td>
+            </tr>
+            <tr>
+                <td>User Description Mentioned Locations</td>
+                <td id="tw_user_description_locations"></td>
+            </tr>
+            <tr>
+                <td>User URL</td>
+                <td id="tw_user_url" class="link"></td>
+            </tr>
+            <tr>
+                <td>User Description</td>
+                <td id="tw_user_desc"></td>
+            </tr>
+            <tr>
+                <td>User Protected</td>
+                <td id="tw_user_protected"></td>
+            </tr>
+            <tr>
+                <td>User Verified</td>
+                <td id="tw_user_verified"></td>
+            </tr>
+            <tr>
+                <td>User Followers</td>
+                <td id="tw_user_followers"></td>
+            </tr>
+            <tr>
+                <td>User Friends</td>
+                <td id="tw_user_friends"></td>
+            </tr>
+            <tr>
+                <td>User Listed</td>
+                <td id="tw_user_listed"></td>
+            </tr>
+            <tr>
+                <td>User Favourites</td>
+                <td id="tw_user_favourites"></td>
+            </tr>
+            <tr>
+                <td>User Statuses</td>
+                <td id="tw_user_statuses"></td>
+            </tr>
+            <tr>
+                <td>User Language</td>
+                <td id="tw_user_lang"></td>
+            </tr>
+            <tr>
+                <td>User Created Time</td>
+                <td id="tw_user_created"></td>
+            </tr>
+            <tr>
+                <td>User Profile Image</td>
+                <td id="tw_user_profile_img"></td>
             </tr>
             </tbody>
         </table>
@@ -505,8 +660,8 @@
                  </div>
 
                 </span></div>
-                    <input id="date_input" type="text" placeholder="Select date">
-                    <input id="time_input" type="text" placeholder="Select time">
+                    <input id="date_input" type="text" placeholder="dd/mm/yyyy">
+                    <input id="time_input" type="text" placeholder="hh:mm">
 
                     <div id="times">
                         <p class="location_title">Possible Values:</p>
@@ -568,7 +723,7 @@
                                                         data-tooltip-content="#tooltip_twitter"/></div>
         <div class="alert" id="alert_twitter">
             <strong>Info!</strong> Fetching more tweets...<p class="note" style="width: auto">*Tweets may be added
-            outside viewport. Click 'reset' to reset zooming scale and inspect all tweets. </p>
+            outside viewport. Click 'Reset Zoom Level' to reset zooming scale and inspect all tweets. </p>
         </div>
         <div id="timeline">
             <div id="visualization">
@@ -614,7 +769,6 @@
     <div class="circle"></div>
     <p>Loading results...</p>
 </div>
-<div id="empty">This video cannot be found!</div>
 <div class="tooltip_templates">
     <p id="tooltip_wind_speed">
         Wind speed is caused by air moving from high pressure to low pressure, usually due to changes in
@@ -705,9 +859,19 @@
         Pages with a large number of followers can be manually verified by Facebook as having an authentic
         identity. This field indicates whether the page is verified by this process.
     </p>
+
+    <p id="tooltip_dimension">
+        Indicates whether the video is available in 3D or in 2D.
+    </p>
+
+    <p id="tooltip_definition">
+        Indicates whether the video is available in high definition (HD) or
+        only in standard definition. Valid values for this property are: hd and sd.
+    </p>
 </div>
 <!-- JS -->
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+<script src="https://platform.twitter.com/widgets.js"></script>
 <script src="js/main_timeline.js"></script>
 <script src="js/main.js"></script>
 <script src="js/jquery.imagesloaded.js"></script>
@@ -716,7 +880,6 @@
 <script src="js/timepicker.js"></script>
 <script src="js/jquery.reveal.js"></script>
 <script src="js/vis.js"></script>
-<script src="https://platform.twitter.com/widgets.js"></script>
 
 <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDOOPffhARnRWiCM2TyhJbHkmbDbpxrWec&libraries=places&callback=initMap"
         async defer></script>
