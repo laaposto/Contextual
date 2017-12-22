@@ -48,97 +48,131 @@ function load_twitter() {
                             timeline.on('select', function (properties) {
                                 $('#tweet').empty().css({opacity: 0, "z-index": -1});
                                 var tweet = document.getElementById("tweet");
-                                twttr.widgets.createTweet(
-                                    '' + properties.items[0], tweet,
-                                    {
-                                        conversation: 'none',    // or all
-                                        cards: 'visible',  // or visible
-                                        theme: 'light'    // or dark
-                                    })
-                                    .then(function (el) {
-                                        if ($('#tweet').height() === 0) {//wrong tweet ID
-                                            $('#tweet').css('border-color', '#c2e1f5');
-                                            $('#tweet').css({
-                                                left: properties.event.srcEvent.clientX + 75 - properties.event.srcEvent.layerX,
-                                                top: properties.event.srcEvent.pageY - 49 - properties.event.srcEvent.layerY,
-                                                opacity: 1,
-                                                "z-index": 3
-                                            }).removeClass().addClass('middle_left_arrow');
-                                            $('#tweet').append('<p class="tweet_p">Wrong Id or Tweet was deleted</p>');
-                                            if (properties.event.srcEvent.clientX + 68 - properties.event.srcEvent.layerX + 408 > $(window).width()) {
-                                                $('#tweet').css({
-                                                    left: properties.event.srcEvent.clientX + 58 - properties.event.srcEvent.layerX - 504,
-                                                    top: properties.event.srcEvent.pageY - ($('#tweet').height() / 2) - properties.event.srcEvent.layerY + 16,
-                                                    opacity: 1,
-                                                    "z-index": 3
-                                                }).removeClass().addClass('middle_right_arrow');
-                                            }
-                                        }
-                                        else {
-                                            if (properties.event.target.offsetParent.attributes[1].value === "fake") {
-                                                $('#tweet').css('border-color', 'rgb(229,0,0)');
+                                if (!(properties.items[0] == null)) {
+                                    twttr.widgets.createTweet(
+                                        '' + properties.items[0], tweet,
+                                        {
+                                            conversation: 'none',    // or all
+                                            cards: 'visible',  // or visible
+                                            theme: 'light'    // or dark
+                                        })
+                                        .then(function (el) {
+                                            if (el == null) {//wrong tweet ID
+                                                $('#tweet').css('border-color', '#777');
                                                 $('#tweet').css({
                                                     left: properties.event.srcEvent.clientX + 75 - properties.event.srcEvent.layerX,
-                                                    top: properties.event.srcEvent.pageY - ($('#tweet').height() / 2) - properties.event.srcEvent.layerY + 16,
+                                                    top: properties.event.srcEvent.pageY - 49 - properties.event.srcEvent.layerY,
                                                     opacity: 1,
                                                     "z-index": 21
-                                                }).removeClass().addClass('middle_left_arrow middle_left_arrow_red');
-                                                if ((properties.event.srcEvent.clientY - ($('#tweet').height() / 2) - properties.event.srcEvent.layerY + 25 > $(window).height() - $('#tweet').height()) && (properties.event.srcEvent.clientX + 68 - properties.event.srcEvent.layerX + 408 > $(window).width())) {
+                                                }).removeClass().addClass('middle_left_arrow');
+                                                $('#tweet').append('<p class="tweet_p">Wrong Id or Tweet was deleted</p>');
+                                                if (properties.event.srcEvent.clientX + 68 - properties.event.srcEvent.layerX + 408 > $(window).width()) {
                                                     $('#tweet').css({
                                                         left: properties.event.srcEvent.clientX + 58 - properties.event.srcEvent.layerX - 504,
-                                                        top: properties.event.srcEvent.pageY - $('#tweet').height() - properties.event.srcEvent.layerY + 48,
+                                                        top: properties.event.srcEvent.pageY - ($('#tweet').height() / 2) - properties.event.srcEvent.layerY + 16,
                                                         opacity: 1,
                                                         "z-index": 21
-                                                    }).removeClass().addClass('bottom_right_arrow bottom_right_arrow_red');
-                                                }
-                                                else if (properties.event.srcEvent.clientY - ($('#tweet').height() / 2) - properties.event.srcEvent.layerY + 25 > $(window).height() - $('#tweet').height()) {
-                                                    $('#tweet').css({
-                                                        top: properties.event.srcEvent.pageY - $('#tweet').height() - properties.event.srcEvent.layerY + 48,
-                                                        opacity: 1,
-                                                        "z-index": 21
-                                                    }).removeClass().addClass('bottom_left_arrow bottom_left_arrow_red');
-                                                }
-                                                else if (properties.event.srcEvent.clientX + 73 - properties.event.srcEvent.layerX + 408 > $(window).width()) {
-                                                    $('#tweet').css({
-                                                        left: properties.event.srcEvent.clientX + 58 - properties.event.srcEvent.layerX - 504,
-                                                        opacity: 1,
-                                                        "z-index": 21
-                                                    }).removeClass().addClass('middle_right_arrow middle_right_arrow_red');
+                                                    }).removeClass().addClass('middle_right_arrow');
                                                 }
                                             }
                                             else {
-                                                $('#tweet').css('border-color', 'rgb(44,160,0)');
-                                                $('#tweet').css({
-                                                    left: properties.event.srcEvent.clientX + 75 - properties.event.srcEvent.layerX,
-                                                    top: properties.event.srcEvent.pageY - ($('#tweet').height() / 2) - properties.event.srcEvent.layerY + 16,
-                                                    opacity: 1,
-                                                    "z-index": 21
-                                                }).removeClass().addClass('middle_left_arrow middle_left_arrow_green');
-                                                if ((properties.event.srcEvent.clientY - ($('#tweet').height() / 2) - properties.event.srcEvent.layerY + 25 > $(window).height() - $('#tweet').height()) && (properties.event.srcEvent.clientX + 68 - properties.event.srcEvent.layerX + 408 > $(window).width())) {
+                                                if (properties.event.target.offsetParent.attributes[2].value === "fake") {
+                                                    $('#tweet').css('border-color', 'rgb(229,0,0)');
                                                     $('#tweet').css({
-                                                        left: properties.event.srcEvent.clientX + 58 - properties.event.srcEvent.layerX - 504,
-                                                        top: properties.event.srcEvent.pageY - $('#tweet').height() - properties.event.srcEvent.layerY + 48,
+                                                        left: properties.event.srcEvent.clientX + 75 - properties.event.srcEvent.layerX,
+                                                        top: properties.event.srcEvent.pageY - ($('#tweet').height() / 2) - properties.event.srcEvent.layerY + 16,
                                                         opacity: 1,
                                                         "z-index": 21
-                                                    }).removeClass().addClass('bottom_right_arrow bottom_right_arrow_green');
+                                                    }).removeClass().addClass('middle_left_arrow middle_left_arrow_red');
+                                                    if ((properties.event.srcEvent.clientY - ($('#tweet').height() / 2) - properties.event.srcEvent.layerY + 25 > $(window).height() - $('#tweet').height()) && (properties.event.srcEvent.clientX + 68 - properties.event.srcEvent.layerX + 408 > $(window).width())) {
+                                                        $('#tweet').css({
+                                                            left: properties.event.srcEvent.clientX + 58 - properties.event.srcEvent.layerX - 504,
+                                                            top: properties.event.srcEvent.pageY - $('#tweet').height() - properties.event.srcEvent.layerY + 48,
+                                                            opacity: 1,
+                                                            "z-index": 21
+                                                        }).removeClass().addClass('bottom_right_arrow bottom_right_arrow_red');
+                                                    }
+                                                    else if (properties.event.srcEvent.clientY - ($('#tweet').height() / 2) - properties.event.srcEvent.layerY + 25 > $(window).height() - $('#tweet').height()) {
+                                                        $('#tweet').css({
+                                                            top: properties.event.srcEvent.pageY - $('#tweet').height() - properties.event.srcEvent.layerY + 48,
+                                                            opacity: 1,
+                                                            "z-index": 21
+                                                        }).removeClass().addClass('bottom_left_arrow bottom_left_arrow_red');
+                                                    }
+                                                    else if (properties.event.srcEvent.clientX + 73 - properties.event.srcEvent.layerX + 408 > $(window).width()) {
+                                                        $('#tweet').css({
+                                                            left: properties.event.srcEvent.clientX + 58 - properties.event.srcEvent.layerX - 504,
+                                                            opacity: 1,
+                                                            "z-index": 21
+                                                        }).removeClass().addClass('middle_right_arrow middle_right_arrow_red');
+                                                    }
                                                 }
-                                                else if (properties.event.srcEvent.clientY - ($('#tweet').height() / 2) - properties.event.srcEvent.layerY + 25 > $(window).height() - $('#tweet').height()) {
+                                                else if (properties.event.target.offsetParent.attributes[2].value === "real") {
+                                                    $('#tweet').css('border-color', 'rgb(44,160,0)');
                                                     $('#tweet').css({
-                                                        top: properties.event.srcEvent.pageY - $('#tweet').height() - properties.event.srcEvent.layerY + 48,
+                                                        left: properties.event.srcEvent.clientX + 75 - properties.event.srcEvent.layerX,
+                                                        top: properties.event.srcEvent.pageY - ($('#tweet').height() / 2) - properties.event.srcEvent.layerY + 16,
                                                         opacity: 1,
                                                         "z-index": 21
-                                                    }).removeClass().addClass('bottom_left_arrow bottom_left_arrow_green');
+                                                    }).removeClass().addClass('middle_left_arrow middle_left_arrow_green');
+                                                    if ((properties.event.srcEvent.clientY - ($('#tweet').height() / 2) - properties.event.srcEvent.layerY + 25 > $(window).height() - $('#tweet').height()) && (properties.event.srcEvent.clientX + 68 - properties.event.srcEvent.layerX + 408 > $(window).width())) {
+                                                        $('#tweet').css({
+                                                            left: properties.event.srcEvent.clientX + 58 - properties.event.srcEvent.layerX - 504,
+                                                            top: properties.event.srcEvent.pageY - $('#tweet').height() - properties.event.srcEvent.layerY + 48,
+                                                            opacity: 1,
+                                                            "z-index": 21
+                                                        }).removeClass().addClass('bottom_right_arrow bottom_right_arrow_green');
+                                                    }
+                                                    else if (properties.event.srcEvent.clientY - ($('#tweet').height() / 2) - properties.event.srcEvent.layerY + 25 > $(window).height() - $('#tweet').height()) {
+                                                        $('#tweet').css({
+                                                            top: properties.event.srcEvent.pageY - $('#tweet').height() - properties.event.srcEvent.layerY + 48,
+                                                            opacity: 1,
+                                                            "z-index": 21
+                                                        }).removeClass().addClass('bottom_left_arrow bottom_left_arrow_green');
+                                                    }
+                                                    else if (properties.event.srcEvent.clientX + 73 - properties.event.srcEvent.layerX + 408 > $(window).width()) {
+                                                        $('#tweet').css({
+                                                            left: properties.event.srcEvent.clientX + 58 - properties.event.srcEvent.layerX - 504,
+                                                            opacity: 1,
+                                                            "z-index": 21
+                                                        }).removeClass().addClass('middle_right_arrow middle_right_arrow_green');
+                                                    }
                                                 }
-                                                else if (properties.event.srcEvent.clientX + 73 - properties.event.srcEvent.layerX + 408 > $(window).width()) {
+                                                else {
+                                                    $('#tweet').css('border-color', '#777');
                                                     $('#tweet').css({
-                                                        left: properties.event.srcEvent.clientX + 58 - properties.event.srcEvent.layerX - 504,
+                                                        left: properties.event.srcEvent.clientX + 75 - properties.event.srcEvent.layerX,
+                                                        top: properties.event.srcEvent.pageY - ($('#tweet').height() / 2) - properties.event.srcEvent.layerY + 16,
                                                         opacity: 1,
                                                         "z-index": 21
-                                                    }).removeClass().addClass('middle_right_arrow middle_right_arrow_green');
+                                                    }).removeClass().addClass('middle_left_arrow');
+                                                    if ((properties.event.srcEvent.clientY - ($('#tweet').height() / 2) - properties.event.srcEvent.layerY + 25 > $(window).height() - $('#tweet').height()) && (properties.event.srcEvent.clientX + 68 - properties.event.srcEvent.layerX + 408 > $(window).width())) {
+                                                        $('#tweet').css({
+                                                            left: properties.event.srcEvent.clientX + 58 - properties.event.srcEvent.layerX - 504,
+                                                            top: properties.event.srcEvent.pageY - $('#tweet').height() - properties.event.srcEvent.layerY + 48,
+                                                            opacity: 1,
+                                                            "z-index": 21
+                                                        }).removeClass().addClass('bottom_right_arrow');
+                                                    }
+                                                    else if (properties.event.srcEvent.clientY - ($('#tweet').height() / 2) - properties.event.srcEvent.layerY + 25 > $(window).height() - $('#tweet').height()) {
+                                                        $('#tweet').css({
+                                                            top: properties.event.srcEvent.pageY - $('#tweet').height() - properties.event.srcEvent.layerY + 48,
+                                                            opacity: 1,
+                                                            "z-index": 21
+                                                        }).removeClass().addClass('bottom_left_arrow');
+                                                    }
+                                                    else if (properties.event.srcEvent.clientX + 73 - properties.event.srcEvent.layerX + 408 > $(window).width()) {
+                                                        $('#tweet').css({
+                                                            left: properties.event.srcEvent.clientX + 58 - properties.event.srcEvent.layerX - 504,
+                                                            opacity: 1,
+                                                            "z-index": 21
+                                                        }).removeClass().addClass('middle_right_arrow');
+                                                    }
                                                 }
                                             }
-                                        }
-                                    });
+                                        });
+                                }
+
                             });
 
                             $('.arrow').click(function () {
@@ -307,7 +341,7 @@ function load_twitter() {
                                         $('.vis-axis .vis-group .vis-dot').eq($(this).index()).css('border-color', 'rgb(229,0,0)');
                                         $('.vis-background .vis-group .vis-line').eq($(this).index()).css('border-color', 'rgb(229,0,0)');
                                     }
-                                    else {
+                                    else if ($(this).attr('data-fake') === "real") {
                                         $('.vis-axis .vis-group .vis-dot').eq($(this).index()).css('border-color', 'rgb(44,160,0)');
                                         $('.vis-background .vis-group .vis-line').eq($(this).index()).css('border-color', 'rgb(44,160,0)');
                                     }
@@ -318,7 +352,7 @@ function load_twitter() {
                             setTimeout(function () {
                                 var fake_tweets = json.aggregate_stats.number_of_fake_tweets;
                                 var real_tweets = json.aggregate_stats.number_of_real_tweets;
-                                var total_tweets = fake_tweets + real_tweets;
+                                var total_tweets = json.aggregate_stats.number_of_tweets;
                                 var percentage_fake = Math.round((fake_tweets / total_tweets) * 100);
                                 $('#fake_tweet_bar').css('width', percentage_fake + '%');
                                 $('#total_tweets').text(total_tweets);
@@ -331,8 +365,11 @@ function load_twitter() {
                                 $('#cover_info,#loading_info').show();
                             }
                         }
-                        else {
-                            for (var v = items.length; v < json.tweets.length; v++) {
+                        else {//EDW EIMAI
+                            for (var v = 0; v < items.length; v++) {
+                                timeline.itemsData.update({id: json.tweets[v].id_str, "fake": json.tweets[v].fake})
+                            }
+                            for (v = items.length; v < json.tweets.length; v++) {
                                 items.add({
                                     "id": json.tweets[v].id_str,
                                     content: "<img class='tweet_img' src='https://twitter.com/" + json.tweets[v].user.screen_name + "/profile_image?size=normal' height='32' width='32'>",
@@ -351,7 +388,7 @@ function load_twitter() {
                                         $('.vis-axis .vis-group .vis-dot').eq($(this).index()).css('border-color', 'rgb(229,0,0)');
                                         $('.vis-background .vis-group .vis-line').eq($(this).index()).css('border-color', 'rgb(229,0,0)');
                                     }
-                                    else {
+                                    else if ($(this).attr('data-fake') === "real") {
                                         $('.vis-axis .vis-group .vis-dot').eq($(this).index()).css('border-color', 'rgb(44,160,0)');
                                         $('.vis-background .vis-group .vis-line').eq($(this).index()).css('border-color', 'rgb(44,160,0)');
                                     }
@@ -360,7 +397,7 @@ function load_twitter() {
                             setTimeout(function () {
                                 var fake_tweets = json.aggregate_stats.number_of_fake_tweets;
                                 var real_tweets = json.aggregate_stats.number_of_real_tweets;
-                                var total_tweets = fake_tweets + real_tweets;
+                                var total_tweets = json.aggregate_stats.number_of_tweets;
                                 var percentage_fake = Math.round((fake_tweets / total_tweets) * 100);
                                 $('#fake_tweet_bar').css('width', percentage_fake + '%');
                                 $('#total_tweets').text(total_tweets);

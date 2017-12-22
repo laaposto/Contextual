@@ -42,8 +42,8 @@
         for traces of forgery, this platform analyzes the video context: The
         characteristics of the poster, any relevant user comments, the local weather
         reports at the time of the event, and other contextual pieces of information are
-        aggregated and presented to the user for analysis. To test the service, simply
-        copy and paste a YouTube or Facebook* URL into the box, then click &quot;Verify&quot;</p>
+        aggregated and presented to the user for analysis. To test the service, simply copy and paste a YouTube,
+        Facebook* or Twitter URL into the box, then click &quot;Verify&quot;</p>
 
     <p class="note">*Right click on the Facebook video and copy the video URL</p>
 
@@ -54,6 +54,7 @@
     </div>
     <div class="checkbox_wrapper"><label class="control control--checkbox">Force Reprocess
         <input type="checkbox" id="reprocess_check">
+
         <div class="control__indicator"></div>
     </label></div>
     <ul class="input_box">
@@ -196,7 +197,8 @@
         <img src="imgs/youtube-placeholder.jpg">
         <iframe width="360" height="305" frameborder="0" src="https://www.youtube.com/embed/UTeqpMQKZaY">
         </iframe>
-        <p class="video_desc">This video supposedly shows a young Syrian boy rescuing a girl amid gunfire. It was in truth filmed in a Malta.</p>
+        <p class="video_desc">This video supposedly shows a young Syrian boy rescuing a girl amid gunfire. It was in
+            truth filmed in a Malta.</p>
         <button type="button" onclick="verify_example('https://www.youtube.com/watch?v=UTeqpMQKZaY');return false;"
                 class="btn btn_small">
             Verify
@@ -679,38 +681,79 @@
                     <p>Loading weather context...</p>
                 </div>
             </div>
-            <article class="widget">
-                <div class="weatherIcon"></div>
-                <div class="weatherData">
-                    <h2 class="description"></h2>
+            <div id="weather_table">
+                <div id="weather_table_wrapper">
+                    <div id="top">
+                        <div class="location">Brussels, Belgium</div>
+                        <div class="time">Tue, 21 Nov 2017</div>
+                        <div class="summary">Mostly cloudy throughout the day</div>
+                        <div class="status">Mostly cloudy throughout the day</div>
+                    </div>
+                    <div id="left-information"><img id="weather_icon"
+                                                    src="https://ssl.gstatic.com/onebox/weather/64/partly_cloudy.png"
+                                                    class="thumbnail">
 
-                    <h3 class="precip"></h3>
-                    <ul class="weather_statistics statistics">
-                        <li style="height: 40px">
-                            <div class="number" id="visibility"></div>
-                            <div class="title">Visibility<img src="imgs/info.png" class="tooltip"
-                                                              data-tooltip-content="#tooltip_visibility"/></div>
-                        </li>
-                        <li style="height: 40px">
-                            <div class="number" id="cloud"></div>
-                            <div class="title">Cloud Cover<img src="imgs/info.png" class="tooltip"
-                                                               data-tooltip-content="#tooltip_cloud_cover"/></div>
-                        </li>
-                        <li style="height: 40px;border-right: 0">
-                            <div class="number" id="wind"></div>
-                            <div class="title">Wind Speed<img src="imgs/info.png" class="tooltip"
-                                                              data-tooltip-content="#tooltip_wind_speed"/></div>
-                        </li>
-                    </ul>
-                    <p class="powered"><a href="https://darksky.net/forecast/40.6403,22.9439/si24/en" target="_blank">Powered
-                        by Dark Sky</a></p>
+                        <div class="temperature">-</div>
+                        <div class="unit">°C</div>
+                    </div>
+                    <div id="right-information"><span>Visibility<img src="imgs/info.png" class="tooltip"
+                                                                     data-tooltip-content="#tooltip_visibility"/> : <span
+                            id="visibility">-</span></span><br> <span>Cloud Cover<img
+                            src="imgs/info.png" class="tooltip"
+                            data-tooltip-content="#tooltip_cloud_cover"/> : <span id="cloud">-</span></span><br>
+                        <span>Wind speed<img src="imgs/info.png" class="tooltip"
+                                             data-tooltip-content="#tooltip_wind_speed"/> : <span
+                                id="wind">-</span></span></div>
+                    <div id="forecast">
+                        <ul>
+                            <li data-index="00">
+                                <div>00:00</div>
+                                <img id="hourly00_img" src="#">
+                                <span id="hourly00_temp"></span>
+                            </li>
+                            <li data-index="03">
+                                <div>03:00</div>
+                                <img id="hourly03_img" src="#">
+                                <span id="hourly03_temp"></span>
+                            </li>
+                            <li data-index="06">
+                                <div>06:00</div>
+                                <img id="hourly06_img" src="#">
+                                <span id="hourly06_temp"></span>
+                            </li>
+                            <li data-index="09">
+                                <div>09:00</div>
+                                <img id="hourly09_img" src="#">
+                                <span id="hourly09_temp"></span>
+                            </li>
+                            <li data-index="12">
+                                <div>12:00</div>
+                                <img id="hourly12_img" src="#">
+                                <span id="hourly12_temp"></span>
+                            </li>
+                            <li data-index="15">
+                                <div>15:00</div>
+                                <img id="hourly15_img" src="#">
+                                <span id="hourly15_temp"></span>
+                            </li>
+                            <li data-index="18">
+                                <div>18:00</div>
+                                <img id="hourly18_img" src="#">
+                                <span id="hourly18_temp"></span>
+                            </li>
+                            <li data-index="21">
+                                <div>21:00</div>
+                                <img id="hourly21_img" src="#">
+                                <span id="hourly21_temp"></span>
+                            </li>
+                        </ul>
+                        <button class="btn" id="daily_button">Daily <img src="imgs/tick_16.png" style="width: 16px;vertical-align: middle;"></button>
+                        <p class="powered"><a href="https://darksky.net/forecast/40.6403,22.9439/si24/en"
+                                              target="_blank">Powered
+                            by Dark Sky</a></p>
+                    </div>
                 </div>
-                <div class="date">
-                    <h4 class="month" id="month"></h4>
-                    <h5 class="day" id="day"></h5>
-                </div>
-            </article>
-
+            </div>
         </div>
     </div>
     <div style="position: relative">
@@ -773,7 +816,7 @@
     <p id="tooltip_wind_speed">
         Wind speed is caused by air moving from high pressure to low pressure, usually due to changes in
         temperature.
-        <span style="font-weight: bold;margin: 5px 0;display: block">Beaufort: <span id="beaufort_num"></span></span>
+        <span style="font-weight: bold;margin: 5px 0;display: block">Beaufort: </span>
         <a href="https://en.wikipedia.org/wiki/Beaufort_scale" target="_blank">More</a>
     </p>
 
@@ -876,8 +919,8 @@
 <script src="js/main.js"></script>
 <script src="js/jquery.imagesloaded.js"></script>
 <script src="js/jquery.wookmark.js"></script>
-<script src="js/datepicker.js"></script>
 <script src="js/timepicker.js"></script>
+<script src="js/datepicker.js"></script>
 <script src="js/jquery.reveal.js"></script>
 <script src="js/vis.js"></script>
 

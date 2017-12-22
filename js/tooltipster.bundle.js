@@ -4255,5 +4255,5 @@
 
 }));
 $(document).ready(function () {
-    $('.tooltip').tooltipster({theme: 'tooltipster-shadow'});
+    $('.tooltip').tooltipster({theme: 'tooltipster-shadow',contentAsHTML:true});
 });

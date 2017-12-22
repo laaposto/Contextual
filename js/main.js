@@ -1,5 +1,5 @@
 var video_verify = gup('video');
-var reprocess= gup('reprocess');
+var reprocess = gup('reprocess');
 var arabic = /[\u0600-\u06FF]/;
 $(function () {
     $('.tab ul.tabs li a').click(function (g) {
@@ -69,7 +69,7 @@ $(function () {
 });
 
 if (video_verify !== "") {
-    if(reprocess==="true"){
+    if (reprocess === "true") {
         $('#reprocess_check').attr('checked', true);
     }
     $('#video_examples,#video_examples_facebook,.desc_p,hr,.title_example').remove();
@@ -108,11 +108,11 @@ function detect_video_drop(evt) {
     evt.preventDefault();
     video_verify = evt.dataTransfer.getData('text');
     if (video_verify.length < 300) {
-        var reprocess_param="";
-        if($('#reprocess_check').is(":checked")){
-            reprocess_param="&reprocess=true";
+        var reprocess_param = "";
+        if ($('#reprocess_check').is(":checked")) {
+            reprocess_param = "&reprocess=true";
         }
-        window.location.href = 'http://' + window.location.hostname + ':' + window.location.port + window.location.pathname + '?video=' + video_verify+reprocess_param;
+        window.location.href = 'http://' + window.location.hostname + ':' + window.location.port + window.location.pathname + '?video=' + video_verify + reprocess_param;
     } else {
         $('#myModal h1').html("Oops! Something went wrong");
         $('#myModal p').html("The provived video URL is <b>" + video_verify.length + "</b> characters long<br/>We can not handle such big URL");
@@ -120,12 +120,12 @@ function detect_video_drop(evt) {
     }
 }
 function verify_video_text() {
-    var reprocess_param="";
-    if($('#reprocess_check').is(":checked")){
-        reprocess_param="&reprocess=true";
+    var reprocess_param = "";
+    if ($('#reprocess_check').is(":checked")) {
+        reprocess_param = "&reprocess=true";
     }
     if ($("#video_verify").val() !== "") {
-        window.location.href = 'http://' + window.location.hostname + ':' + window.location.port + window.location.pathname + '?video=' + $("#video_verify").val()+reprocess_param;
+        window.location.href = 'http://' + window.location.hostname + ':' + window.location.port + window.location.pathname + '?video=' + $("#video_verify").val() + reprocess_param;
     }
 }
 
@@ -138,13 +138,13 @@ $("#video_verify").keyup(function (e) {
 var global_json;
 var verification_comments = [];
 function start_video_calls_youtube() {
-    var reprocess_param="";
-    if($('#reprocess_check').is(":checked")){
-        reprocess_param="&reprocess=1";
+    var reprocess_param = "";
+    if ($('#reprocess_check').is(":checked")) {
+        reprocess_param = "&reprocess=1";
     }
     $.ajax({
         type: 'GET',
-        url: 'http://caa.iti.gr:8008/verify_videoV2?url=' + video_verify+reprocess_param,
+        url: 'http://caa.iti.gr:8008/verify_videoV2?url=' + video_verify + reprocess_param,
         dataType: 'text',
         async: true
     });
@@ -155,13 +155,13 @@ function start_video_calls_youtube() {
 
 }
 function start_video_calls_facebook() {
-    var reprocess_param="";
-    if($('#reprocess_check').is(":checked")){
-        reprocess_param="&reprocess=1";
+    var reprocess_param = "";
+    if ($('#reprocess_check').is(":checked")) {
+        reprocess_param = "&reprocess=1";
     }
     $.ajax({
         type: 'GET',
-        url: 'http://caa.iti.gr:8008/verify_videoV2?url=' + video_verify+reprocess_param,
+        url: 'http://caa.iti.gr:8008/verify_videoV2?url=' + video_verify + reprocess_param,
         dataType: 'text',
         async: true
     });
@@ -173,13 +173,13 @@ function start_video_calls_facebook() {
 }
 
 function start_video_calls_twitter() {
-    var reprocess_param="";
-    if($('#reprocess_check').is(":checked")){
-        reprocess_param="&reprocess=1";
+    var reprocess_param = "";
+    if ($('#reprocess_check').is(":checked")) {
+        reprocess_param = "&reprocess=1";
     }
     $.ajax({
         type: 'GET',
-        url: 'http://caa.iti.gr:8008/verify_videoV2?url=' + video_verify+reprocess_param,
+        url: 'http://caa.iti.gr:8008/verify_videoV2?url=' + video_verify + reprocess_param,
         dataType: 'text',
         async: true
     });
@@ -361,34 +361,42 @@ $('.filter').click(function () {
         $('.controls').find('.filter').removeClass('active');
         $(this).addClass('active');
         $('#comments_info').empty();
-        if($('.table_title').eq(0).text()==="TWEET"){
+        if ($('.table_title').eq(0).text() === "TWEET") {
             replies();
         }
-        else{
+        else {
             comments();
         }
 
     }
 });
 $('.more').click(function () {
-    if($('.table_title').eq(0).text()==="TWEET"){
+    if ($('.table_title').eq(0).text() === "TWEET") {
         replies();
     }
-    else{
+    else {
         comments();
     }
 });
 
 function verify_example(video_url) {
-    var reprocess_param="";
-    if($('#reprocess_check').is(":checked")){
-        reprocess_param="&reprocess=true";
+    var reprocess_param = "";
+    if ($('#reprocess_check').is(":checked")) {
+        reprocess_param = "&reprocess=true";
     }
-    window.location.href = 'http://' + window.location.hostname + ':' + window.location.port + window.location.pathname + '?video=' + video_url+reprocess_param;
+    window.location.href = 'http://' + window.location.hostname + ':' + window.location.port + window.location.pathname + '?video=' + video_url + reprocess_param;
 }
 function load_youtube() {
     var first_call = true;
-    $('#time_input').wickedpicker();
+    $('#time_input').timepicker({
+        timeFormat: 'HH:mm',
+        interval: 60,
+        startHour: 0,
+        startMinutes: 0,
+        dynamic: false,
+        dropdown: true,
+        scrollbar: true
+    });
     $('#date_input').datetimepicker({
         timepicker: false,
         format: 'd/m/Y',
@@ -443,14 +451,14 @@ function load_youtube() {
                     if (json.video_upload_time !== "") {
                         empty_time = false;
                         var time = json.video_upload_time;
-                        var format_time = time.substring(8, 10) + '/' + time.substring(5, 7) + '/' + time.substring(0, 4) + ' ' + time.substring(12, 14) + ':' + time.substring(15, 17);
+                        var format_time = time.substring(8, 10) + '/' + time.substring(5, 7) + '/' + time.substring(0, 4) + ' ' + time.substring(12, 14) + ':00';
 
                         $('#times .location_title').after('<p class="location_name" data-time="' + format_time + '"><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>' + format_time + '</p>')
                     }
                     if (json.video_recording_time !== "") {
                         empty_time = false;
                         var time = json.video_recording_time;
-                        var format_time = time.substring(8, 10) + '/' + time.substring(5, 7) + '/' + time.substring(0, 4) + ' ' + time.substring(12, 14) + ':' + time.substring(15, 17);
+                        var format_time = time.substring(8, 10) + '/' + time.substring(5, 7) + '/' + time.substring(0, 4) + ' ' + time.substring(12, 14) + ':00';
 
                         $('#times .location_title').after('<p class="location_name" data-time="' + format_time + '"><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>' + format_time + '</p>')
                     }
@@ -577,7 +585,15 @@ function load_youtube() {
 }
 function load_facebook() {
     var first_call = true;
-    $('#time_input').wickedpicker();
+    $('#time_input').timepicker({
+        timeFormat: 'HH:mm',
+        interval: 60,
+        startHour: 0,
+        startMinutes: 0,
+        dynamic: false,
+        dropdown: true,
+        scrollbar: true
+    });
     $('#date_input').datetimepicker({
         timepicker: false,
         format: 'd/m/Y',
@@ -633,7 +649,7 @@ function load_facebook() {
                     if (json.created_time !== "") {
                         empty_time = false;
                         var time = json.created_time;
-                        var format_time = time.substring(8, 10) + '/' + time.substring(5, 7) + '/' + time.substring(0, 4) + ' ' + time.substring(12, 14) + ':' + time.substring(15, 17);
+                        var format_time = time.substring(8, 10) + '/' + time.substring(5, 7) + '/' + time.substring(0, 4) + ' ' + time.substring(12, 14) + ':00';
 
                         $('#times .location_title').after('<p class="location_name" data-time="' + format_time + '"><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>' + format_time + '</p>');
 
@@ -641,7 +657,7 @@ function load_facebook() {
                     if (json.updated_time !== "") {
                         empty_time = false;
                         var time = json.updated_time;
-                        var format_time = time.substring(8, 10) + '/' + time.substring(5, 7) + '/' + time.substring(0, 4) + ' ' + time.substring(12, 14) + ':' + time.substring(15, 17);
+                        var format_time = time.substring(8, 10) + '/' + time.substring(5, 7) + '/' + time.substring(0, 4) + ' ' + time.substring(12, 14) + ':00';
                         $('#times .location_title').after('<p class="location_name" data-time="' + format_time + '"><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>' + format_time + '</p>')
                     }
                     if (empty_time) {
@@ -753,7 +769,15 @@ function load_facebook() {
 }
 function load_twitter_video() {
     var first_call = true;
-    $('#time_input').wickedpicker();
+    $('#time_input').timepicker({
+        timeFormat: 'HH:mm',
+        interval: 60,
+        startHour: 0,
+        startMinutes: 0,
+        dynamic: false,
+        dropdown: true,
+        scrollbar: true
+    });
     $('#date_input').datetimepicker({
         timepicker: false,
         format: 'd/m/Y',
@@ -821,7 +845,7 @@ function load_twitter_video() {
                     $('#times .location_name').remove();
                     if (json.created_at !== "") {
                         var time = json.created_at;
-                        var format_time = time.substring(8, 10) + '/' + time.substring(5, 7) + '/' + time.substring(0, 4) + ' ' + time.substring(12, 14) + ':' + time.substring(15, 17);
+                        var format_time = time.substring(8, 10) + '/' + time.substring(5, 7) + '/' + time.substring(0, 4) + ' ' + time.substring(12, 14) + ':00';
 
                         $('#times .location_title').after('<p class="location_name" data-time="' + format_time + '"><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>' + format_time + '</p>');
 
@@ -905,7 +929,7 @@ function load_twitter_video() {
                     $('#tw_tweet_id').text(json.id_str);
                     $('#tw_tweet_text').text(json.full_text);
                     $('#tw_tweet_created_time').text(json.created_at);
-                    $('#tw_tweet_source').html(json.source);
+                    $('#tw_tweet_source').html('<a target="_blank" href="'+json.source_url+'">'+json.source+'</a>');
                     $('#tw_tweet_mentioned_locations').html(tweet_text_locations);
                     $('#tw_tweet_rt').text(json.retweet_count);
                     $('#tw_tweet_fav').text(json.favorite_count);
@@ -936,7 +960,7 @@ function load_twitter_video() {
                     $('#tw_user_created').text(json.user_created_at);
                     $('#tw_user_profile_img').html('<img id="imgtab2" class="small" src="' + json.user_profile_image_url_https_bigger + '">');
 
-                    if($('#thumb_info .ca-item').length===0){
+                    if ($('#thumb_info .ca-item').length === 0) {
                         $tiles_thumbs.append('<div class="ca-item" style="width:230px"><div class="ca-item-main"><img src="' + json.media_url + '" style="width: 230px;"><p class="google">Reverse image search by:</p><ul class="reverse_list"><li class="link" data-url="' + json.reverse_image_thumbnails_search_url_google + '">Google</li><li class="link" data-url="' + json.reverse_image_thumbnails_search_url_yandex + '">Yandex</li></ul></div></div>');
                     }
 
@@ -994,9 +1018,14 @@ function load_twitter_video() {
     }, 1000);
 
 }
+var weather_json;
 function get_weather() {
     if (!($('#weather_btn').hasClass("disable_btn"))) {
+        $('.active_weather').removeClass('active_weather');
+        $('.weather_empty').removeClass('weather_empty');
         $('#weather_error').stop().slideUp();
+        var $weather_table = $('#weather_table');
+        var $weather_icon = $('#weather_icon');
         var dateParts, dateObject, time, checked = false;
 
         if ($('#exact_time').is(":checked")) {
@@ -1011,107 +1040,127 @@ function get_weather() {
             time = new Date(dateObject).getTime() / 1000;
         }
         $('#loading_weather').show();
-        if ($('.widget').is(":visible")) {
-            $('.widget').addClass('widget_blur');
+        if ($weather_table.is(":visible")) {
+            $weather_table.addClass('weather_blur');
         }
         $.ajax({
             type: 'GET',
             url: 'http://caa.iti.gr:8008/weatherV2?time=' + time + '&location=' + $('#location_input').val(),
             dataType: 'json',
             success: function (json) {
+                weather_json = json;
                 if (json.hasOwnProperty("message")) {
                     $('#weather_error').html(json.message).stop().slideDown();
-                    $('.widget').hide().removeClass('widget_blur');
+                    $weather_table.hide().removeClass('weather_blur');
                 }
                 else {
-                    var summary, visibility, preciptype, icon, cloud_cover, wind_speed, temp, min_temp, max_temp, day_indi;
-                    if (checked) {
-                        if (!(json.hourly.data_exist)) {
-                            $('#weather_error').html("No Weather Data for this Location/Timestamp").stop().slideDown();
-                            $('.widget').hide().removeClass('widget_blur');
+                    for (var i = 0; i < 22; i += 3) {
+                        if (json['hourly' + zeroPad(i, 2)].data_exist) {
+                            $('#hourly' + zeroPad(i, 2) + '_img').attr('src', 'imgs/').attr('src', 'imgs/' + json['hourly' + zeroPad(i, 2)].icon.toLowerCase() + '_64.png');
+                            $('#hourly' + zeroPad(i, 2) + '_temp').html(json['hourly' + zeroPad(i, 2)].temperature + '&deg;');
                         }
                         else {
-                            $('#beaufort_num').text(json.hourly.beaufort);
-                            summary = json.hourly.summary;
+                            $('#hourly' + zeroPad(i, 2) + '_img').attr('src', 'imgs/').attr('src', 'imgs/weather_empty_64.png');
+                            $('#hourly' + zeroPad(i, 2) + '_temp').html('-').parent().addClass('weather_empty');
+                        }
+                    }
+
+                    var summary, visibility, icon, cloud_cover, wind_speed, day_indication;
+                    var hour = parseInt($('#time_input').val().split(':')[0], 10);
+                    hour = Math.round(hour / 3.0) * 3;
+                    if (hour > 21) {
+                        hour = 21;
+                    }
+                    if (checked) {
+                        if (!(json['hourly' + zeroPad(hour, 2)].data_exist)) {
+                            $('#weather_error').html("No Weather Data for this Location/Timestamp").stop().slideDown();
+                            $weather_table.hide().removeClass('weather_blur');
+                        }
+                        else {
+                            $('#daily_button').addClass('deactivate_daily');
+                            $('#forecast ul li').eq((hour / 3)).addClass('active_weather');
+                            $('.tooltip').eq(10).tooltipster('content', 'Wind speed is caused by air moving from high pressure to low pressure, usually due to changes in temperature. <span style="font-weight: bold;margin: 5px 0;display: block">Beaufort: ' + json['hourly' + zeroPad(hour, 2)].beaufort + '</span> <a href="https://en.wikipedia.org/wiki/Beaufort_scale" target="_blank">More</a>');
+                            summary = json['hourly' + zeroPad(hour, 2)].summary;
                             if (summary === "") {
                                 summary = "-";
                             }
-                            $('.weatherData').find('.description').text(summary);
+                            $weather_table.find('.summary').text(summary);
+                            $weather_table.find('.location').text(json.address);
+                            $weather_table.find('.time').text(new Date(dateObject).toUTCString().split(' ').slice(0, 4).join(' '));
+                            $weather_table.find('.temperature').text(json['hourly' + zeroPad(hour, 2)].temperature);
 
-                            visibility = json.hourly.visibility;
+                            visibility = json['hourly' + zeroPad(hour, 2)].visibility;
                             if (visibility === "") {
                                 visibility = "-";
                             }
                             $('#visibility').text(visibility);
 
-                            cloud_cover = json.hourly.cloud_cover;
+                            cloud_cover = json['hourly' + zeroPad(hour, 2)].cloud_cover;
                             if (cloud_cover === "") {
                                 cloud_cover = "-";
                             }
                             $('#cloud').text(cloud_cover);
 
-                            wind_speed = json.hourly.wind_speed;
+                            wind_speed = json['hourly' + zeroPad(hour, 2)].wind_speed;
                             if (wind_speed === "") {
                                 wind_speed = "-";
                             }
                             $('#wind').text(wind_speed);
 
-                            temp = json.hourly.temperature;
-                            icon = json.hourly.icon;
-                            day_indi = json.hourly.day_night_indication;
-                            $('.weatherIcon').empty();
+                            icon = json['hourly' + zeroPad(hour, 2)].icon;
+                            $weather_icon.attr('src', 'imgs/' + icon.toLowerCase() + '_64.png');
+                            day_indication = json['hourly' + zeroPad(hour, 2)].day_night_indication;
                             switch (icon) {
                                 case "CLEAR_DAY":
-                                    $('.weatherIcon').append('<div id="temp"><h1>' + temp + '&deg;C</h1></div><div class="sunny"><div class="sun"><div class="rays"></div></div></div><p class="weatherInfo">Clear Day</p>')
+                                    $weather_table.find('.status').text("Clear Day");
                                     break;
                                 case "CLEAR_NIGHT":
-                                    $('.weatherIcon').append('<div id="temp"><h1>' + temp + '&deg;C</h1></div><div class="moon"></div><p class="weatherInfo" style="margin-top: 115px;">Clear Night</p>');
+                                    $weather_table.find('.status').text("Clear Night");
                                     break;
                                 case "RAIN":
-                                    $('.weatherIcon').append('<div id="temp"><h1>' + temp + '&deg;C</h1></div><div class="rainy"><div class="cloud"></div><div class="rain"></div></div><p class="weatherInfo">Rain ' + capitalizeFirstLetter(day_night_indication) + '</p>');
+                                    $weather_table.find('.status').text("Rain " + capitalizeFirstLetter(day_indication));
                                     break;
                                 case "SNOW":
-                                    $('.weatherIcon').append('<div id="temp"><h1>' + temp + '&deg;C</h1></div><div class="flurries"><div class="cloud"></div><div class="snow"><div class="flake"></div><div class="flake"></div></div></div><p class="weatherInfo">Snow ' + capitalizeFirstLetter(day_night_indication) + '</p>');
+                                    $weather_table.find('.status').text("Snow " + capitalizeFirstLetter(day_indication));
                                     break;
                                 case "SLEET":
-                                    $('.weatherIcon').append('<div id="temp"><h1>' + temp + '&deg;C</h1></div><div class="flurries"><div class="cloud"></div><div class="snow"><div class="flake sleet"></div><div class="flake sleet"></div></div></div><p class="weatherInfo">Sleet ' + capitalizeFirstLetter(day_night_indication) + '</p>');
+                                    $weather_table.find('.status').text("Sleet " + capitalizeFirstLetter(day_indication));
                                     break;
                                 case "WIND":
-                                    $('.weatherIcon').append('<div id="temp"><h1>' + temp + '&deg;C</h1></div><div class="svg-contain"> <svg version="1.1" class="windy-svg" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="-447 254.4 64 52.6" style="enable-background:new -447 254.4 64 52.6;" xml:space="preserve"> <g id="Layer_1_1_"> <g> <path class="st0 little-path path-1" d="M-429.2,276.8h6.3"/> <path class="big-path big-path-1" d="M-438.1,279.3c0,0,20.5,0,20.6,0c4.1,0,7.4-3.4,7.7-7.4c0.1-1.1-0.1-2.3-0.6-3.3c-2.2-5.4-9.8-6.3-13.3-1.7 c-1,1.3-1.6,3-1.7,4.6"/> <path class="little-path path-2" d="M-422.6,271.7c0-2.8,2.3-5.1,5.1-5.1s5.1,2.3,5.1,5.1c0,2.8-2.3,5.1-5.1,5.1"/> </g> <g> <path class="little-path path-3" d="M-434.1,284.9h30.4"/> <path class="little-path path-4" d="M-410.6,280h8.7"/> <path class="big-path big-path-2" d="M-442.9,282.7h44c3.6,0,6.6,3,6.8,6.5c0.1,1-0.1,2-0.5,3c-2,4.8-8.7,5.5-11.8,1.5c-0.9-1.2-1.4-2.6-1.5-4.1" /> <path class="little-path path-5" d="M-403.4,289.4c0,2.5,2,4.5,4.5,4.5s4.5-2,4.5-4.5s-2-4.5-4.5-4.5"/> </g> </g> </svg> </div><p class="weatherInfo">Wind ' + capitalizeFirstLetter(day_night_indication) + '</p>');
+                                    $weather_table.find('.status').text("Wind " + capitalizeFirstLetter(day_indication));
                                     break;
                                 case "FOG":
-                                    $('.weatherIcon').append('<div id="temp"><h1>' + temp + '&deg;C</h1></div><div class="svg-contain"> <svg class="fog-svg" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 68 52.6" style="enable-background:new 0 0 68 52.6;" xml:space="preserve"> <g id="Layer_1"> <g> <path class="cloud_fog" d="M62.8,29.3c0-5.2-4.2-9.4-9.4-9.4c-0.2,0-0.4,0.1-0.7,0.1c-0.1-0.9-0.2-1.8-0.5-2.7c-0.3-1.1-0.9-2.2-1.5-3.1 C48.6,11,44.9,9,40.8,9c-2.5,0-4.8,0.7-6.7,2c-0.6,0.4-1.2,0.9-1.8,1.5c-0.3,0.3-0.5,0.6-0.8,0.8c-0.2,0.3-0.5,0.6-0.7,0.9 c-1.9-1.3-4.2-2.1-6.7-2.1c-6,0-10.9,4.4-11.8,10.1c-3.8,1.1-6.7,4.3-7.2,8.3h28.7h13.9h14.1h0.8C62.7,30.6,62.8,30.1,62.8,29.3z" /> <path class="fog-line big-path" d="M7.3,28.8h12.4"/> <path class="fog-line big-path" d="M23.5,28.8h38.4"/> <path class="fog-line big-path" d="M57.3,32.6h5.2"/> <path class="fog-line big-path" d="M31.2,32.6h22.1"/> <path class="fog-line big-path" d="M6.2,32.6h21.1"/> <path class="fog-line big-path" d="M11.4,43.6H6.2"/> <path class="fog-line big-path" d="M37.5,43.6H15.4"/> <path class="fog-line big-path" d="M62.5,43.6H41.4"/> <path class="fog-line big-path" d="M6.2,36.4h2.1"/> <path class="fog-line big-path" d="M11.9,36.4h6"/> <path class="fog-line big-path" d="M21.8,36.4h20.4"/> <path class="fog-line big-path" d="M46.3,36.4h16.1"/> <path class="fog-line big-path" d="M55.2,40.2h7.3"/> <path class="fog-line big-path" d="M48.3,40.2h2.8"/> <path class="fog-line big-path" d="M37.3,40.2H44"/> <path class="fog-line big-path" d="M18.3,40.2h15.3"/> <path class="fog-line big-path" d="M6.2,40.2h8"/> </g> </g> </svg> </div></div><p class="weatherInfo">Fog ' + capitalizeFirstLetter(day_night_indication) + '</p>');
+                                    $weather_table.find('.status').text("Fog " + capitalizeFirstLetter(day_indication));
                                     break;
                                 case "CLOUDY":
-                                    $('.weatherIcon').append('<div id="temp"><h1>' + temp + '&deg;C</h1></div><div class="cloudy"><div class="cloud"></div><div class="cloud"></div></div><p class="weatherInfo">Cloudy ' + capitalizeFirstLetter(day_night_indication) + '</p>');
+                                    $weather_table.find('.status').text("Cloudy " + capitalizeFirstLetter(day_indication));
                                     break;
                                 case "PARTLY_CLOUDY_DAY":
-                                    $('.weatherIcon').append('<div id="temp"><h1>' + temp + '&deg;C</h1></div><div class="icon-weather sun_static sun--with-cloud"><div class="icon-weather cloud_static cloud--silver"></div></div><p class="weatherInfo">Partly Cloudy Day</p>');
+                                    $weather_table.find('.status').text("Partly Cloudy Day");
                                     break;
                                 case "PARTLY_CLOUDY_NIGHT":
-                                    $('.weatherIcon').append('<div id="temp"><h1>' + temp + '&deg;C</h1></div><div class="icon-weather moon_static moon--with-cloud"> <div class="icon-weather cloud_static cloud--silver"></div> </div><p class="weatherInfo">Partly Cloudy Night</p>');
+                                    $weather_table.find('.status').text("Partly Cloudy Night");
                                     break;
                             }
-                            $('.widget').show().removeClass('widget_blur');
+                            $weather_table.show().removeClass('weather_blur');
                         }
                     }
                     else {
                         if (!(json.daily.data_exist)) {
                             $('#weather_error').html("No Weather Data for this Location/Timestamp").stop().slideDown();
-                            $('.widget').hide().removeClass('widget_blur');
+                            $weather_table.hide().removeClass('weather_blur');
                         }
                         else {
-                            $('#beaufort_num').text(json.daily.beaufort);
+                            $('#daily_button').removeClass('deactivate_daily');
+                            $('.tooltip').eq(10).tooltipster('content', 'Wind speed is caused by air moving from high pressure to low pressure, usually due to changes in temperature. <span style="font-weight: bold;margin: 5px 0;display: block">Beaufort: ' + json.daily.beaufort + '</span> <a href="https://en.wikipedia.org/wiki/Beaufort_scale" target="_blank">More</a>');
                             summary = json.daily.summary;
                             if (summary === "") {
                                 summary = "-";
                             }
-                            $('.weatherData').find('.description').text(summary);
-
-                            preciptype = json.daily.precipType;
-                            if (preciptype !== "") {
-                                $('.weatherData').find('.precip').text(preciptype);
-                            }
+                            $weather_table.find('.summary').text(summary);
+                            $weather_table.find('.location').text(json.address);
+                            $weather_table.find('.time').text(new Date(dateObject).toUTCString().split(' ').slice(0, 4).join(' '));
+                            $weather_table.find('.temperature').text(json.daily.max_temperature + '...' + json.daily.min_temperature);
 
                             visibility = json.daily.visibility;
                             if (visibility === "") {
@@ -1125,62 +1174,200 @@ function get_weather() {
                             }
                             $('#cloud').text(cloud_cover);
 
-
                             wind_speed = json.daily.wind_speed;
                             if (wind_speed === "") {
                                 wind_speed = "-";
                             }
                             $('#wind').text(wind_speed);
 
-                            min_temp = json.daily.min_temperature;
-                            max_temp = json.daily.max_temperature;
-
                             icon = json.daily.icon;
-                            $('.weatherIcon').empty();
+                            $weather_icon.attr('src', 'imgs/' + icon.toLowerCase() + '_64.png');
                             switch (icon) {
                                 case "CLEAR_DAY":
-                                    $('.weatherIcon').append('<div id="temp"><h1 style="font-size: 26px;">' + min_temp + ' ... ' + max_temp + '&deg;C</h1></div><div class="icon sunny"><div class="sun"><div class="rays"></div></div></div><p class="weatherInfo">Clear Day</p>')
+                                    $weather_table.find('.status').text("Clear Day");
                                     break;
                                 case "CLEAR_NIGHT":
-                                    $('.weatherIcon').append('<div id="temp"><h1 style="font-size: 26px;">' + min_temp + ' ... ' + max_temp + '&deg;C</h1></div><div class="moon"></div><p class="weatherInfo" style="margin-top: 115px;">Clear Night</p>');
+                                    $weather_table.find('.status').text("Clear Night");
                                     break;
                                 case "RAIN":
-                                    $('.weatherIcon').append('<div id="temp"><h1 style="font-size: 26px;">' + min_temp + ' ... ' + max_temp + '&deg;C</h1></div><div class="rainy"><div class="cloud"></div><div class="rain"></div></div><p class="weatherInfo">Rain</p>');
+                                    $weather_table.find('.status').text("Rain");
                                     break;
                                 case "SNOW":
-                                    $('.weatherIcon').append('<div id="temp"><h1 style="font-size: 26px;">' + min_temp + ' ... ' + max_temp + '&deg;C</h1></div><div class="flurries"><div class="cloud"></div><div class="snow"><div class="flake"></div><div class="flake"></div></div></div><p class="weatherInfo">Snow</p>');
+                                    $weather_table.find('.status').text("Snow");
                                     break;
                                 case "SLEET":
-                                    $('.weatherIcon').append('<div id="temp"><h1 style="font-size: 26px;">' + min_temp + ' ... ' + max_temp + '&deg;C</h1></div><div class="flurries"><div class="cloud"></div><div class="snow"><div class="flake sleet"></div><div class="flake sleet"></div></div></div><p class="weatherInfo">Sleet</p>');
+                                    $weather_table.find('.status').text("Sleet");
                                     break;
                                 case "WIND":
-                                    $('.weatherIcon').append('<div id="temp"><h1 style="font-size: 26px;">' + min_temp + ' ... ' + max_temp + '&deg;C</h1></div><div class="svg-contain"> <svg version="1.1" class="windy-svg" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="-447 254.4 64 52.6" style="enable-background:new -447 254.4 64 52.6;" xml:space="preserve"> <g id="Layer_1_1_"> <g> <path class="st0 little-path path-1" d="M-429.2,276.8h6.3"/> <path class="big-path big-path-1" d="M-438.1,279.3c0,0,20.5,0,20.6,0c4.1,0,7.4-3.4,7.7-7.4c0.1-1.1-0.1-2.3-0.6-3.3c-2.2-5.4-9.8-6.3-13.3-1.7 c-1,1.3-1.6,3-1.7,4.6"/> <path class="little-path path-2" d="M-422.6,271.7c0-2.8,2.3-5.1,5.1-5.1s5.1,2.3,5.1,5.1c0,2.8-2.3,5.1-5.1,5.1"/> </g> <g> <path class="little-path path-3" d="M-434.1,284.9h30.4"/> <path class="little-path path-4" d="M-410.6,280h8.7"/> <path class="big-path big-path-2" d="M-442.9,282.7h44c3.6,0,6.6,3,6.8,6.5c0.1,1-0.1,2-0.5,3c-2,4.8-8.7,5.5-11.8,1.5c-0.9-1.2-1.4-2.6-1.5-4.1" /> <path class="little-path path-5" d="M-403.4,289.4c0,2.5,2,4.5,4.5,4.5s4.5-2,4.5-4.5s-2-4.5-4.5-4.5"/> </g> </g> </svg></div><p class="weatherInfo">Wind</p>');
+                                    $weather_table.find('.status').text("Wind");
                                     break;
                                 case "FOG":
-                                    $('.weatherIcon').append('<div id="temp"><h1 style="font-size: 26px;">' + min_temp + ' ... ' + max_temp + '&deg;C</h1></div><div class="svg-contain"> <svg class="fog-svg" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 68 52.6" style="enable-background:new 0 0 68 52.6;" xml:space="preserve"> <g id="Layer_1"> <g> <path class="cloud_fog" d="M62.8,29.3c0-5.2-4.2-9.4-9.4-9.4c-0.2,0-0.4,0.1-0.7,0.1c-0.1-0.9-0.2-1.8-0.5-2.7c-0.3-1.1-0.9-2.2-1.5-3.1 C48.6,11,44.9,9,40.8,9c-2.5,0-4.8,0.7-6.7,2c-0.6,0.4-1.2,0.9-1.8,1.5c-0.3,0.3-0.5,0.6-0.8,0.8c-0.2,0.3-0.5,0.6-0.7,0.9 c-1.9-1.3-4.2-2.1-6.7-2.1c-6,0-10.9,4.4-11.8,10.1c-3.8,1.1-6.7,4.3-7.2,8.3h28.7h13.9h14.1h0.8C62.7,30.6,62.8,30.1,62.8,29.3z" /> <path class="fog-line big-path" d="M7.3,28.8h12.4"/> <path class="fog-line big-path" d="M23.5,28.8h38.4"/> <path class="fog-line big-path" d="M57.3,32.6h5.2"/> <path class="fog-line big-path" d="M31.2,32.6h22.1"/> <path class="fog-line big-path" d="M6.2,32.6h21.1"/> <path class="fog-line big-path" d="M11.4,43.6H6.2"/> <path class="fog-line big-path" d="M37.5,43.6H15.4"/> <path class="fog-line big-path" d="M62.5,43.6H41.4"/> <path class="fog-line big-path" d="M6.2,36.4h2.1"/> <path class="fog-line big-path" d="M11.9,36.4h6"/> <path class="fog-line big-path" d="M21.8,36.4h20.4"/> <path class="fog-line big-path" d="M46.3,36.4h16.1"/> <path class="fog-line big-path" d="M55.2,40.2h7.3"/> <path class="fog-line big-path" d="M48.3,40.2h2.8"/> <path class="fog-line big-path" d="M37.3,40.2H44"/> <path class="fog-line big-path" d="M18.3,40.2h15.3"/> <path class="fog-line big-path" d="M6.2,40.2h8"/> </g> </g> </svg> </div></div><p class="weatherInfo">Fog</p>');
+                                    $weather_table.find('.status').text("Fog");
                                     break;
                                 case "CLOUDY":
-                                    $('.weatherIcon').append('<div id="temp"><h1 style="font-size: 26px;">' + min_temp + ' ... ' + max_temp + '&deg;C</h1></div><div class="cloudy"><div class="cloud"></div><div class="cloud"></div></div><p class="weatherInfo">Cloudy</p>');
+                                    $weather_table.find('.status').text("Cloudy");
                                     break;
                                 case "PARTLY_CLOUDY_DAY":
-                                    $('.weatherIcon').append('<div id="temp"><h1 style="font-size: 26px;">' + min_temp + ' ... ' + max_temp + '&deg;C</h1></div><div class="icon-weather sun_static sun--with-cloud"><div class="icon-weather cloud_static cloud--silver"></div></div><p class="weatherInfo">Partly Cloudy Day</p>');
+                                    $weather_table.find('.status').text("Partly Cloudy Day");
                                     break;
                                 case "PARTLY_CLOUDY_NIGHT":
-                                    $('.weatherIcon').append('<div id="temp"><h1 style="font-size: 26px;">' + min_temp + ' ... ' + max_temp + '&deg;C</h1></div><div class="icon-weather moon_static moon--with-cloud"> <div class="icon-weather cloud_static cloud--silver"></div> </div><p class="weatherInfo">Partly Cloudy Night</p>');
+                                    $weather_table.find('.status').text("Partly Cloudy Night");
                                     break;
                             }
+                            $weather_table.show().removeClass('weather_blur');
                         }
-                        $('.widget').show().removeClass('widget_blur');
                     }
-
                 }
                 $('#loading_weather').hide();
-
             },
             async: true
         });
     }
 }
+
+$('#forecast ul li').click(function () {
+    $('#daily_button').addClass('deactivate_daily');
+    $('.active_weather').removeClass('active_weather');
+    $(this).addClass('active_weather');
+    var summary, visibility, icon, cloud_cover, wind_speed, day_indication;
+    var $weather_table = $('#weather_table');
+    var $weather_icon = $('#weather_icon');
+    var pos = $(this).attr('data-index');
+
+    $('.tooltip').eq(10).tooltipster('content', 'Wind speed is caused by air moving from high pressure to low pressure, usually due to changes in temperature. <span style="font-weight: bold;margin: 5px 0;display: block">Beaufort: ' + weather_json['hourly' + pos].beaufort + '</span> <a href="https://en.wikipedia.org/wiki/Beaufort_scale" target="_blank">More</a>');
+    summary = weather_json['hourly' + pos].summary;
+    if (summary === "") {
+        summary = "-";
+    }
+    $weather_table.find('.summary').text(summary);
+    $weather_table.find('.temperature').text(weather_json['hourly' + pos].temperature);
+
+    visibility = weather_json['hourly' + pos].visibility;
+    if (visibility === "") {
+        visibility = "-";
+    }
+    $('#visibility').text(visibility);
+
+    cloud_cover = weather_json['hourly' + pos].cloud_cover;
+    if (cloud_cover === "") {
+        cloud_cover = "-";
+    }
+    $('#cloud').text(cloud_cover);
+
+    wind_speed = weather_json['hourly' + pos].wind_speed;
+    if (wind_speed === "") {
+        wind_speed = "-";
+    }
+    $('#wind').text(wind_speed);
+
+    icon = weather_json['hourly' + pos].icon;
+    $weather_icon.attr('src', 'imgs/' + icon.toLowerCase() + '_64.png');
+    day_indication = weather_json['hourly' + pos].day_night_indication;
+    switch (icon) {
+        case "CLEAR_DAY":
+            $weather_table.find('.status').text("Clear Day");
+            break;
+        case "CLEAR_NIGHT":
+            $weather_table.find('.status').text("Clear Night");
+            break;
+        case "RAIN":
+            $weather_table.find('.status').text("Rain " + capitalizeFirstLetter(day_indication));
+            break;
+        case "SNOW":
+            $weather_table.find('.status').text("Snow " + capitalizeFirstLetter(day_indication));
+            break;
+        case "SLEET":
+            $weather_table.find('.status').text("Sleet " + capitalizeFirstLetter(day_indication));
+            break;
+        case "WIND":
+            $weather_table.find('.status').text("Wind " + capitalizeFirstLetter(day_indication));
+            break;
+        case "FOG":
+            $weather_table.find('.status').text("Fog " + capitalizeFirstLetter(day_indication));
+            break;
+        case "CLOUDY":
+            $weather_table.find('.status').text("Cloudy " + capitalizeFirstLetter(day_indication));
+            break;
+        case "PARTLY_CLOUDY_DAY":
+            $weather_table.find('.status').text("Partly Cloudy Day");
+            break;
+        case "PARTLY_CLOUDY_NIGHT":
+            $weather_table.find('.status').text("Partly Cloudy Night");
+            break;
+    }
+
+});
+
+$('#daily_button').click(function(){
+    var summary, visibility, icon, cloud_cover, wind_speed;
+    $('.active_weather').removeClass('active_weather');
+    $(this).removeClass('deactivate_daily');
+
+    var $weather_table = $('#weather_table');
+    var $weather_icon = $('#weather_icon');
+
+    $('.tooltip').eq(10).tooltipster('content', 'Wind speed is caused by air moving from high pressure to low pressure, usually due to changes in temperature. <span style="font-weight: bold;margin: 5px 0;display: block">Beaufort: ' + weather_json.daily.beaufort + '</span> <a href="https://en.wikipedia.org/wiki/Beaufort_scale" target="_blank">More</a>');
+    summary = weather_json.daily.summary;
+    if (summary === "") {
+        summary = "-";
+    }
+    $weather_table.find('.summary').text(summary);
+    $weather_table.find('.temperature').text(weather_json.daily.max_temperature + '...' + weather_json.daily.min_temperature);
+
+    visibility = weather_json.daily.visibility;
+    if (visibility === "") {
+        visibility = "-";
+    }
+    $('#visibility').text(visibility);
+
+    cloud_cover = weather_json.daily.cloud_cover;
+    if (cloud_cover === "") {
+        cloud_cover = "-";
+    }
+    $('#cloud').text(cloud_cover);
+
+    wind_speed = weather_json.daily.wind_speed;
+    if (wind_speed === "") {
+        wind_speed = "-";
+    }
+    $('#wind').text(wind_speed);
+
+    icon = weather_json.daily.icon;
+    $weather_icon.attr('src', 'imgs/' + icon.toLowerCase() + '_64.png');
+    switch (icon) {
+        case "CLEAR_DAY":
+            $weather_table.find('.status').text("Clear Day");
+            break;
+        case "CLEAR_NIGHT":
+            $weather_table.find('.status').text("Clear Night");
+            break;
+        case "RAIN":
+            $weather_table.find('.status').text("Rain");
+            break;
+        case "SNOW":
+            $weather_table.find('.status').text("Snow");
+            break;
+        case "SLEET":
+            $weather_table.find('.status').text("Sleet");
+            break;
+        case "WIND":
+            $weather_table.find('.status').text("Wind");
+            break;
+        case "FOG":
+            $weather_table.find('.status').text("Fog");
+            break;
+        case "CLOUDY":
+            $weather_table.find('.status').text("Cloudy");
+            break;
+        case "PARTLY_CLOUDY_DAY":
+            $weather_table.find('.status').text("Partly Cloudy Day");
+            break;
+        case "PARTLY_CLOUDY_NIGHT":
+            $weather_table.find('.status').text("Partly Cloudy Night");
+            break;
+    }
+    $weather_table.show().removeClass('weather_blur');
+});
 function initMap() {
     var input = document.getElementById('location_input');
     var autocomplete = new google.maps.places.Autocomplete(input);
@@ -1294,4 +1481,8 @@ $('#time_input').change(function () {
 
 function capitalizeFirstLetter(string) {
     return string.charAt(0).toUpperCase() + string.slice(1);
+}
+function zeroPad(num, places) {
+    var zero = places - num.toString().length + 1;
+    return Array(+(zero > 0 && zero)).join("0") + num;
 }

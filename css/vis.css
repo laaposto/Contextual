@@ -58,7 +58,7 @@
 
 .middle_left_arrow:before {
     border-color: rgba(194, 225, 245, 0);
-    border-right-color: #c2e1f5;
+    border-right-color: #777;
     border-width: 36px;
     margin-top: -36px;
 }
@@ -79,7 +79,7 @@
 
 .bottom_left_arrow:before {
     border-color: rgba(194, 225, 245, 0);
-    border-right-color: lightblue;
+    border-right-color: #777;
     border-width: 36px;
     margin-top: -67px;
 }
@@ -107,7 +107,7 @@
 
 .bottom_right_arrow:before {
     border-color: rgba(194, 225, 245, 0);
-    border-left-color: #c2e1f5;
+    border-left-color: #777;
     border-width: 36px;
     margin-top: -67px;
 }
@@ -142,7 +142,7 @@
 
 .middle_right_arrow:before {
     border-color: rgba(194, 225, 245, 0);
-    border-left-color: #c2e1f5;
+    border-left-color: #777;
     border-width: 36px;
     margin-top: -36px;
 }
@@ -165,7 +165,7 @@
     width: 400px;
     position: absolute;
     z-index: -1;
-    border: 4px solid #c2e1f5;
+    border: 4px solid #777;
     left: 37px;
     opacity: 0;
     top: 50px;
@@ -472,14 +472,13 @@
 .vis-item {
     position: absolute;
     color: #1A1A1A;
-    border-width: 4px;
     background-color: transparent;
-    border-color: transparent;
     display: inline-block;
     -webkit-transition: border 500ms ease-out;
     -moz-transition: border 500ms ease-out;
     -o-transition: border 500ms ease-out;
     transition: border 500ms ease-out;
+    border: 4px #777;
 }
 
 .vis-item.vis-selected {
@@ -499,9 +498,8 @@
 .vis-item.vis-dot {
     position: absolute;
     padding: 0;
-    border-width: 5px;
-    border-style: solid;
     border-radius: 5px;
+    border: 5px solid #777;
 }
 
 .vis-item.vis-background {
