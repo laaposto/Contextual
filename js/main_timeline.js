@@ -9,7 +9,7 @@ function load_twitter() {
                 if (json.hasOwnProperty("message")) {
                     clearInterval(interval_twitter);
                     $('#alert_twitter').slideUp();
-                    $('#empty').show();
+                    $('#empty').text("Something unexpected happen. Please try again!").show();
                     $('#loading_all,#cover,#cover_info,#loading_info,#cover_timeline,#loading_timeline').remove();
                 }
                 else {

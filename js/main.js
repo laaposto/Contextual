@@ -145,14 +145,19 @@ function start_video_calls_youtube() {
     $.ajax({
         type: 'GET',
         url: 'http://caa.iti.gr:8008/verify_videoV2?url=' + video_verify + reprocess_param,
-        dataType: 'text',
+        dataType: 'json',
+        success: function (json) {
+            if (json.hasOwnProperty("message")) {
+                $('#empty').text(json.message).show();
+                $('#loading_all,#cover,#cover_info,#loading_info,#cover_timeline,#loading_timeline,.controls,.table,.table_title,#weather_input').remove();
+
+            } else {
+                load_youtube();
+                load_twitter();
+            }
+        },
         async: true
     });
-    setTimeout(function () {
-        load_youtube();
-        load_twitter();
-    }, 1000);
-
 }
 function start_video_calls_facebook() {
     var reprocess_param = "";
@@ -162,14 +167,19 @@ function start_video_calls_facebook() {
     $.ajax({
         type: 'GET',
         url: 'http://caa.iti.gr:8008/verify_videoV2?url=' + video_verify + reprocess_param,
-        dataType: 'text',
+        dataType: 'json',
+        success: function (json) {
+            if (json.hasOwnProperty("message")) {
+                $('#empty').text(json.message).show();
+                $('#loading_all,#cover,#cover_info,#loading_info,#cover_timeline,#loading_timeline,.controls,.table,.table_title,#weather_input').remove();
+
+            } else {
+                load_facebook();
+                load_twitter();
+            }
+        },
         async: true
     });
-    setTimeout(function () {
-        load_facebook();
-        load_twitter();
-    }, 1000);
-
 }
 
 function start_video_calls_twitter() {
@@ -180,14 +190,19 @@ function start_video_calls_twitter() {
     $.ajax({
         type: 'GET',
         url: 'http://caa.iti.gr:8008/verify_videoV2?url=' + video_verify + reprocess_param,
-        dataType: 'text',
+        dataType: 'json',
+        success: function (json) {
+            if (json.hasOwnProperty("message")) {
+                $('#empty').text(json.message).show();
+                $('#loading_all,#cover,#cover_info,#loading_info,#cover_timeline,#loading_timeline,.controls,.table,.table_title,#weather_input').remove();
+
+            } else {
+                load_twitter_video();
+                load_twitter();
+            }
+        },
         async: true
     });
-    setTimeout(function () {
-        load_twitter_video();
-        load_twitter();
-    }, 1000);
-
 }
 
 $("#thumb_info").on("click", ".link", function () {
@@ -418,7 +433,7 @@ function load_youtube() {
                 if (json.hasOwnProperty("message")) {
                     clearInterval(interval_youtube);
                     $('#alert_comments').stop().slideUp();
-                    $('#empty').show();
+                    $('#empty').text("Something unexpected happen. Please try again!").show();
                     $('#loading_all,#cover,#cover_info,#loading_info,#cover_timeline,#loading_timeline,.controls,.table,.table_title,#weather_input').remove();
                 }
                 else {
@@ -615,7 +630,7 @@ function load_facebook() {
                 if (json.hasOwnProperty("message")) {
                     clearInterval(interval_facebook);
                     $('#alert_comments').stop().slideUp();
-                    $('#empty').show();
+                    $('#empty').text("Something unexpected happen. Please try again!").show();
                     $('#loading_all,#cover,#cover_info,#loading_info,.controls,.table,.table_title,#weather_input').remove();
                 }
                 else {
@@ -799,7 +814,7 @@ function load_twitter_video() {
                 if (json.hasOwnProperty("message")) {
                     clearInterval(interval_twitter);
                     $('#alert_comments').stop().slideUp();
-                    $('#empty').show();
+                    $('#empty').text("Something unexpected happen. Please try again!").show();
                     $('#loading_all,#cover,#cover_info,#loading_info,.controls,.table,.table_title,#weather_input').remove();
                 }
                 else {
@@ -929,7 +944,7 @@ function load_twitter_video() {
                     $('#tw_tweet_id').text(json.id_str);
                     $('#tw_tweet_text').text(json.full_text);
                     $('#tw_tweet_created_time').text(json.created_at);
-                    $('#tw_tweet_source').html('<a target="_blank" href="'+json.source_url+'">'+json.source+'</a>');
+                    $('#tw_tweet_source').html('<a target="_blank" href="' + json.source_url + '">' + json.source + '</a>');
                     $('#tw_tweet_mentioned_locations').html(tweet_text_locations);
                     $('#tw_tweet_rt').text(json.retweet_count);
                     $('#tw_tweet_fav').text(json.favorite_count);
@@ -1298,7 +1313,7 @@ $('#forecast ul li').click(function () {
 
 });
 
-$('#daily_button').click(function(){
+$('#daily_button').click(function () {
     var summary, visibility, icon, cloud_cover, wind_speed;
     $('.active_weather').removeClass('active_weather');
     $(this).removeClass('deactivate_daily');
