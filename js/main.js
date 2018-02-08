@@ -990,32 +990,42 @@ function load_twitter_video() {
                         $tiles_thumbs.find('.ca-item').wookmark(options_thumbs);
                     });
 
-                    $('#verified').html('VERIFICATION (' + json.verification_replies.length + ')');
-                    $('#all').html('ALL (' + json.replies.length + ')');
-                    verification_comments = [];
-                    for (var k = 0; k < json.verification_replies.length; k++) {
-                        verification_comments.push(json.verification_replies[k]);
-                    }
+                    if (json.replies_overflow === "false") {
+                        $('#verified').html('VERIFICATION (' + json.verification_replies.length + ')');
+                        $('#all').html('ALL (' + json.replies.length + ')');
+                        verification_comments = [];
+                        for (var k = 0; k < json.verification_replies.length; k++) {
+                            verification_comments.push(json.verification_replies[k]);
+                        }
 
-                    if ($('.filter.active').attr('id') === "all") {
-                        if (global_json.replies.length > $('#comments_info .ca-item').length) {
-                            $('.more').show();
+                        if ($('.filter.active').attr('id') === "all") {
+                            if (global_json.replies.length > $('#comments_info .ca-item').length) {
+                                $('.more').show();
+                            }
+                            else {
+                                $('.more').hide();
+                            }
                         }
                         else {
-                            $('.more').hide();
+                            if (verification_comments.length > $('#comments_info .ca-item').length) {
+                                $('.more').show();
+                            }
+                            else {
+                                $('.more').hide();
+                            }
+                        }
+                        if ((first_call) && (json.verification_replies.length > 0)) {
+                            replies();
+                            first_call = false
                         }
                     }
-                    else {
-                        if (verification_comments.length > $('#comments_info .ca-item').length) {
-                            $('.more').show();
-                        }
-                        else {
-                            $('.more').hide();
-                        }
-                    }
-                    if ((first_call) && (json.verification_replies.length > 0)) {
-                        replies();
-                        first_call = false
+                    else{
+                        $('#verified').html('VERIFICATION (-)');
+                        $('#all').html('ALL (-)');
+                        verification_comments = [];
+                        $('.more').hide();
+                        $('#alert_comments').hide();
+                        $('#alert_comments_overflow').stop().slideDown();
                     }
 
                     $('#loading_all,#cover,#cover_info,#loading_info').remove();

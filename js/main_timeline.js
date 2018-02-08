@@ -424,7 +424,13 @@ function load_twitter() {
                 }
                 if (json.processing_status === "done") {
                     clearInterval(interval_twitter);
-                    $('#alert_twitter').slideUp();
+                    if (json.tweets_overflow === "true") {
+                        $('#alert_twitter').hide();
+                        $('#alert_twitter_overflow').stop().slideDown();
+                    }
+                    else {
+                        $('#alert_twitter').stop().slideUp();
+                    }
                 }
             },
             error: function (e) {
