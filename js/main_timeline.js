@@ -21,7 +21,7 @@ function load_twitter() {
                             for (var i = 0; i < json.tweets.length; i++) {
                                 data.push({
                                     "id": json.tweets[i].id_str,
-                                    content: "<img class='tweet_img' src='https://twitter.com/" + json.tweets[i].user.screen_name + "/profile_image?size=normal' height='32' width='32'>",
+                                    content: "<img class='tweet_img' src='https://avatars.io/twitter/" + json.tweets[i].user.screen_name + "' height='32' width='32'>",
                                     "start": new Date(json.tweets[i].created_at).getTime(),
                                     "text": json.tweets[i].text,
                                     "fake": json.tweets[i].fake
@@ -372,7 +372,7 @@ function load_twitter() {
                             for (v = items.length; v < json.tweets.length; v++) {
                                 items.add({
                                     "id": json.tweets[v].id_str,
-                                    content: "<img class='tweet_img' src='https://twitter.com/" + json.tweets[v].user.screen_name + "/profile_image?size=normal' height='32' width='32'>",
+                                    content: "<img class='tweet_img' src='https://avatars.io/twitter/" + json.tweets[v].user.screen_name + "' height='32' width='32'>",
                                     "start": new Date(json.tweets[v].created_at).getTime(),
                                     "text": json.tweets[v].text,
                                     "fake": json.tweets[v].fake
