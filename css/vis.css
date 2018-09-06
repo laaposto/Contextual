@@ -58,7 +58,7 @@
 
 .middle_left_arrow:before {
     border-color: rgba(194, 225, 245, 0);
-    border-right-color: #777;
+    border-right-color: #1da1f2;
     border-width: 36px;
     margin-top: -36px;
 }
@@ -79,7 +79,7 @@
 
 .bottom_left_arrow:before {
     border-color: rgba(194, 225, 245, 0);
-    border-right-color: #777;
+    border-right-color: #1da1f2;
     border-width: 36px;
     margin-top: -67px;
 }
@@ -107,7 +107,7 @@
 
 .bottom_right_arrow:before {
     border-color: rgba(194, 225, 245, 0);
-    border-left-color: #777;
+    border-left-color: #1da1f2;
     border-width: 36px;
     margin-top: -67px;
 }
@@ -142,7 +142,7 @@
 
 .middle_right_arrow:before {
     border-color: rgba(194, 225, 245, 0);
-    border-left-color: #777;
+    border-left-color: #1da1f2;
     border-width: 36px;
     margin-top: -36px;
 }
@@ -165,11 +165,12 @@
     width: 400px;
     position: absolute;
     z-index: -1;
-    border: 4px solid #777;
+    border: 4px solid #1da1f2;
     left: 37px;
     opacity: 0;
     top: 50px;
     background: #fff;
+    min-height: 60px;
 }
 
 .twitter-tweet-rendered {
@@ -331,7 +332,7 @@
     position: relative;
     overflow: hidden;
     padding: 0;
-    margin: 0 0 111px;
+    margin: 0;
     box-sizing: border-box;
 }
 
@@ -478,7 +479,7 @@
     -moz-transition: border 500ms ease-out;
     -o-transition: border 500ms ease-out;
     transition: border 500ms ease-out;
-    border: 4px #777;
+    border: 4px #1da1f2;
 }
 
 .vis-item.vis-selected {
@@ -499,7 +500,7 @@
     position: absolute;
     padding: 0;
     border-radius: 5px;
-    border: 5px solid #777;
+    border: 5px solid #1da1f2;
 }
 
 .vis-item.vis-background {

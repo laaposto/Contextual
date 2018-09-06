@@ -71,6 +71,14 @@
 
 </div>
 <p class="desc_p">or have a look at some explanatory examples below</p>
+
+<div id="links_wrapper">
+    <p> Facebook </p>
+
+    <p> Youtube</p>
+
+    <p>Twitter</p>
+</div>
 <hr>
 <h3 class="title_example">FACEBOOK EXAMPLES</h3>
 <ul class="tiles" id="video_examples_facebook">
@@ -103,7 +111,6 @@
 </ul>
 <hr>
 <h3 class="title_example">YOUTUBE EXAMPLES</h3>
-
 <ul class="tiles" id="video_examples">
     <div class="video">
         <img src="imgs/youtube-placeholder.jpg">
@@ -205,12 +212,27 @@
         </button>
     </div>
 </ul>
+<hr>
+<h3 class="title_example">TWITTER EXAMPLES</h3>
+<ul class="tiles" id="video_examples_twitter">
+    <div id="tweet1" class="video" data-tweetID="905257372066750466"></div>
+    <div id="tweet2" class="video" data-tweetID="712402767113953281"></div>
+    <div id="tweet3" class="video" data-tweetID="834326652360458241"></div>
+</ul>
+<div class="alert" id="analysis_info">
+    <span class="close_alert">×</span>
+    <strong>Info!</strong> <span id="analysis_info_msg"></span>
+</div>
 <div id="user_video">
     <iframe id="iframe" width="360" height="305" frameborder="0">
     </iframe>
     <p class="twitter_p">Search in Twitter<img src="imgs/twitter_icon.png"></p>
 </div>
-<div id="empty"></div>
+<p class="embedded_yt">Tweet contains embedded YouTube video. Submit the YouTube video to CAA for analysis <a href="#">here</a>
+</p>
+
+<p class="debunked"></p>
+
 <div class="tab">
     <ul class="tabs active">
         <li><a href="#">GENERAL</a></li>
@@ -231,6 +253,7 @@
                                                                             data-tooltip-content="#tooltip_general"/>
         </div>
         <p class="table_title">VIDEO</p>
+
         <table class="table" id="video_yt_table">
             <thead>
             <tr>
@@ -239,71 +262,84 @@
             </tr>
             </thead>
             <tbody>
+
             <tr>
-                <td>Video ID</td>
-                <td id="video_id"></td>
-            </tr>
-            <tr>
-                <td>Video Title</td>
+                <td>Title</td>
                 <td id="video_title"></td>
             </tr>
             <tr>
-                <td>Video Description</td>
+                <td>Description</td>
                 <td id="video_description"></td>
             </tr>
             <tr>
-                <td>Video Description Mentioned Locations</td>
+                <td>Description Mentioned Locations</td>
                 <td id="video_locations"></td>
             </tr>
             <tr>
-                <td>Video Upload Time</td>
+                <td>Upload Time</td>
                 <td id="video_upload_time"></td>
             </tr>
             <tr>
-                <td>Video View Count</td>
+                <td>View Count</td>
                 <td id="video_view_count"></td>
             </tr>
             <tr>
-                <td>Video Like Count</td>
-                <td id="video_like_count"></td>
-            </tr>
-            <tr>
-                <td>Video Dislike Count</td>
-                <td id="video_dislike_count"></td>
-            </tr>
-            <tr>
-                <td>Video Comment Count</td>
-                <td id="video_comment_count"></td>
-            </tr>
-            <tr>
-                <td>Video Duration</td>
+                <td>Duration</td>
                 <td id="video_duration"></td>
             </tr>
             <tr>
-                <td>Video Dimension<img src="imgs/info_color.png" class="tooltip"
-                                        data-tooltip-content="#tooltip_dimension"/></td>
+                <td>Verification comment count</td>
+                <td id="video_verification_comment_count"></td>
+            </tr>
+            </tbody>
+        </table>
+        <table class="table" id="video_yt_table_more">
+            <thead>
+            </thead>
+            <tbody>
+            <tr>
+                <td>ID</td>
+                <td id="video_id"></td>
+            </tr>
+            <tr>
+                <td>Like Count</td>
+                <td id="video_like_count"></td>
+            </tr>
+            <tr>
+                <td>Dislike Count</td>
+                <td id="video_dislike_count"></td>
+            </tr>
+            <tr>
+                <td>Comment Count</td>
+                <td id="video_comment_count"></td>
+            </tr>
+            <tr>
+                <td>Dimension<img src="imgs/info_color.png" class="tooltip"
+                                  data-tooltip-content="#tooltip_dimension"/></td>
                 <td id="video_dimension"></td>
             </tr>
             <tr>
-                <td>Video Definition<img src="imgs/info_color.png" class="tooltip"
-                                         data-tooltip-content="#tooltip_definition"/></td>
+                <td>Definition<img src="imgs/info_color.png" class="tooltip"
+                                   data-tooltip-content="#tooltip_definition"/></td>
                 <td id="video_definition"></td>
             </tr>
             <tr>
-                <td>Video Licensed Content<img src="imgs/info_color.png" class="tooltip"
-                                               data-tooltip-content="#tooltip_licensed"/></td>
+                <td>Licensed Content<img src="imgs/info_color.png" class="tooltip"
+                                         data-tooltip-content="#tooltip_licensed"/></td>
                 <td id="video_licensed_content"></td>
             </tr>
             <tr>
-                <td>Video Recording Location Description</td>
+                <td>Recording Location Description</td>
                 <td id="video_recording_location_description"></td>
             </tr>
             <tr>
-                <td>Video Recording Time</td>
+                <td>Recording Time</td>
                 <td id="video_recording_time"></td>
             </tr>
             </tbody>
         </table>
+        <p class="details video_yt">More Details<img src="imgs/down_arrow.png"></p>
+
         <table class="table" id="video_fb_table">
             <thead>
             <tr>
@@ -313,59 +349,74 @@
             </thead>
             <tbody>
             <tr>
-                <td>Video Title</td>
+                <td>Title</td>
                 <td id="fb_video_title"></td>
             </tr>
             <tr>
-                <td>Video ID</td>
-                <td id="fb_video_id"></td>
-            </tr>
-            <tr>
-                <td>Video Content Category</td>
-                <td id="fb_content_category"></td>
-            </tr>
-            <tr>
-                <td>Video Content Tags</td>
-                <td id="fb_content_tags"></td>
-            </tr>
-            <tr>
-                <td>Video Desctiption</td>
+                <td>Description</td>
                 <td id="fb_video_description"></td>
             </tr>
             <tr>
-                <td>Video Description Mentioned Locations</td>
+                <td>Description Mentioned Locations</td>
                 <td id="fb_video_locations"></td>
             </tr>
             <tr>
-                <td>Video Created Time</td>
-                <td id="fb_created_time"></td>
-            </tr>
-            <tr>
-                <td>Video Updated Time</td>
+                <td>Updated Time<img src="imgs/info_color.png" class="tooltip"
+                                     data-tooltip-content="#tooltip_updated_time"/></td>
                 <td id="fb_updated_time"></td>
             </tr>
             <tr>
-                <td>Video Comments</td>
+                <td>Verification Comments</td>
+                <td id="fb_total_verification_comment_count"></td>
+            </tr>
+            </tbody>
+        </table>
+        <table class="table" id="video_fb_table_more">
+            <thead>
+
+            </thead>
+            <tbody>
+            <tr>
+                <td>ID</td>
+                <td id="fb_video_id"></td>
+            </tr>
+            <tr>
+                <td>Content Category</td>
+                <td id="fb_content_category"></td>
+            </tr>
+            <tr>
+                <td>Content Tags</td>
+                <td id="fb_content_tags"></td>
+            </tr>
+            <tr>
+                <td>Created Time</td>
+                <td id="fb_created_time"></td>
+            </tr>
+            <tr>
+                <td>Comments</td>
                 <td id="fb_total_comment_count"></td>
             </tr>
             <tr>
-                <td>Video Embeddable</td>
+                <td>Embeddable</td>
                 <td id="fb_embeddable"></td>
             </tr>
             <tr>
-                <td>Video Length</td>
+                <td>Length</td>
                 <td id="fb_length"></td>
             </tr>
             <tr>
-                <td>Video Picture</td>
+                <td>Picture</td>
                 <td id="fb_picture"></td>
             </tr>
             <tr>
-                <td>Video Privacy</td>
+                <td>Privacy</td>
                 <td id="fb_privacy"></td>
             </tr>
             </tbody>
         </table>
+        <p class="details video_fb">More Details<img src="imgs/down_arrow.png"></p>
+
+
         <table class="table" id="tweet_tw_table">
             <thead>
             <tr>
@@ -374,73 +425,90 @@
             </tr>
             </thead>
             <tbody>
+
             <tr>
-                <td>Tweet ID</td>
-                <td id="tw_tweet_id"></td>
-            </tr>
-            <tr>
-                <td>Tweet Text</td>
+                <td>Text</td>
                 <td id="tw_tweet_text"></td>
             </tr>
             <tr>
-                <td>Tweet Created Time</td>
+                <td>Created Time</td>
                 <td id="tw_tweet_created_time"></td>
             </tr>
             <tr>
-                <td>Tweet Source</td>
-                <td id="tw_tweet_source" class="link"></td>
-            </tr>
-            <tr>
-                <td>Tweet Text Mentioned Locations</td>
+                <td>Text Mentioned Locations</td>
                 <td id="tw_tweet_mentioned_locations"></td>
             </tr>
             <tr>
-                <td>Tweet Retweet Count</td>
+                <td>Retweet Count</td>
                 <td id="tw_tweet_rt"></td>
             </tr>
             <tr>
-                <td>Tweet Favorite Count</td>
+                <td>Favorite Count</td>
                 <td id="tw_tweet_fav"></td>
             </tr>
             <tr>
-                <td>Tweet Hashtags</td>
-                <td id="tw_tweet_hashtags"></td>
-            </tr>
-            <tr>
-                <td>Tweet URLs</td>
-                <td id="tw_tweet_urls" class="link"></td>
-            </tr>
-            <tr>
-                <td>Tweet Users Mentions</td>
-                <td id="tw_tweet_users_mentions"></td>
-            </tr>
-            <tr>
-                <td>Tweet Language</td>
-                <td id="tw_tweet_lang"></td>
-            </tr>
-            <tr>
-                <td>Tweet Video Aspect Ratio</td>
-                <td id="tw_tweet_aspect"></td>
-            </tr>
-            <tr>
-                <td>Tweet Video Duration</td>
+                <td>Video Duration</td>
                 <td id="tw_tweet_duration"></td>
             </tr>
             <tr>
-                <td>Tweet Video Url</td>
+                <td>Verification Replies</td>
+                <td id="tw_tweet_ver_comments"></td>
+            </tr>
+            </tbody>
+        </table>
+        <table class="table" id="tweet_tw_table_more">
+            <thead>
+
+            </thead>
+            <tbody>
+            <tr>
+                <td>ID</td>
+                <td id="tw_tweet_id"></td>
+            </tr>
+            <tr>
+                <td>Source</td>
+                <td id="tw_tweet_source" class="link"></td>
+            </tr>
+            <tr>
+                <td>Hashtags</td>
+                <td id="tw_tweet_hashtags"></td>
+            </tr>
+            <tr>
+                <td>URLs</td>
+                <td id="tw_tweet_urls" class="link"></td>
+            </tr>
+            <tr>
+                <td>Users Mentions</td>
+                <td id="tw_tweet_users_mentions"></td>
+            </tr>
+            <tr>
+                <td>Language</td>
+                <td id="tw_tweet_lang"></td>
+            </tr>
+            <tr>
+                <td>Video Aspect Ratio</td>
+                <td id="tw_tweet_aspect"></td>
+            </tr>
+
+            <tr>
+                <td>Video Url</td>
                 <td id="tw_tweet_url" class="link"></td>
             </tr>
             <tr>
-                <td>Tweet Video Bitrate</td>
+                <td>Video Bitrate</td>
                 <td id="tw_tweet_bitrate"></td>
             </tr>
             <tr>
-                <td>Tweet Verification Label</td>
+                <td>Verification Label</td>
                 <td id="tw_tweet_verification"></td>
             </tr>
             </tbody>
         </table>
+        <p class="details video_tw">More Details<img src="imgs/down_arrow.png"></p>
+
+
         <p class="table_title">CHANNEL</p>
+
         <table class="table" id="channel_yt_table">
             <thead>
             <tr>
@@ -450,20 +518,27 @@
             </thead>
             <tbody>
             <tr>
-                <td>ID</td>
-                <td id="channel_id"></td>
-            </tr>
-            <tr>
                 <td>Description</td>
                 <td id="channel_description"></td>
             </tr>
             <tr>
-                <td>Description Mentioned Locations</td>
-                <td id="channel_locations"></td>
-            </tr>
-            <tr>
                 <td>Created Time</td>
                 <td id="channel_created_time"></td>
+            </tr>
+            </tbody>
+        </table>
+        <table class="table" id="channel_yt_table_more">
+            <thead>
+
+            </thead>
+            <tbody>
+            <tr>
+                <td>ID</td>
+                <td id="channel_id"></td>
+            </tr>
+            <tr>
+                <td>Description Mentioned Locations</td>
+                <td id="channel_locations"></td>
             </tr>
             <tr>
                 <td>Location</td>
@@ -499,6 +574,8 @@
             </tr>
             </tbody>
         </table>
+        <p class="details channel_yt">More Details<img src="imgs/down_arrow.png"></p>
+
         <table class="table" id="user_fb_table">
             <thead>
             <tr>
@@ -511,45 +588,10 @@
                 <td>Source</td>
                 <td id="fb_source"></td>
             </tr>
-            <tr>
-                <td>About</td>
-                <td id="fb_about"></td>
-            </tr>
-            <tr>
-                <td>Category</td>
-                <td id="fb_category"></td>
-            </tr>
-            <tr>
-                <td>Fan Count</td>
-                <td id="fb_fan_count"></td>
-            </tr>
-            <tr>
-                <td>Link</td>
-                <td id="fb_link" class="link"></td>
-            </tr>
-            <tr>
-                <td>Verified <img src="imgs/info_color.png" class="tooltip"
-                                  data-tooltip-content="#tooltip_verified"/></td>
-                <td id="fb_verified"></td>
-            </tr>
-            <tr>
-                <td>Description</td>
-                <td id="fb_description"></td>
-            </tr>
-            <tr>
-                <td>City</td>
-                <td id="fb_city"></td>
-            </tr>
-            <tr>
-                <td>Country</td>
-                <td id="fb_country"></td>
-            </tr>
-            <tr>
-                <td>Website</td>
-                <td id="fb_website" class="link"></td>
-            </tr>
             </tbody>
         </table>
+
+
         <table class="table" id="user_tw_table">
             <thead>
             <tr>
@@ -559,90 +601,183 @@
             </thead>
             <tbody>
             <tr>
+                <td>Description Mentioned Locations</td>
+                <td id="tw_user_description_locations"></td>
+            </tr>
+            <tr>
+                <td>Description</td>
+                <td id="tw_user_desc"></td>
+            </tr>
+            <tr>
+                <td>Created Time</td>
+                <td id="tw_user_created"></td>
+            </tr>
+
+            </tbody>
+        </table>
+        <table class="table" id="user_tw_table_more">
+            <thead>
+
+            </thead>
+            <tbody>
+            <tr>
                 <td>Username</td>
                 <td id="tw_user_username"></td>
             </tr>
             <tr>
-                <td>User Screen Name</td>
-                <td id="tw_user_screenname"></td>
+                <td>Screen Name</td>
+                <td id="tw_user_screenname" class="link"></td>
             </tr>
             <tr>
-                <td>User Location</td>
+                <td>Location</td>
                 <td id="tw_user_location"></td>
             </tr>
             <tr>
-                <td>User Description Mentioned Locations</td>
-                <td id="tw_user_description_locations"></td>
-            </tr>
-            <tr>
-                <td>User URL</td>
+                <td>URL</td>
                 <td id="tw_user_url" class="link"></td>
             </tr>
             <tr>
-                <td>User Description</td>
-                <td id="tw_user_desc"></td>
-            </tr>
-            <tr>
-                <td>User Protected</td>
+                <td>Protected</td>
                 <td id="tw_user_protected"></td>
             </tr>
             <tr>
-                <td>User Verified</td>
+                <td>Verified</td>
                 <td id="tw_user_verified"></td>
             </tr>
             <tr>
-                <td>User Followers</td>
+                <td>Followers</td>
                 <td id="tw_user_followers"></td>
             </tr>
             <tr>
-                <td>User Friends</td>
+                <td>Friends</td>
                 <td id="tw_user_friends"></td>
             </tr>
             <tr>
-                <td>User Listed</td>
+                <td>Listed</td>
                 <td id="tw_user_listed"></td>
             </tr>
             <tr>
-                <td>User Favourites</td>
+                <td>Favorites</td>
                 <td id="tw_user_favourites"></td>
             </tr>
             <tr>
-                <td>User Statuses</td>
+                <td>Statuses</td>
                 <td id="tw_user_statuses"></td>
             </tr>
             <tr>
-                <td>User Language</td>
+                <td>Language</td>
                 <td id="tw_user_lang"></td>
             </tr>
             <tr>
-                <td>User Created Time</td>
-                <td id="tw_user_created"></td>
-            </tr>
-            <tr>
-                <td>User Profile Image</td>
+                <td>Profile Image</td>
                 <td id="tw_user_profile_img"></td>
             </tr>
             </tbody>
         </table>
+        <p class="details user_tw">More Details<img src="imgs/down_arrow.png"></p>
+
+
         <div class="section_title">COMMENTS <img src="imgs/info.png" class="tooltip"
                                                  data-tooltip-content="#tooltip_comments"/></div>
         <div class="alert" id="alert_comments">
-            <strong>Info!</strong> Fetching more comments...
+            <span class="close_alert">×</span>
+            <strong>Info!</strong> Fetching more comments... Once all comments are fetched, you'll be able to perform free-text search on them.
         </div>
         <div class="alert" id="alert_comments_overflow">
-            <strong>Info!</strong> Due to Twitter API limitations, it is impossible to retrieve replies to this particular tweet
+            <span class="close_alert">×</span>
+            <strong>Info!</strong> Due to Twitter API limitations, it is impossible to retrieve replies to this
+            particular tweet
         </div>
         <div class="controls">
             <div class="filter" id="all"></div>
             <div class="filter active" id="verified">
             </div>
         </div>
-        <ul class="tiles" id="comments_info"></ul>
+        <p class="comments_search"><img src="imgs/search-12.png">Search in comments</p>
+
+        <p class="output_expr"></p>
+
+        <p id="zero_comments">Zero comments found</p>
+
+        <div id="comments_table">
+            <div id="comments_table_wrapper">
+                <p class="comments_title">Search in comments <img src="imgs/close-black.png"></p>
+
+                <div class="search_section">
+                    <p class="search_title">Match <span>ANY</span> of the following keywords</p>
+
+                    <div class="keyword_wrapper keyword_wrapper_or">
+                        <label for="or_1">1</label>
+                        <input id="or_1" type="text" value="" name="or">
+
+                        <p class="search_remove remove_or">Remove<img src="imgs/close_cross.png"></p>
+                    </div>
+                    <div class="keyword_wrapper keyword_wrapper_or">
+                        <label for="or_2">2</label>
+                        <input id="or_2" type="text" value="" name="or">
+
+                        <p class="search_remove remove_or">Remove<img src="imgs/close_cross.png"></p>
+                    </div>
+                    <div class="keyword_wrapper keyword_wrapper_or">
+                        <label for="or_3">3</label>
+                        <input id="or_3" type="text" value="" name="or">
+
+                        <p class="search_remove remove_or">Remove<img src="imgs/close_cross.png"></p>
+                    </div>
+                    <p class="search_add add_or">Add more <img src="imgs/add_icon.png"></p>
+                </div>
+                <div class="search_section">
+                    <p class="search_title">Match <span>ALL</span> of the following keywords</p>
+
+                    <div class="keyword_wrapper keyword_wrapper_and">
+                        <label for="and_1">1</label>
+                        <input id="and_1" type="text" value="" name="and">
+
+                        <p class="search_remove">Remove<img src="imgs/close_cross.png"></p>
+                    </div>
+                    <div class="keyword_wrapper keyword_wrapper_and">
+                        <label for="and_2">2</label>
+                        <input id="and_2" type="text" value="" name="and">
+
+                        <p class="search_remove">Remove<img src="imgs/close_cross.png"></p>
+                    </div>
+                    <div class="keyword_wrapper keyword_wrapper_and">
+                        <label for="and_3">3</label>
+                        <input id="and_3" type="text" value="" name="and">
+
+                        <p class="search_remove">Remove<img src="imgs/close_cross.png"></p>
+                    </div>
+                    <p class="search_add">Add more <img src="imgs/add_icon.png"></p>
+                </div>
+                <p id="comments_calculate">Show the expression</p>
+
+                <p id="comments_output"></p>
+
+                <div style="text-align: center;padding-bottom: 10px">
+                    <div class="comments_but" id="search_but">Search</div>
+                    <div class="comments_but" id="cancel_but">Cancel</div>
+                </div>
+            </div>
+        </div>
+        <ul class="tiles" id="comments_info">
+
+        </ul>
+        <div id="loading">Loading comments, please wait.....
+            <img id="loadimg" src="imgs/loading.gif" alt="loading..">
+        </div>
         <div class="more">
+            <div>More Comments...</div>
+        </div>
+        <div class="more_search">
             <div>More Comments...</div>
         </div>
         <div class="section_title">THUMBNAILS <img src="imgs/info.png" class="tooltip"
                                                    data-tooltip-content="#tooltip_thumbnails"/></div>
+        <div class="alert" id="alert_thumbs">
+            <span class="close_alert">×</span>
+            <strong>Info!</strong> The tweet contains embedded YouTube video thus no thumbnail images can be retrieved.
+            Submit the YouTube video to CAA for analysis <a href="#">here</a>
+        </div>
         <ul class="tiles" id="thumb_info"></ul>
         <div class="section_title">WEATHER CONTEXT <img src="imgs/info.png" class="tooltip"
                                                         data-tooltip-content="#tooltip_weather"/></div>
@@ -699,6 +834,8 @@
                         <div class="temperature">-</div>
                         <div class="unit">°C</div>
                     </div>
+                    <p class="weather_box_time">06:00</p>
+
                     <div id="right-information"><span>Visibility<img src="imgs/info.png" class="tooltip"
                                                                      data-tooltip-content="#tooltip_visibility"/> : <span
                             id="visibility">-</span></span><br> <span>Cloud Cover<img
@@ -750,7 +887,9 @@
                                 <span id="hourly21_temp"></span>
                             </li>
                         </ul>
-                        <button class="btn" id="daily_button">Daily <img src="imgs/tick_16.png" style="width: 16px;vertical-align: middle;"></button>
+                        <button class="btn" id="daily_button">Daily <img src="imgs/tick_16.png"
+                                                                         style="width: 16px;vertical-align: middle;">
+                        </button>
                         <p class="powered"><a href="https://darksky.net/forecast/40.6403,22.9439/si24/en"
                                               target="_blank">Powered
                             by Dark Sky</a></p>
@@ -768,11 +907,21 @@
         <div class="section_title">TWITTER CONTEXT <img src="imgs/info.png" class="tooltip"
                                                         data-tooltip-content="#tooltip_twitter"/></div>
         <div class="alert" id="alert_twitter">
+            <span class="close_alert">×</span>
             <strong>Info!</strong> Fetching more tweets...<p class="note" style="width: auto">*Tweets may be added
             outside viewport. Click 'Reset Zoom Level' to reset zooming scale and inspect all tweets. </p>
         </div>
+        <div class="alert" id="alert_twitter_user">
+            <span class="close_alert">×</span>
+            <strong>Info!</strong> Provides information on twitter traffic around the video, and aggregate verification
+            information on any Retweets, calculated using CERTH's Tweet Verification Assistant. Due to retweets
+            containing the exact same tweet text, the veracity of the tweet depends on the user profile
+        </div>
         <div class="alert" id="alert_twitter_overflow">
-            <strong>Info!</strong> Due to the large number of tweets, only a representative sample is shown.
+            <span class="close_alert">×</span>
+            <strong>Info!</strong> Due to the large number of tweets, only a representative sample (10) is shown. While
+            we fetch more tweets only the bar at the bottom is being visual updated. If you want to see all the tweets
+            in the timeline graph <b id="more_tweets">Click here</b>
         </div>
         <div id="timeline">
             <div id="visualization">
@@ -792,23 +941,6 @@
                     <input id="query" name="q" type="text" size="40" placeholder="Search..." autocomplete="off"><br>
 
                     <p class="icon-clear">Clear search<img src="imgs/close-black.png" alt="close-icon"></p>
-                </div>
-                <div class="container">
-                    <section>
-                        <div class="tweets_bar">
-                            <div class="verticalLine"><span>50%</span></div>
-                            <div id="fake_tweet_bar" class="features"><span
-                                    class="featuresArea">Total tweets: <span id="total_tweets">0</span><img
-                                    src="imgs/info.png" class="tooltip"
-                                    data-tooltip-content="#tweet_bar"/></span></div>
-                            <span id="fake_tweets"><p class="circle_red"></p><span
-                                    class="tweet_title">Unreliable tweets: <span
-                                    id="fake_tweets_num">0 (0%)</span></span></span>
-                            <span id="real_tweets"><p class="circle_green"></p><span
-                                    class="tweet_title">Reliable tweets: <span
-                                    id="real_tweets_num">0 (0%)</span></span></span>
-                        </div>
-                    </section>
                 </div>
             </div>
         </div>
@@ -853,7 +985,7 @@
         These are all the comments that appear under the
         video. User name and date/time are provided. Comments are further filtered
         into Verification-related comments based on the presence of verification-
-        related keywords, such as “fake”, “confirm”, or “location”.
+        related keywords, such as “fake”, “confirm”, or “location”. Free-text search with keyword(s) is provided.
     </p>
 
     <p id="tooltip_thumbnails">
@@ -875,9 +1007,9 @@
     </p>
 
     <p id="tooltip_twitter">
-        Provides information on twitter traffic around the video, and aggregate verification information on any
-        Tweets sharing the video, calculated using CERTH's <a href="http://reveal-mklab.iti.gr/reveal/fake/"
-                                                              target="_blank">Tweet Verification Assistant</a>
+        Provides information on twitter traffic around the video, and the possibility to perform further verification
+        using the <a href="http://reveal-mklab.iti.gr/reveal/fake/"
+                                                  target="_blank">Tweet Verification Assistant</a>
     </p>
 
     <p id="tooltip_timeline">
@@ -887,16 +1019,6 @@
 
     <p id="tooltip_statistics">
         Statistics of the credibility scores of Tweets sharing the video.
-    </p>
-
-    <p id="tweet_bar">
-        We have developed a
-        machine learning algorithm for tweet verification, based on linguistic patterns
-        from the text and features from the user profile, and trained on a large
-        number of fake and real tweets. We apply the algorithm to all tweets sharing
-        the video and, depending on the number of such tweets that the algorithm
-        labels as “fake”, we can draw an overall conclusion on the probability that the
-        video itself contains false information.
     </p>
 
     <p id="tooltip_licensed">
@@ -917,6 +1039,10 @@
         Indicates whether the video is available in high definition (HD) or
         only in standard definition. Valid values for this property are: hd and sd.
     </p>
+
+    <p id="tooltip_updated_time">
+        The last time the video or its caption was updated.
+    </p>
 </div>
 <!-- JS -->
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
@@ -933,21 +1059,6 @@
 <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDOOPffhARnRWiCM2TyhJbHkmbDbpxrWec&libraries=places&callback=initMap"
         async defer></script>
 <script src="js/tooltipster.bundle.js"></script>
-<!-- Matomo -->
-<script type="text/javascript">
-    var _paq = _paq || [];
-    /* tracker methods like "setCustomDimension" should be called before "trackPageView" */
-    _paq.push(['trackPageView']);
-    _paq.push(['enableLinkTracking']);
-    (function() {
-        var u="//160.40.51.26/projects/matomo/";
-        _paq.push(['setTrackerUrl', u+'piwik.php']);
-        _paq.push(['setSiteId', '2']);
-        var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0];
-        g.type='text/javascript'; g.async=true; g.defer=true; g.src=u+'piwik.js'; s.parentNode.insertBefore(g,s);
-    })();
-</script>
-<!-- End Matomo Code -->
 </body>
 
 </html>

@@ -28,7 +28,7 @@
             content: null,
             contentAsHTML: false,
             contentCloning: false,
-            debug: true,
+            debug: false,
             delay: 100,
             delayTouch: [300, 500],
             functionInit: null,
