@@ -274,10 +274,12 @@ ul li {
 .more div:hover, .more_search div:hover {
     box-shadow: 0 5px 11px 0 rgba(0, 0, 0, 0.18), 0 4px 15px 0 rgba(0, 0, 0, 0.15);
 }
-.more_search div{
+
+.more_search div {
     width: auto;
     padding: 0 10px;
 }
+
 .filter {
     color: #fff;
     background-color: #8693AB;
@@ -1237,8 +1239,8 @@ iframe {
     color: #31708f;
     font-size: 17px;
     background-color: #d9edf7;
-    max-width: 350px;
-    margin: 0 auto;
+    max-width: 470px;
+    margin: 0 auto 15px;
     display: none;
 }
 
@@ -1537,7 +1539,7 @@ iframe {
     display: none;
 }
 
-#loadimg {
+.loadimg {
     width: 276px;
     margin-left: -12px;
 }
@@ -1575,4 +1577,19 @@ iframe {
     font-weight: bold;
     cursor: pointer;
     display: none;
+}
+#fb_but,#fb_desc,#fb_but_2{
+    display: none;
+    text-align: center;
+}
+#fb_desc{
+    padding: 15px;
+    border: 1px solid #bce8f1;
+    border-radius: 4px;
+    color: #31708f;
+    font-size: 17px;
+    background-color: #d9edf7;
+    max-width: 470px;
+    margin: -10px auto 15px;
+    text-align: left;
 }

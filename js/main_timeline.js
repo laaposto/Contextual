@@ -6,7 +6,7 @@ function load_twitter(more_items, source) {
     interval_twitter = setInterval(function () {
         $.ajax({
             type: 'GET',
-            url: 'http://caa.iti.gr/get_twverificationV3?twtimeline=0&url=' + video_verify,
+            url: 'https://caa.iti.gr/get_twverificationV3?twtimeline=0&url=' + video_verify,
             success: function (json) {
                 if (source === "twitter") {
                     $('#alert_twitter_user').slideDown();

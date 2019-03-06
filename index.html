@@ -8,7 +8,7 @@
     <meta name="viewport"
           content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="author" content="laaposto">
-    <link href='http://fonts.googleapis.com/css?family=Bitter:400,300,700|Ubuntu:400,300,700&subset=latin,cyrillic-ext,greek-ext,greek,latin-ext,cyrillic'
+    <link href='https://fonts.googleapis.com/css?family=Bitter:400,300,700|Ubuntu:400,300,700&subset=latin,cyrillic-ext,greek-ext,greek,latin-ext,cyrillic'
           rel='stylesheet' type='text/css'>
 
     <link rel="shortcut icon" href="imgs/favicon.ico"/>
@@ -23,6 +23,71 @@
 
 </head>
 <body>
+<script>
+    var isLoaded = false;
+    window.fbAsyncInit = function () {
+        FB.init({
+            appId: '697724640623413',
+            cookie: true,
+            xfbml: true,
+            version: 'v3.2'
+        });
+        FB.AppEvents.logPageView();
+        isLoaded = true;
+    };
+
+    (function (d, s, id) {
+        var js, fjs = d.getElementsByTagName(s)[0];
+        if (d.getElementById(id)) {
+            return;
+        }
+        js = d.createElement(s);
+        js.id = id;
+        js.src = "https://connect.facebook.net/en_US/sdk.js";
+        fjs.parentNode.insertBefore(js, fjs);
+    }(document, 'script', 'facebook-jssdk'));
+
+    function checkLoginState(source) {
+        FB.getLoginStatus(function (response) {
+            if (source === "video") {
+                if (response.status === 'connected') {
+                    var iframe_url = "https://www.facebook.com/v2.3/plugins/video.php?allowfullscreen=true&autoplay=false&container_width=360&height=305&href=" + video_verify + "&locale=en_US&sdk=joey";
+                    $('#iframe').attr('src', iframe_url);
+                    $('.twitter_p').remove();
+                    $('.table_title').eq(1).text("USER");
+                    fb_access_token = response.authResponse.accessToken;
+                    start_video_calls_facebook();
+                } else if (response.status === 'not_authorized') {
+                    $('#analysis_fb').slideDown();
+                    $('#fb_but_2').show();
+                    $('#loading_all,#cover,#cover_info,#loading_info,#cover_timeline,#loading_timeline,.controls,.table,.table_title,#weather_input,.comments_search').remove();
+                } else {
+                }
+
+            }
+            else {
+                $('#fb_but,#fb_desc').hide();
+                $('#video_examples_facebook').show();
+                if (response.status === 'connected') {
+                    var options_thumbs = {
+                        autoResize: true,
+                        container: $('#video_examples_facebook'),
+                        offset: 15,
+                        itemWidth: 360,
+                        outerOffset: 0
+                    };
+                    $('#video_examples_facebook').find('.video').wookmark(options_thumbs);
+                    //fb_access_token = response.authResponse.accessToken;
+                } else if (response.status === 'not_authorized') {
+                    $('#fb_but,#fb_desc').show();
+                } else {
+                    $('#fb_but,#fb_desc').show();
+                }
+            }
+        });
+    }
+</script>
+
 <a href="#" class="scrollToTop"></a>
 
 <div id="tweet"></div>
@@ -81,7 +146,16 @@
 </div>
 <hr>
 <h3 class="title_example">FACEBOOK EXAMPLES</h3>
-<ul class="tiles" id="video_examples_facebook">
+<div class="tiles" id="video_examples_facebook">
+    <div id="fb_desc">
+        <strong>Info!</strong> In order to process Facebook videos you have to login first!
+    </div>
+    <div id="fb_but" class="fb-login-button" data-max-rows="1" data-size="large"
+         data-button-type="continue_with" data-show-faces="false"
+         data-auto-logout-link="false" data-use-continue-as="true"
+         data-scope="public_profile,email" data-onlogin="checkLoginState();">
+    </div>
+
     <div class="video">
         <img src="imgs/facebook-placeholder.jpg">
         <iframe width="360" height="305" frameborder="0"
@@ -108,7 +182,7 @@
             Verify
         </button>
     </div>
-</ul>
+</div>
 <hr>
 <h3 class="title_example">YOUTUBE EXAMPLES</h3>
 <ul class="tiles" id="video_examples">
@@ -222,6 +296,14 @@
 <div class="alert" id="analysis_info">
     <span class="close_alert">×</span>
     <strong>Info!</strong> <span id="analysis_info_msg"></span>
+</div>
+<div class="alert" id="analysis_fb">
+    <strong>Info!</strong> In order to process Facebook videos you have to login first!
+</div>
+<div id="fb_but_2" class="fb-login-button" data-max-rows="1" data-size="large"
+     data-button-type="continue_with" data-show-faces="false"
+     data-auto-logout-link="false" data-use-continue-as="true"
+     data-scope="public_profile,email" data-onlogin="window.location.reload();">
 </div>
 <div id="user_video">
     <iframe id="iframe" width="360" height="305" frameborder="0">
@@ -681,7 +763,8 @@
                                                  data-tooltip-content="#tooltip_comments"/></div>
         <div class="alert" id="alert_comments">
             <span class="close_alert">×</span>
-            <strong>Info!</strong> Fetching more comments... Once all comments are fetched, you'll be able to perform free-text search on them.
+            <strong>Info!</strong> Fetching more comments... Once all comments are fetched, you'll be able to perform
+            free-text search on them.
         </div>
         <div class="alert" id="alert_comments_overflow">
             <span class="close_alert">×</span>
@@ -1009,7 +1092,7 @@
     <p id="tooltip_twitter">
         Provides information on twitter traffic around the video, and the possibility to perform further verification
         using the <a href="http://reveal-mklab.iti.gr/reveal/fake/"
-                                                  target="_blank">Tweet Verification Assistant</a>
+                     target="_blank">Tweet Verification Assistant</a>
     </p>
 
     <p id="tooltip_timeline">

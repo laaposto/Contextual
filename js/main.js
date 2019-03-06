@@ -1,6 +1,7 @@
 var video_verify = gup('video');
 var reprocess = gup('reprocess');
 var arabic = /[\u0600-\u06FF]/;
+var fb_access_token = "";
 $(function () {
     $('.tab ul.tabs li a').click(function (g) {
         var tab = $(this).closest('.tab'),
@@ -37,7 +38,6 @@ $(function () {
         return false;
     });
 
-    $('.video').show();
     var count = 1;
     $("#video_fb_table,#video_fb_table_more").on("click", "#imgtab", function () {
         var $this = $(this);
@@ -52,24 +52,31 @@ $(function () {
         $this.addClass((count == 1) ? 'large' : 'small', 400);
         count = 1 - count;
     });
-    var options_thumbs = {
-        autoResize: true,
-        container: $('#video_examples'),
-        offset: 15,
-        itemWidth: 360,
-        outerOffset: 0
-    };
-    $('#video_examples').find('.video').wookmark(options_thumbs);
 
-    options_thumbs = {
-        autoResize: true,
-        container: $('#video_examples_facebook'),
-        offset: 15,
-        itemWidth: 360,
-        outerOffset: 0
-    };
-    $('#video_examples_facebook').find('.video').wookmark(options_thumbs);
+    (function myLoop() {
+        setTimeout(function () {
+            if (isLoaded) {
+                fb_ready();
+            }
+            else {
+                myLoop()
+            }
+        }, 1000)
+    })();
+});
+
+function fb_ready() {
     if (video_verify === "") {
+        checkLoginState("index");
+        $('#video_examples,.desc_p,#links_wrapper,#video_examples_twitter,hr,.title_example').show();
+        var options_thumbs = {
+            autoResize: true,
+            container: $('#video_examples'),
+            offset: 15,
+            itemWidth: 360,
+            outerOffset: 0
+        };
+        $('#video_examples').find('.video').wookmark(options_thumbs);
         var tweet1 = document.getElementById("tweet1");
         var id1 = tweet1.getAttribute("data-tweetID");
 
@@ -139,61 +146,43 @@ $(function () {
                 $('#video_examples_twitter').find('.video').wookmark(options_thumbs);
             });
     }
-});
-
-if (video_verify !== "") {
-    if (reprocess === "true") {
-        $('#reprocess_check').attr('checked', true);
-    }
-
-    $('#video_examples,#video_examples_facebook,#video_examples_twitter,.desc_p,#links_wrapper,hr,.title_example').remove();
-    $("#video_verify").val(video_verify);
-    $('.back,.section_title,#loading_all,#cover,.tab').show();
-    if ((video_verify.indexOf('facebook.com') > -1) || (video_verify.indexOf('fb.me') > -1)) {
-        var iframe_url = "https://www.facebook.com/v2.3/plugins/video.php?allowfullscreen=true&autoplay=false&container_width=360&height=305&href=" + video_verify + "&locale=en_US&sdk=joey";
-        $('#iframe').attr('src', iframe_url);
-        $('.twitter_p').remove();
-        $('.table_title').eq(1).text("USER");
-        start_video_calls_facebook();
-        var fixmeTop = $('.tab').offset().top;
-        $(window).scroll(function () {
-            var currentScroll = $(window).scrollTop();
-            if (currentScroll <= fixmeTop) {
-                $('.tab').removeClass('sticky_tab');
-            } else {
-                $('.tab').addClass('sticky_tab');
-            }
-        });
-    }
-    else if (video_verify.indexOf('twitter.com') > -1) {
-        $('#user_video').empty().css({'width': '360px', 'margin': '30px auto 0'});
-        twttr.widgets.createVideo(video_verify.split('/').pop(), document.getElementById("user_video"),
-            {})
-            .then(function () {
-                var fixmeTop = $('.tab').offset().top + $('#user_video').height();
-                $(window).scroll(function () {
-                    var currentScroll = $(window).scrollTop();
-                    if (currentScroll <= fixmeTop) {
-                        $('.tab').removeClass('sticky_tab');
-                    } else {
-                        $('.tab').addClass('sticky_tab');
-                    }
-                });
-            });
-        $('.table_title').eq(0).text("TWEET");
-        $('.table_title').eq(1).text("USER");
-        start_video_calls_twitter();
-    }
     else {
-        var iframe_url = "https://www.youtube.com/embed/" + youtube_parser(video_verify);
-        $('#iframe').attr('src', iframe_url);
-        start_video_calls_youtube();
+        if (reprocess === "true") {
+            $('#reprocess_check').attr('checked', true);
+        }
+
+        $('#video_examples,#video_examples_facebook,#video_examples_twitter,.desc_p,#links_wrapper,hr,.title_example').remove();
+        $("#video_verify").val(video_verify);
+        $('.back,.section_title,#loading_all,#cover,.tab').show();
+        if ((video_verify.indexOf('facebook.com') > -1) || (video_verify.indexOf('fb.me') > -1)) {
+            checkLoginState("video");
+        }
+        else if (video_verify.indexOf('twitter.com') > -1) {
+            $('#user_video').empty().css({'width': '360px', 'margin': '30px auto 0'});
+            twttr.widgets.createVideo(video_verify.split('/').pop(), document.getElementById("user_video"),
+                {})
+                .then(function () {
+                    var fixmeTop = $('.tab').offset().top + $('#user_video').height();
+                    $(window).scroll(function () {
+                        var currentScroll = $(window).scrollTop();
+                        if (currentScroll <= fixmeTop) {
+                            $('.tab').removeClass('sticky_tab');
+                        } else {
+                            $('.tab').addClass('sticky_tab');
+                        }
+                    });
+                });
+            $('.table_title').eq(0).text("TWEET");
+            $('.table_title').eq(1).text("USER");
+            start_video_calls_twitter();
+        }
+        else {
+            var iframe_url = "https://www.youtube.com/embed/" + youtube_parser(video_verify);
+            $('#iframe').attr('src', iframe_url);
+            start_video_calls_youtube();
+        }
     }
 }
-else {
-    $('#video_examples,.desc_p,#links_wrapper,#video_examples_facebook,#video_examples_twitter,hr,.title_example').show();
-}
-
 function detect_video_drop(evt) {
     evt.stopPropagation();
     evt.preventDefault();
@@ -203,7 +192,7 @@ function detect_video_drop(evt) {
         if ($('#reprocess_check').is(":checked")) {
             reprocess_param = "&reprocess=true";
         }
-        window.location.href = 'http://' + window.location.hostname + ':' + window.location.port + window.location.pathname + '?video=' + video_verify.replace('&', '%26') + reprocess_param;
+        window.location.href = 'https://' + window.location.hostname + ':' + window.location.port + window.location.pathname + '?video=' + video_verify.replace('&', '%26') + reprocess_param;
     } else {
         $('#myModal h1').html("Oops! Something went wrong");
         $('#myModal p').html("The provived video URL is <b>" + video_verify.length + "</b> characters long<br/>We can not handle such big URL");
@@ -216,7 +205,7 @@ function verify_video_text() {
         reprocess_param = "&reprocess=true";
     }
     if ($("#video_verify").val() !== "") {
-        window.location.href = 'http://' + window.location.hostname + ':' + window.location.port + window.location.pathname + '?video=' + $("#video_verify").val().replace('&', '%26') + reprocess_param;
+        window.location.href = 'https://' + window.location.hostname + ':' + window.location.port + window.location.pathname + '?video=' + $("#video_verify").val().replace('&', '%26') + reprocess_param;
     }
 }
 
@@ -232,7 +221,8 @@ function start_video_calls_youtube() {
     $.ajax({
         url: "store_url.php?url=" + video_verify,
         type: "GET",
-        success: function (msg) {}
+        success: function (msg) {
+        }
     });
     var reprocess_param = "";
     if ($('#reprocess_check').is(":checked")) {
@@ -240,7 +230,7 @@ function start_video_calls_youtube() {
     }
     $.ajax({
         type: 'GET',
-        url: 'http://caa.iti.gr/verify_videoV3?twtimeline=0&url=' + video_verify + reprocess_param,
+        url: 'https://caa.iti.gr/verify_videoV3?twtimeline=0&url=' + video_verify + reprocess_param,
         dataType: 'json',
         success: function (json) {
             $('#analysis_info_msg').text(json.message);
@@ -281,7 +271,8 @@ function start_video_calls_facebook() {
     $.ajax({
         url: "store_url.php?url=" + video_verify,
         type: "GET",
-        success: function (msg) {}
+        success: function (msg) {
+        }
     });
     var reprocess_param = "";
     if ($('#reprocess_check').is(":checked")) {
@@ -289,7 +280,7 @@ function start_video_calls_facebook() {
     }
     $.ajax({
         type: 'GET',
-        url: 'http://caa.iti.gr/verify_videoV3?twtimeline=0&url=' + video_verify + reprocess_param,
+        url: 'https://caa.iti.gr/verify_videoV3?twtimeline=0&url=' + video_verify + reprocess_param + "&fb_access_token=" + fb_access_token,
         dataType: 'json',
         success: function (json) {
             $('#analysis_info_msg').text(json.message);
@@ -330,7 +321,8 @@ function start_video_calls_twitter() {
     $.ajax({
         url: "store_url.php?url=" + video_verify,
         type: "GET",
-        success: function (msg) {}
+        success: function (msg) {
+        }
     });
     var reprocess_param = "";
     if ($('#reprocess_check').is(":checked")) {
@@ -338,7 +330,7 @@ function start_video_calls_twitter() {
     }
     $.ajax({
         type: 'GET',
-        url: 'http://caa.iti.gr/verify_videoV3?twtimeline=0&url=' + video_verify + reprocess_param,
+        url: 'https://caa.iti.gr/verify_videoV3?twtimeline=0&url=' + video_verify + reprocess_param,
         dataType: 'json',
         success: function (json) {
             $('#analysis_info_msg').text(json.message);
@@ -498,7 +490,7 @@ var fake_terms_search = "";
 function comments_search(source, and, or) {
     $.ajax({
         type: 'GET',
-        url: 'http://caa.iti.gr/searchcomments?url=' + encodeURI(video_verify) + '&keywordsor=' + or + '&keywordsand=' + and,
+        url: 'https://caa.iti.gr/searchcomments?url=' + encodeURI(video_verify) + '&keywordsor=' + or + '&keywordsand=' + and,
         dataType: 'json',
         success: function (json) {
             global_json_comments = json;
@@ -567,7 +559,7 @@ function comments_search(source, and, or) {
             }
             if (json.comments_sub.length > 10) {
                 $('.more_search').show();
-                $('.more_search div').text("More comments ("+json.comments_sub.length+" in total)");
+                $('.more_search div').text("More comments (" + json.comments_sub.length + " in total)");
             }
 
             var options_comments = {
@@ -788,7 +780,7 @@ function verify_example(video_url) {
     if ($('#reprocess_check').is(":checked")) {
         reprocess_param = "&reprocess=true";
     }
-    window.location.href = 'http://' + window.location.hostname + ':' + window.location.port + window.location.pathname + '?video=' + video_url.replace('&', '%26') + reprocess_param;
+    window.location.href = 'https://' + window.location.hostname + ':' + window.location.port + window.location.pathname + '?video=' + video_url.replace('&', '%26') + reprocess_param;
 }
 function load_youtube() {
     var first_call = true;
@@ -810,7 +802,7 @@ function load_youtube() {
     var interval_youtube = setInterval(function () {
         $.ajax({
             type: 'GET',
-            url: 'http://caa.iti.gr/get_verificationV3?twtimeline=0&url=' + video_verify,
+            url: 'https://caa.iti.gr/get_verificationV3?twtimeline=0&url=' + video_verify,
             dataType: 'json',
             success: function (json) {
                 $('#alert_comments').stop().slideDown();
@@ -1263,7 +1255,7 @@ function load_facebook() {
     var interval_facebook = setInterval(function () {
         $.ajax({
             type: 'GET',
-            url: 'http://caa.iti.gr/get_verificationV3?twtimeline=0&url=' + video_verify,
+            url: 'https://caa.iti.gr/get_verificationV3?twtimeline=0&url=' + video_verify + "&fb_access_token=" + fb_access_token,
             dataType: 'json',
             success: function (json) {
                 $('#alert_comments').stop().slideDown();
@@ -1576,7 +1568,7 @@ function load_twitter_video() {
     var interval_twitter = setInterval(function () {
         $.ajax({
             type: 'GET',
-            url: 'http://caa.iti.gr/get_verificationV3?twtimeline=0&url=' + video_verify,
+            url: 'https://caa.iti.gr/get_verificationV3?twtimeline=0&url=' + video_verify,
             dataType: 'json',
             success: function (json) {
 
@@ -1841,10 +1833,10 @@ function load_twitter_video() {
                 }
 
                 if (json.embedded_youtube !== "") {
-                    $('#tw_tweet_aspect').html('<p class="empty_cell">Tweet contains embedded YouTube video. Submit the YouTube video to CAA for analysis <a href="index.html?video=' + json.embedded_youtube.replace('&', '%26') + '">here</a></p>');
-                    $('#tw_tweet_duration').html('<p class="empty_cell">Tweet contains embedded YouTube video. Submit the YouTube video to CAA for analysis <a href="index.html?video=' + json.embedded_youtube.replace('&', '%26') + '">here</a></p>');
-                    $('#tw_tweet_url').removeClass('link').html('<p class="empty_cell">Tweet contains embedded YouTube video. Submit the YouTube video to CAA for analysis <a href="index.html?video=' + json.embedded_youtube.replace('&', '%26') + '">here</a></p>');
-                    $('#tw_tweet_bitrate').html('<p class="empty_cell">Tweet contains embedded YouTube video. Submit the YouTube video to CAA for analysis <a href="index.html?video=' + json.embedded_youtube.replace('&', '%26') + '">here</a></p>');
+                    $('#tw_tweet_aspect').html('<p class="empty_cell">Tweet contains embedded YouTube video. Submit the YouTube video to CAA for analysis <a href="index.html?video=' + json.embedded_youtube.replace('&', '%26') + '" target="_blank">here</a></p>');
+                    $('#tw_tweet_duration').html('<p class="empty_cell">Tweet contains embedded YouTube video. Submit the YouTube video to CAA for analysis <a href="index.html?video=' + json.embedded_youtube.replace('&', '%26') + '" target="_blank">here</a></p>');
+                    $('#tw_tweet_url').removeClass('link').html('<p class="empty_cell">Tweet contains embedded YouTube video. Submit the YouTube video to CAA for analysis <a href="index.html?video=' + json.embedded_youtube.replace('&', '%26') + '" target="_blank">here</a></p>');
+                    $('#tw_tweet_bitrate').html('<p class="empty_cell">Tweet contains embedded YouTube video. Submit the YouTube video to CAA for analysis <a href="index.html?video=' + json.embedded_youtube.replace('&', '%26') + '" target="_blank">here</a></p>');
                 }
                 else {
                     if (json.video_info_aspect_ratio !== "") {
@@ -2160,7 +2152,7 @@ function get_weather() {
         }
         $.ajax({
             type: 'GET',
-            url: 'http://caa.iti.gr/weatherV3?time=' + time + '&location=' + $('#location_input').val(),
+            url: 'https://caa.iti.gr/weatherV3?time=' + time + '&location=' + $('#location_input').val(),
             dataType: 'json',
             success: function (json) {
                 weather_json = json;
@@ -2705,10 +2697,11 @@ $('#cancel_but').click(function () {
 var keywordor = [];
 var keywordand = [];
 $('#search_but').click(function () {
-    keywordand=[];
-    keywordor=[];
+    keywordand = [];
+    keywordor = [];
     $('#loading').show();
-    $('#comments_table').slideUp(800, function () {});
+    $('#comments_table').slideUp(800, function () {
+    });
 
     var expr_or = "";
     $("input[name='or']").each(function (idx, elem) {
