@@ -1,7 +1,7 @@
 var video_verify = gup('video');
+var image_verify = gup('image');
 var reprocess = gup('reprocess');
 var arabic = /[\u0600-\u06FF]/;
-var fb_access_token = "";
 $(function () {
     $('.tab ul.tabs li a').click(function (g) {
         var tab = $(this).closest('.tab'),
@@ -39,13 +39,6 @@ $(function () {
     });
 
     var count = 1;
-    $("#video_fb_table,#video_fb_table_more").on("click", "#imgtab", function () {
-        var $this = $(this);
-        $this.removeClass('small, large', 400);
-        $this.addClass((count == 1) ? 'large' : 'small', 400);
-        count = 1 - count;
-    });
-
     $("#user_tw_table,#user_tw_table_more").on("click", "#imgtab2", function () {
         var $this = $(this);
         $this.removeClass('small, large', 400);
@@ -63,10 +56,35 @@ $(function () {
             }
         }, 1000)
     })();
+
+    var fixmeTop = $('.tab').offset().top + 424;
+    $(window).scroll(function () {
+        var currentScroll = $(window).scrollTop();
+        if (currentScroll <= fixmeTop) {
+            $('.tab').removeClass('sticky_tab');
+        } else {
+            $('.tab').addClass('sticky_tab');
+        }
+    });
+    $('#time_input').timepicker({
+        timeFormat: 'HH:mm',
+        interval: 60,
+        startHour: 0,
+        startMinutes: 0,
+        dynamic: false,
+        dropdown: true,
+        scrollbar: true
+    });
+    $('#date_input').datetimepicker({
+        timepicker: false,
+        format: 'd/m/Y',
+        maxDate: '+1970/01/01'
+    });
 });
 
 function fb_ready() {
-    if (video_verify === "") {
+    if (video_verify === "" && image_verify === "") {
+        //$('.form-checkbox-field').eq(0).attr('checked', true);
         checkLoginState("index");
         $('#video_examples,.desc_p,#links_wrapper,#video_examples_twitter,hr,.title_example').show();
         var options_thumbs = {
@@ -90,29 +108,6 @@ function fb_ready() {
             })
             .then(function () {
                 $('#tweet1').append('<p class="video_desc">The video claimed to depict the cat 5 Irma winds in Barbados while it is actually footage of another tornado. Several comments mention that this is a video from other location and event.</p> <button type="button" onclick="verify_example(\'https://twitter.com/acardnal/status/905257372066750466\');return false;" class="btn btn_small"> Verify </button>');
-                options_thumbs = {
-                    autoResize: true,
-                    container: $('#video_examples_twitter'),
-                    offset: 15,
-                    itemWidth: 360,
-                    outerOffset: 0
-                };
-                $('#video_examples_twitter').find('.video').wookmark(options_thumbs);
-            });
-
-        var tweet2 = document.getElementById("tweet2");
-        var id2 = tweet2.getAttribute("data-tweetID");
-
-        twttr.widgets.createTweet(
-            id2, tweet2,
-            {
-                conversation: 'none',
-                cards: 'visible',
-                theme: 'light',
-                width: 360
-            })
-            .then(function () {
-                $('#tweet2').append('<p class="video_desc">CCTV Footage claimed to depict the 2016 Brussels Airport explosion. The video is in truth from a 2011 attack in Moscow.</p> <button type="button" onclick="verify_example(\'https://twitter.com/acardnal/status/712402767113953281\');return false;" class="btn btn_small"> Verify </button>');
                 options_thumbs = {
                     autoResize: true,
                     container: $('#video_examples_twitter'),
@@ -150,37 +145,49 @@ function fb_ready() {
         if (reprocess === "true") {
             $('#reprocess_check').attr('checked', true);
         }
-
         $('#video_examples,#video_examples_facebook,#video_examples_twitter,.desc_p,#links_wrapper,hr,.title_example').remove();
-        $("#video_verify").val(video_verify);
-        $('.back,.section_title,#loading_all,#cover,.tab').show();
-        if ((video_verify.indexOf('facebook.com') > -1) || (video_verify.indexOf('fb.me') > -1)) {
-            checkLoginState("video");
-        }
-        else if (video_verify.indexOf('twitter.com') > -1) {
-            $('#user_video').empty().css({'width': '360px', 'margin': '30px auto 0'});
-            twttr.widgets.createVideo(video_verify.split('/').pop(), document.getElementById("user_video"),
-                {})
-                .then(function () {
-                    var fixmeTop = $('.tab').offset().top + $('#user_video').height();
-                    $(window).scroll(function () {
-                        var currentScroll = $(window).scrollTop();
-                        if (currentScroll <= fixmeTop) {
-                            $('.tab').removeClass('sticky_tab');
-                        } else {
-                            $('.tab').addClass('sticky_tab');
-                        }
+        $('.back,.section_title,#loading_all,#cover,.tab,.sticky_tab').show();
+        $('.section_title').eq(3).hide();//laaposto for tests only
+        if (video_verify != "") {
+            $('.form-checkbox-field').eq(0).attr('checked', true);
+            $("#video_verify").val(video_verify);
+
+            if ((video_verify.indexOf('facebook.com') > -1) || (video_verify.indexOf('fb.me') > -1)) {
+                checkLoginState("video");
+            }
+            else if (video_verify.indexOf('twitter.com') > -1) {
+                $('#user_video').empty().css({'width': '360px', 'margin': '30px auto 0'});
+                twttr.widgets.createVideo(video_verify.split('/').pop(), document.getElementById("user_video"),
+                    {})
+                    .then(function () {
+                        var fixmeTop = $('.tab').offset().top + $('#user_video').height();
+                        $(window).scroll(function () {
+                            var currentScroll = $(window).scrollTop();
+                            if (currentScroll <= fixmeTop) {
+                                $('.tab').removeClass('sticky_tab');
+                            } else {
+                                $('.tab').addClass('sticky_tab');
+                            }
+                        });
                     });
-                });
-            $('.table_title').eq(0).text("TWEET");
-            $('.table_title').eq(1).text("USER");
-            start_video_calls_twitter();
+                $('.table_title').eq(0).text("TWEET");
+                $('.table_title').eq(1).text("USER");
+                start_video_calls_twitter();
+            }
+            else {
+                var iframe_url = "https://www.youtube.com/embed/" + youtube_parser(video_verify);
+                $('#iframe').attr('src', iframe_url);
+                start_video_calls_youtube();
+            }
         }
         else {
-            var iframe_url = "https://www.youtube.com/embed/" + youtube_parser(video_verify);
-            $('#iframe').attr('src', iframe_url);
-            start_video_calls_youtube();
+            $('.form-checkbox-field').eq(1).attr('checked', true);
+            $('.table_title').eq(0).text("IMAGE");
+            $("#video_verify").val(image_verify);
+            checkLoginState("image");
         }
+
+
     }
 }
 function detect_video_drop(evt) {
@@ -192,7 +199,16 @@ function detect_video_drop(evt) {
         if ($('#reprocess_check').is(":checked")) {
             reprocess_param = "&reprocess=true";
         }
-        window.location.href = 'https://' + window.location.hostname + ':' + window.location.port + window.location.pathname + '?video=' + video_verify.replace('&', '%26') + reprocess_param;
+        if ($(".form-checkbox-field:checked").val() === "video") {
+            window.location.href = 'https://' + window.location.hostname + ':' + window.location.port + window.location.pathname + '?video=' + video_verify.replace('&', '%26') + reprocess_param;
+
+        }
+        else if ($(".form-checkbox-field:checked").val() === "image") {
+            window.location.href = 'https://' + window.location.hostname + ':' + window.location.port + window.location.pathname + '?image=' + video_verify.replace('&', '%26') + reprocess_param;
+        }
+        else {
+            $('#checkbox_error').slideDown();
+        }
     } else {
         $('#myModal h1').html("Oops! Something went wrong");
         $('#myModal p').html("The provived video URL is <b>" + video_verify.length + "</b> characters long<br/>We can not handle such big URL");
@@ -205,7 +221,17 @@ function verify_video_text() {
         reprocess_param = "&reprocess=true";
     }
     if ($("#video_verify").val() !== "") {
-        window.location.href = 'https://' + window.location.hostname + ':' + window.location.port + window.location.pathname + '?video=' + $("#video_verify").val().replace('&', '%26') + reprocess_param;
+
+        if ($(".form-checkbox-field:checked").val() === "video") {
+            window.location.href = 'https://' + window.location.hostname + ':' + window.location.port + window.location.pathname + '?video=' + $("#video_verify").val().replace('&', '%26') + reprocess_param;
+
+        }
+        else if ($(".form-checkbox-field:checked").val() === "image") {
+            window.location.href = 'https://' + window.location.hostname + ':' + window.location.port + window.location.pathname + '?image=' + $("#video_verify").val().replace('&', '%26') + reprocess_param;
+        }
+        else {
+            $('#checkbox_error').slideDown();
+        }
     }
 }
 
@@ -215,8 +241,6 @@ $("#video_verify").keyup(function (e) {
     }
 });
 
-var global_json;
-var verification_comments = [];
 function start_video_calls_youtube() {
     $.ajax({
         url: "store_url.php?url=" + video_verify,
@@ -228,94 +252,205 @@ function start_video_calls_youtube() {
     if ($('#reprocess_check').is(":checked")) {
         reprocess_param = "&reprocess=1";
     }
-    $.ajax({
-        type: 'GET',
-        url: 'https://caa.iti.gr/verify_videoV3?twtimeline=0&url=' + video_verify + reprocess_param,
-        dataType: 'json',
-        success: function (json) {
-            $('#analysis_info_msg').text(json.message);
-            $('#analysis_info').slideDown();
-            var fixmeTop = $('.tab').offset().top + 424 + $('#analysis_info').height();
-            $(window).scroll(function () {
-                var currentScroll = $(window).scrollTop();
-                if (currentScroll <= fixmeTop) {
-                    $('.tab').removeClass('sticky_tab');
-                } else {
-                    $('.tab').addClass('sticky_tab');
-                }
-            });
-            switch (json.status) {
-                case "new_video":
-                case "processing":
-                case "completed":
-                case "reprocess":
-                case "force_reprocess":
-                    load_youtube();
-                    load_twitter("-", "-");
-                    break;
-                case "removed_video":
-                case "no_video":
-                case "no_video_id":
-                case "empty_url":
-                case "facebook_auth_limit":
-                case "facebook_group":
-                case "facebook_photo":
-                    $('#loading_all,#cover,#cover_info,#loading_info,#cover_timeline,#loading_timeline,.controls,.table,.table_title,#weather_input,.comments_search').remove();
-                    break;
-            }
-        },
-        async: true
-    });
+    if (gup('delete') === "yes") {
+
+        $.ajax({
+            type: 'DELETE',
+            url: 'https://caa.iti.gr/caa/api/v4/videos/reports/3wAjpMP5eyo',
+            dataType: 'json',
+            success: function (json_outer) {
+                alert("OK");
+            },
+            async: true
+        });
+    }
+    else {
+        $.ajax({
+            type: 'POST',
+            url: 'https://caa.iti.gr/caa/api/v4/videos/jobs?url=' + video_verify + reprocess_param,
+            dataType: 'json',
+            success: function (json_outer) {
+                var interval_youtube_calls = setInterval(function () {
+                    $.ajax({
+                        type: 'GET',
+                        url: 'https://caa.iti.gr/caa/api/v4/videos/jobs/' + json_outer.id,
+                        dataType: 'json',
+                        success: function (json_inner) {
+                            $('#analysis_info_msg').text('Status: ' + json_inner.status);
+                            $('#analysis_info,#alert_comments').slideDown();
+                            //media_id
+                            if (json_inner.status === "unavailable") {
+
+                                $('#loading_all,#cover,#cover_info,#loading_info,#cover_timeline,#loading_timeline,.controls,.table,.table_title,#weather_input,.comments_search,#alert_comments').remove();
+                                $('#analysis_info_msg').text(json_inner.sjob.message);
+                                $('#analysis_info').slideDown();
+                                setTimeout(function () {
+                                    abort_jobs();
+                                    abort_tw();
+                                    clearInterval(interval_youtube_calls);
+                                }, 1500);
+                            } else if (json_inner.status === "processing") {
+                                load_youtube(json_inner);
+                                load_twitter("-", "-", json_inner, "video");
+                            } else {//done
+
+                                load_youtube(json_inner);
+                                load_twitter("-", "-", json_inner, "video");
+                                setTimeout(function () {
+                                    abort_jobs();
+                                    abort_tw();
+                                    clearInterval(interval_youtube_calls);
+                                }, 1500);
+
+                            }
+                        }
+                    });
+                }, 1000);
+            },
+            async: true
+        });
+
+    }
+
 }
-function start_video_calls_facebook() {
-    $.ajax({
-        url: "store_url.php?url=" + video_verify,
-        type: "GET",
-        success: function (msg) {
-        }
-    });
+function start_video_calls_facebook(type) {
     var reprocess_param = "";
     if ($('#reprocess_check').is(":checked")) {
         reprocess_param = "&reprocess=1";
     }
-    $.ajax({
-        type: 'GET',
-        url: 'https://caa.iti.gr/verify_videoV3?twtimeline=0&url=' + video_verify + reprocess_param + "&fb_access_token=" + fb_access_token,
-        dataType: 'json',
-        success: function (json) {
-            $('#analysis_info_msg').text(json.message);
-            $('#analysis_info').slideDown();
-            var fixmeTop = $('.tab').offset().top + 404 + $('#analysis_info').height();
-            $(window).scroll(function () {
-                var currentScroll = $(window).scrollTop();
-                if (currentScroll <= fixmeTop) {
-                    $('.tab').removeClass('sticky_tab');
-                } else {
-                    $('.tab').addClass('sticky_tab');
-                }
-            });
-            switch (json.status) {
-                case "new_video":
-                case "processing":
-                case "completed":
-                case "reprocess":
-                case "force_reprocess":
-                    load_facebook();
-                    load_twitter("-", "-");
-                    break;
-                case "removed_video":
-                case "no_video":
-                case "no_video_id":
-                case "empty_url":
-                case "facebook_auth_limit":
-                case "facebook_group":
-                case "facebook_photo":
-                    $('#loading_all,#cover,#cover_info,#loading_info,#cover_timeline,#loading_timeline,.controls,.table,.table_title,#weather_input,.comments_search').remove();
-                    break;
+    if (type === "video") {
+        $.ajax({
+            url: "store_url.php?url=" + video_verify,
+            type: "GET",
+            success: function (msg) {
             }
-        },
-        async: true
-    });
+        });
+
+        if (gup('delete') === "yes") {
+
+            $.ajax({
+                type: 'DELETE',
+                url: 'https://caa.iti.gr/caa/api/v4/videos/reports/10101373686098937',
+                dataType: 'json',
+                success: function (json_outer) {
+                    alert("OK");
+                },
+                async: true
+            });
+        }
+        else {
+            $.ajax({
+                type: 'POST',
+                url: 'https://caa.iti.gr/caa/api/v4/videos/jobs?url=' + video_verify + reprocess_param + "&fb_access_token=" + fb_access_token,
+                dataType: 'json',
+                success: function (json_outer) {
+                    var interval_facebook_calls = setInterval(function () {
+                        $.ajax({
+                            type: 'GET',
+                            url: 'https://caa.iti.gr/caa/api/v4/videos/jobs/' + json_outer.id,
+                            dataType: 'json',
+                            success: function (json_inner) {
+                                $('#analysis_info_msg').text('Status: ' + json_inner.status);
+                                $('#analysis_info,#alert_comments').slideDown();
+                                //media_id
+                                if (json_inner.status === "unavailable") {
+
+                                    $('#loading_all,#cover,#cover_info,#loading_info,#cover_timeline,#loading_timeline,.controls,.table,.table_title,#weather_input,.comments_search,#alert_comments').remove();
+                                    $('#analysis_info_msg').text(json_inner.sjob.message);
+                                    $('#analysis_info').slideDown();
+
+                                    setTimeout(function () {
+                                        abort_jobs();
+                                        abort_tw();
+                                        clearInterval(interval_facebook_calls);
+                                    }, 1500);
+                                } else if (json_inner.status === "processing") {
+                                    load_facebook(json_inner, "video");
+                                    load_twitter("-", "-", json_inner, "video");
+                                } else {//done
+                                    load_facebook(json_inner, "video");
+                                    load_twitter("-", "-", json_inner, "video");
+                                    setTimeout(function () {
+                                        abort_jobs();
+                                        abort_tw();
+                                        clearInterval(interval_facebook_calls);
+                                    }, 1500);
+                                }
+                            }
+                        });
+                    }, 1000);
+                },
+                async: true
+            });
+        }
+    }
+    else {
+        $.ajax({
+            url: "store_url.php?url=" + image_verify,
+            type: "GET",
+            success: function (msg) {
+            }
+        });
+
+        if (gup('delete') === "yes") {
+
+            $.ajax({
+                type: 'DELETE',
+                url: 'https://caa.iti.gr/caa/api/v4/videos/reports/10101373686098937',
+                dataType: 'json',
+                success: function (json_outer) {
+                    alert("OK");
+                },
+                async: true
+            });
+        }
+        else {
+            $.ajax({
+                type: 'POST',
+                url: 'https://caa.iti.gr/caa/api/v4/images/jobs?url=' + image_verify + reprocess_param + "&fb_access_token=" + fb_access_token,
+                dataType: 'json',
+                success: function (json_outer) {
+                    var interval_facebook_calls = setInterval(function () {
+                        $.ajax({
+                            type: 'GET',
+                            url: 'https://caa.iti.gr/caa/api/v4/images/jobs/' + json_outer.id,
+                            dataType: 'json',
+                            success: function (json_inner) {
+                                $('#analysis_info_msg').text('Status: ' + json_inner.status);
+                                $('#analysis_info,#alert_comments').slideDown();
+                                //media_id
+                                if (json_inner.status === "unavailable") {
+
+                                    $('#loading_all,#cover,#cover_info,#loading_info,#cover_timeline,#loading_timeline,.controls,.table,.table_title,#weather_input,.comments_search,#alert_comments').remove();
+                                    $('#analysis_info_msg').text(json_inner.sjob.message);
+                                    $('#analysis_info').slideDown();
+
+                                    setTimeout(function () {
+                                        abort_jobs();
+                                        abort_tw();
+                                        clearInterval(interval_facebook_calls);
+                                    }, 1500);
+                                } else if (json_inner.status === "processing") {
+                                    load_facebook(json_inner, "image");
+                                    load_twitter("-", "-", json_inner, "image");
+                                } else {//done
+                                    load_facebook(json_inner, "image");
+                                    load_twitter("-", "-", json_inner, "image");
+                                    setTimeout(function () {
+                                        abort_jobs();
+                                        abort_tw();
+                                        clearInterval(interval_facebook_calls);
+                                    }, 1500);
+                                }
+                            }
+                        });
+                    }, 1000);
+                },
+                async: true
+            });
+        }
+    }
+
 }
 function start_video_calls_twitter() {
     $.ajax({
@@ -329,31 +464,44 @@ function start_video_calls_twitter() {
         reprocess_param = "&reprocess=1";
     }
     $.ajax({
-        type: 'GET',
-        url: 'https://caa.iti.gr/verify_videoV3?twtimeline=0&url=' + video_verify + reprocess_param,
+        type: 'POST',
+        url: 'https://caa.iti.gr/caa/api/v4/videos/jobs?url=' + video_verify + reprocess_param,
         dataType: 'json',
-        success: function (json) {
-            $('#analysis_info_msg').text(json.message);
-            $('#analysis_info').slideDown();
-            switch (json.status) {
-                case "new_video":
-                case "processing":
-                case "completed":
-                case "reprocess":
-                case "force_reprocess":
-                    load_twitter_video();
-                    load_twitter("-", "twitter");
-                    break;
-                case "removed_video":
-                case "no_video":
-                case "no_video_id":
-                case "empty_url":
-                case "facebook_group":
-                case "facebook_auth_limit":
-                case "facebook_photo":
-                    $('#loading_all,#cover,#cover_info,#loading_info,#cover_timeline,#loading_timeline,.controls,.table,.table_title,#weather_input,.comments_search').remove();
-                    break;
-            }
+        success: function (json_outer) {
+            var interval_twitter_calls = setInterval(function () {
+                $.ajax({
+                    type: 'GET',
+                    url: 'https://caa.iti.gr/caa/api/v4/videos/jobs/' + json_outer.id,
+                    dataType: 'json',
+                    success: function (json_inner) {
+                        $('#analysis_info_msg').text('Status: ' + json_inner.status);
+                        $('#analysis_info,#alert_comments').slideDown();
+                        //media_id
+                        if (json_inner.status === "unavailable") {
+
+                            $('#loading_all,#cover,#cover_info,#loading_info,#cover_timeline,#loading_timeline,.controls,.table,.table_title,#weather_input,.comments_search,#alert_comments').remove();
+                            $('#analysis_info_msg').text(json_inner.sjob.message);
+                            $('#analysis_info').slideDown();
+                            setTimeout(function () {
+                                abort_jobs();
+                                abort_tw();
+                                clearInterval(interval_twitter_calls);
+                            }, 1500);
+                        } else if (json_inner.status === "processing") {
+                            load_twitter_video(json_inner);
+                            load_twitter("-", "twitter", json_inner, "video");
+                        } else {//done
+                            load_twitter_video(json_inner);
+                            load_twitter("-", "twitter", json_inner, "video");
+                            setTimeout(function () {
+                                abort_jobs();
+                                abort_tw();
+                                clearInterval(interval_twitter_calls);
+                            }, 1500);
+                        }
+                    }
+                });
+            }, 1000);
         },
         async: true
     });
@@ -362,10 +510,11 @@ function start_video_calls_twitter() {
 $("#thumb_info").on("click", ".link", function () {
     window.open($(this).attr('data-url'), '_blank');
 });
-$("#user_fb_table").on("click", ".link button", function (e) {
-    e.stopPropagation();
+
+$('.twitter_p').click(function () {
     window.open($(this).attr('data-url'), '_blank');
 });
+
 function gup(name) {
     name = name.replace(/[\[]/, "\\\[").replace(/[\]]/, "\\\]");
     var regexS = "[\\?&]" + name + "=([^&#]*)";
@@ -387,394 +536,6 @@ function youtube_parser(url) {
     }
 }
 
-$('.twitter_p').click(function () {
-    window.open($(this).attr('data-url'), '_blank');
-});
-
-var all;
-
-function comments(source) {
-    var $tiles_comments = $('#comments_info');
-    var verified;
-    all = parseInt($('#comments_info .ca-item').last().attr('data-index')) + 1 || 0;
-    for (all, verified = 0; ((all < global_json.video_comments.length) && (verified < 10)); all++) {
-        var time = global_json.video_publishedAt_comments[all];
-        var format_time = time.substring(8, 10) + '/' + time.substring(5, 7) + '/' + time.substring(0, 4) + ', ' + time.substring(12, 14) + ':' + time.substring(15, 17);
-
-        if ($.inArray(global_json.video_comments[all], verification_comments) !== -1) {
-
-            var src_str = global_json.video_comments[all];
-            var fake_terms = " fake , lies , fake , wrong , lie , confirm , where , location , lying , false , incorrect , misleading , propaganda , liar , mensonges , faux , errone , mensonge , confirme , lieu , mentir , faux , inexact , trompeur , propagande , menteur , mentiras , falso , incorrecto , mentira , confirmado , donde , lugar , mitiendo , falso , incorrecto , enganoso , propaganda , mentiroso , l?gen , falsch , l?ge , best?tigt , wo , ort , l?gend , fehlerhaft , unrichtig , irref?hrend , l?gner , \u03C8\u03AD\u03BC\u03B1\u03C4\u03B1 , \u03C8\u03B5\u03CD\u03C4\u03B9\u03BA\u03BF , \u03BB\u03AC\u03B8\u03BF\u03C2 , \u03C8\u03AD\u03BC\u03B1 , \u03B5\u03C0\u03B9\u03B2\u03B5\u03B2\u03B1\u03B9\u03CE\u03BD\u03C9 , \u03C0\u03BF\u03C5 , \u03C4\u03BF\u03C0\u03BF\u03B8\u03B5\u03C3\u03AF\u03B1 , \u03C8\u03B5\u03C5\u03B4\u03AE\u03C2 , \u03B5\u03C3\u03C6\u03B1\u03BB\u03BC\u03AD\u03BD\u03BF , \u03BB\u03B1\u03BD\u03B8\u03B1\u03C3\u03BC\u03AD\u03BD\u03BF , \u03C0\u03B1\u03C1\u03B1\u03C0\u03BB\u03B1\u03BD\u03B7\u03C4\u03B9\u03BA\u03CC , \u03C0\u03C1\u03BF\u03C0\u03B1\u03B3\u03AC\u03BD\u03B4\u03B1 , \u03C8\u03B5\u03CD\u03C4\u03B7\u03C2 , \u0623\u0643\u0627\u0630\u064A\u0628 , \u0623\u0643\u0627\u0630\u064A\u0628 , \u063A\u0644\u0637\u0627\u0646 , \u0623\u0643\u0630\u0648\u0628\u0629\u060C \u0643\u0630\u0628 , \u0645\u0624\u0643\u062F , \u0623\u064A\u0646 , \u0645\u0643\u0627\u0646 , \u0643\u0630\u0628 , \u062E\u0627\u0637\u0626 , \u063A\u064A\u0631 \u0635\u062D\u064A\u062D , \u0645\u0636\u0644\u0644 , \u062F\u0639\u0627\u064A\u0629 , \u0643\u0627\u0630\u0628 , \u062F\u0631\u0648\u063A , \u062C\u0639\u0644\u06CC , \u0627\u0634\u062A\u0628\u0627\u0647 , \u062F\u0631\u0648\u063A , \u062A\u0623\u064A\u064A\u062F \u0634\u062F\u0647 , \u0643\u062C\u0627 , \u0645\u062D\u0644\u060C \u0645\u0643\u0627\u0646 , \u062F\u0631\u0648\u063A \u06AF\u0648 , \u063A\u0644\u0637\u060C \u0627\u0634\u062A\u0628\u0627\u0647\u060C \u062F\u0631\u0648\u063A\u06CC\u0646 , \u063A\u0644\u0637\u060C \u0627\u0634\u062A\u0628\u0627\u0647 , \u06AF\u0645\u0631\u0627\u0647 \u200C \u0643\u0646\u0646\u062F\u0647 , \u062A\u0628\u0644\u06CC\u063A\u0627\u062A \u0633\u06CC\u0627\u0633\u06CC\u060C \u067E\u0631\u0648\u067E\u0627\u06AF\u0627\u0646\u062F\u0627 , \u06A9\u0630\u0627\u0628".split(',');
-            var term;
-            var pattern;
-            for (var i = 0; i < fake_terms.length; i++) {
-                term = fake_terms[i].trim().replace(/(\s+)/, "(<[^>]+>)*$1(<[^>]+>)*");
-                if (arabic.test(src_str)) {
-                    pattern = new RegExp("(" + fake_terms[i].trim() + ")", "gi");
-                }
-                else {
-                    pattern = new RegExp("(\\b" + fake_terms[i].trim() + "\\b)", "gi");
-                }
-
-                src_str = src_str.replace(pattern, "<span class='highlight'>$1</span>");
-                src_str = src_str.replace(/(<mark>[^<>]*)((<[^>]+>)+)([^<>]*<\/mark>)/, "$1</span>$2<span>$4");
-            }
-            if (arabic.test(src_str)) {
-                if (source === "facebook") {
-                    $tiles_comments.append('<div data-index="' + all + '" class="ca-item verified" ><div class="ca-item-main" style="background-color: #8AA399"><span style="direction:rtl;text-align: right" class="value">' + src_str + '</span><p class="time_comment alone">' + format_time + '</p></div></div>');
-                }
-                else {
-                    $tiles_comments.append('<div data-index="' + all + '" class="ca-item verified" ><div class="ca-item-main" style="background-color: #8AA399"><span style="direction:rtl;text-align: right" class="value">' + src_str + '</span><p class="user_comment"><span style="font-weight: normal;font-size: 12px">by  </span><a href="' + global_json.video_author_url_comments[all] + '" target="_blank">' + global_json.video_author_comments[all] + '</a></p><p class="time_comment">' + format_time + '</p></div></div>');
-                }
-            }
-            else {
-                if (source === "facebook") {
-                    $tiles_comments.append('<div data-index="' + all + '" class="ca-item verified" ><div class="ca-item-main" style="background-color: #8AA399"><span class="value">' + src_str + '</span><p class="time_comment alone">' + format_time + '</p></div></div>');
-                }
-                else {
-                    $tiles_comments.append('<div data-index="' + all + '" class="ca-item verified" ><div class="ca-item-main" style="background-color: #8AA399"><span class="value">' + src_str + '</span><p class="user_comment"><span style="font-weight: normal;font-size: 12px">by  </span><a href="' + global_json.video_author_url_comments[all] + '" target="_blank">' + global_json.video_author_comments[all] + '</a></p><p class="time_comment">' + format_time + '</p></div></div>');
-                }
-            }
-            verified++;
-        }
-        else if ($('.filter.active').attr('id') === "all") {
-            if (arabic.test(global_json.video_comments[all])) {
-                if (source === "facebook") {
-                    $tiles_comments.append('<div data-index="' + all + '" class="ca-item no-verified" ><div class="ca-item-main"><span style="direction:rtl;text-align: right" class="value">' + global_json.video_comments[all] + '</span><p class="time_comment alone">' + format_time + '</p></div></div>');
-                }
-                else {
-                    $tiles_comments.append('<div data-index="' + all + '" class="ca-item no-verified" ><div class="ca-item-main"><span style="direction:rtl;text-align: right" class="value">' + global_json.video_comments[all] + '</span><p class="user_comment"><span style="font-weight: normal;font-size: 12px">by  </span><a href="' + global_json.video_author_url_comments[all] + '" target="_blank">' + global_json.video_author_comments[all] + '</a></p><p class="time_comment">' + format_time + '</p></div></div>');
-                }
-            }
-            else {
-                if (source === "facebook") {
-                    $tiles_comments.append('<div data-index="' + all + '" class="ca-item no-verified" ><div class="ca-item-main"><span class="value">' + global_json.video_comments[all] + '</span><p class="time_comment alone">' + format_time + '</p></div></div>');
-                }
-                else {
-                    $tiles_comments.append('<div data-index="' + all + '" class="ca-item no-verified" ><div class="ca-item-main"><span class="value">' + global_json.video_comments[all] + '</span><p class="user_comment"><span style="font-weight: normal;font-size: 12px">by  </span><a href="' + global_json.video_author_url_comments[all] + '" target="_blank">' + global_json.video_author_comments[all] + '</a></p><p class="time_comment">' + format_time + '</p></div></div>');
-                }
-            }
-            verified++;
-        }
-    }
-    if ($('.filter.active').attr('id') === "all") {
-        if (global_json.video_comments.length > $('#comments_info .ca-item').length) {
-            $('.more').show();
-        }
-        else {
-            $('.more').hide();
-        }
-    }
-    else {
-        if (verification_comments.length > $('#comments_info .ca-item').length) {
-            $('.more').show();
-        }
-        else {
-            $('.more').hide();
-        }
-    }
-
-    var options_comments = {
-        autoResize: true,
-        container: $tiles_comments,
-        offset: 15,
-        itemWidth: 330,
-        outerOffset: 0
-    };
-    setTimeout(function () {
-        $tiles_comments.find('.ca-item').wookmark(options_comments);
-    }, 10);
-}
-var global_json_comments = "";
-var fake_terms_search = "";
-function comments_search(source, and, or) {
-    $.ajax({
-        type: 'GET',
-        url: 'https://caa.iti.gr/searchcomments?url=' + encodeURI(video_verify) + '&keywordsor=' + or + '&keywordsand=' + and,
-        dataType: 'json',
-        success: function (json) {
-            global_json_comments = json;
-            var $tiles_comments = $('#comments_info');
-            var verified;
-            if (json.comments_sub.length === 0) {
-                $('#zero_comments').show();
-            }
-
-            or = " " + or.replace(/,/g, ' , ') + " ";
-            and = " " + and.replace(/,/g, ' , ') + " ";
-            fake_terms_search = "";
-            if (or === "  ") {
-                if (and === "  ") {
-                    fake_terms_search = [];
-                }
-                else {
-                    fake_terms_search = and.split(',');
-                }
-            }
-            else {
-                if (and === "  ") {
-                    fake_terms_search = or.split(',');
-                }
-                else {
-                    fake_terms_search = (and + "," + or).split(',');
-                }
-            }
-
-            for (var all_search = 0; ((all_search < json.comments_sub.length) && (all_search < 10)); all_search++) {
-                var time = json.comments_date_sub[all_search];
-                var format_time = time.substring(8, 10) + '/' + time.substring(5, 7) + '/' + time.substring(0, 4) + ', ' + time.substring(12, 14) + ':' + time.substring(15, 17);
-
-                var src_str = json.comments_sub[all_search];
-
-                var term;
-                var pattern;
-                for (var i = 0; i < fake_terms_search.length; i++) {
-                    term = fake_terms_search[i].trim().replace(/(\s+)/, "(<[^>]+>)*$1(<[^>]+>)*");
-                    if (arabic.test(src_str)) {
-                        pattern = new RegExp("(" + fake_terms_search[i].trim() + ")", "gi");
-                    }
-                    else {
-                        pattern = new RegExp("(\\b" + fake_terms_search[i].trim() + "\\b)", "gi");
-                    }
-
-                    src_str = src_str.replace(pattern, "<span class='highlight'>$1</span>");
-                    src_str = src_str.replace(/(<mark>[^<>]*)((<[^>]+>)+)([^<>]*<\/mark>)/, "$1</span>$2<span>$4");
-                }
-                if (arabic.test(src_str)) {
-                    if (source === "facebook") {
-                        $tiles_comments.append('<div data-index="' + all_search + '" class="ca-item" ><div class="ca-item-main" style="background-color: #8AA399"><span style="direction:rtl;text-align: right" class="value">' + src_str + '</span><p class="time_comment alone">' + format_time + '</p></div></div>');
-                    }
-                    else {
-                        $tiles_comments.append('<div data-index="' + all_search + '" class="ca-item" ><div class="ca-item-main" style="background-color: #8AA399"><span style="direction:rtl;text-align: right" class="value">' + src_str + '</span><p class="user_comment"><span style="font-weight: normal;font-size: 12px">by  </span><a href="' + json.comments_url_sub[all_search] + '" target="_blank">' + json.comments_author_sub[all_search] + '</a></p><p class="time_comment">' + format_time + '</p></div></div>');
-                    }
-                }
-                else {
-                    if (source === "facebook") {
-                        $tiles_comments.append('<div data-index="' + all_search + '" class="ca-item" ><div class="ca-item-main" style="background-color: #8AA399"><span class="value">' + src_str + '</span><p class="time_comment alone">' + format_time + '</p></div></div>');
-                    }
-                    else {
-                        $tiles_comments.append('<div data-index="' + all_search + '" class="ca-item" ><div class="ca-item-main" style="background-color: #8AA399"><span class="value">' + src_str + '</span><p class="user_comment"><span style="font-weight: normal;font-size: 12px">by  </span><a href="' + json.comments_url_sub[all_search] + '" target="_blank">' + json.comments_author_sub[all_search] + '</a></p><p class="time_comment">' + format_time + '</p></div></div>');
-                    }
-                }
-            }
-            if (json.comments_sub.length > 10) {
-                $('.more_search').show();
-                $('.more_search div').text("More comments (" + json.comments_sub.length + " in total)");
-            }
-
-            var options_comments = {
-                autoResize: true,
-                container: $tiles_comments,
-                offset: 15,
-                itemWidth: 330,
-                outerOffset: 0
-            };
-            setTimeout(function () {
-                $tiles_comments.find('.ca-item').wookmark(options_comments);
-                $('#loading').hide();
-            }, 10);
-        },
-        async: true
-    });
-}
-function replies() {
-    var $tiles_comments = $('#comments_info');
-    var verified;
-    all = parseInt($('#comments_info .ca-item').last().attr('data-index')) + 1 || 0;
-    for (all, verified = 0; ((all < global_json.replies.length) && (verified < 10)); all++) {
-        var time = global_json.replies_created_at[all];
-        var format_time = time.substring(8, 10) + '/' + time.substring(5, 7) + '/' + time.substring(0, 4) + ', ' + time.substring(12, 14) + ':' + time.substring(15, 17);
-
-        if ($.inArray(global_json.replies[all], verification_comments) !== -1) {
-
-            var src_str = global_json.replies[all];
-            var fake_terms = " fake , lies , fake , wrong , lie , confirm , where , location , lying , false , incorrect , misleading , propaganda , liar , mensonges , faux , errone , mensonge , confirme , lieu , mentir , faux , inexact , trompeur , propagande , menteur , mentiras , falso , incorrecto , mentira , confirmado , donde , lugar , mitiendo , falso , incorrecto , enganoso , propaganda , mentiroso , l?gen , falsch , l?ge , best?tigt , wo , ort , l?gend , fehlerhaft , unrichtig , irref?hrend , l?gner , \u03C8\u03AD\u03BC\u03B1\u03C4\u03B1 , \u03C8\u03B5\u03CD\u03C4\u03B9\u03BA\u03BF , \u03BB\u03AC\u03B8\u03BF\u03C2 , \u03C8\u03AD\u03BC\u03B1 , \u03B5\u03C0\u03B9\u03B2\u03B5\u03B2\u03B1\u03B9\u03CE\u03BD\u03C9 , \u03C0\u03BF\u03C5 , \u03C4\u03BF\u03C0\u03BF\u03B8\u03B5\u03C3\u03AF\u03B1 , \u03C8\u03B5\u03C5\u03B4\u03AE\u03C2 , \u03B5\u03C3\u03C6\u03B1\u03BB\u03BC\u03AD\u03BD\u03BF , \u03BB\u03B1\u03BD\u03B8\u03B1\u03C3\u03BC\u03AD\u03BD\u03BF , \u03C0\u03B1\u03C1\u03B1\u03C0\u03BB\u03B1\u03BD\u03B7\u03C4\u03B9\u03BA\u03CC , \u03C0\u03C1\u03BF\u03C0\u03B1\u03B3\u03AC\u03BD\u03B4\u03B1 , \u03C8\u03B5\u03CD\u03C4\u03B7\u03C2 , \u0623\u0643\u0627\u0630\u064A\u0628 , \u0623\u0643\u0627\u0630\u064A\u0628 , \u063A\u0644\u0637\u0627\u0646 , \u0623\u0643\u0630\u0648\u0628\u0629\u060C \u0643\u0630\u0628 , \u0645\u0624\u0643\u062F , \u0623\u064A\u0646 , \u0645\u0643\u0627\u0646 , \u0643\u0630\u0628 , \u062E\u0627\u0637\u0626 , \u063A\u064A\u0631 \u0635\u062D\u064A\u062D , \u0645\u0636\u0644\u0644 , \u062F\u0639\u0627\u064A\u0629 , \u0643\u0627\u0630\u0628 , \u062F\u0631\u0648\u063A , \u062C\u0639\u0644\u06CC , \u0627\u0634\u062A\u0628\u0627\u0647 , \u062F\u0631\u0648\u063A , \u062A\u0623\u064A\u064A\u062F \u0634\u062F\u0647 , \u0643\u062C\u0627 , \u0645\u062D\u0644\u060C \u0645\u0643\u0627\u0646 , \u062F\u0631\u0648\u063A \u06AF\u0648 , \u063A\u0644\u0637\u060C \u0627\u0634\u062A\u0628\u0627\u0647\u060C \u062F\u0631\u0648\u063A\u06CC\u0646 , \u063A\u0644\u0637\u060C \u0627\u0634\u062A\u0628\u0627\u0647 , \u06AF\u0645\u0631\u0627\u0647 \u200C \u0643\u0646\u0646\u062F\u0647 , \u062A\u0628\u0644\u06CC\u063A\u0627\u062A \u0633\u06CC\u0627\u0633\u06CC\u060C \u067E\u0631\u0648\u067E\u0627\u06AF\u0627\u0646\u062F\u0627 , \u06A9\u0630\u0627\u0628".split(',');
-            var term;
-            var pattern;
-            for (var i = 0; i < fake_terms.length; i++) {
-                term = fake_terms[i].trim().replace(/(\s+)/, "(<[^>]+>)*$1(<[^>]+>)*");
-                if (arabic.test(src_str)) {
-                    pattern = new RegExp("(" + fake_terms[i].trim() + ")", "gi");
-                }
-                else {
-                    pattern = new RegExp("(\\b" + fake_terms[i].trim() + "\\b)", "gi");
-                }
-                src_str = src_str.replace(pattern, "<span class='highlight'>$1</span>");
-                src_str = src_str.replace(/(<mark>[^<>]*)((<[^>]+>)+)([^<>]*<\/mark>)/, "$1</span>$2<span>$4");
-            }
-            if (arabic.test(src_str)) {
-                $tiles_comments.append('<div data-index="' + all + '" class="ca-item verified" ><div class="ca-item-main" style="background-color: #8AA399"><span style="direction:rtl;text-align: right" class="value">' + src_str + '</span><p class="user_comment"><span style="font-weight: normal;font-size: 12px">by  </span><a href="https://twitter.com/' + global_json.replies_screen_name_url[all] + '" target="_blank">' + global_json.replies_screen_name_url[all] + '</a></p><p class="time_comment">' + format_time + '</p></div></div>');
-            }
-            else {
-                $tiles_comments.append('<div data-index="' + all + '" class="ca-item verified" ><div class="ca-item-main" style="background-color: #8AA399"><span class="value">' + src_str + '</span><p class="user_comment"><span style="font-weight: normal;font-size: 12px">by  </span><a href="https://twitter.com/' + global_json.replies_screen_name_url[all] + '" target="_blank">' + global_json.replies_screen_name_url[all] + '</a></p><p class="time_comment">' + format_time + '</p></div></div>');
-            }
-            verified++;
-        }
-        else if ($('.filter.active').attr('id') === "all") {
-            if (arabic.test(global_json.replies[all])) {
-                $tiles_comments.append('<div data-index="' + all + '" class="ca-item no-verified" ><div class="ca-item-main"><span style="direction:rtl;text-align: right" class="value">' + global_json.replies[all] + '</span><p class="user_comment"><span style="font-weight: normal;font-size: 12px">by  </span><a href="https://twitter.com/' + global_json.replies_screen_name_url[all] + '" target="_blank">' + global_json.replies_screen_name_url[all] + '</a></p><p class="time_comment">' + format_time + '</p></div></div>');
-            }
-            else {
-                $tiles_comments.append('<div data-index="' + all + '" class="ca-item no-verified" ><div class="ca-item-main"><span class="value">' + global_json.replies[all] + '</span><p class="user_comment"><span style="font-weight: normal;font-size: 12px">by  </span><a href="https://twitter.com/' + global_json.replies_screen_name_url[all] + '" target="_blank">' + global_json.replies_screen_name_url[all] + '</a></p><p class="time_comment">' + format_time + '</p></div></div>');
-            }
-            verified++;
-        }
-    }
-    if ($('.filter.active').attr('id') === "all") {
-        if (global_json.replies.length > $('#comments_info .ca-item').length) {
-            $('.more').show();
-        }
-        else {
-            $('.more').hide();
-        }
-    }
-    else {
-        if (verification_comments.length > $('#comments_info .ca-item').length) {
-            $('.more').show();
-        }
-        else {
-            $('.more').hide();
-        }
-    }
-
-    var options_comments = {
-        autoResize: true,
-        container: $tiles_comments,
-        offset: 15,
-        itemWidth: 330,
-        outerOffset: 0
-    };
-    setTimeout(function () {
-        $tiles_comments.find('.ca-item').wookmark(options_comments);
-    }, 10);
-}
-
-$('.filter').click(function () {
-    if (!($(this).hasClass(('active')))) {
-        $('.controls').find('.filter').removeClass('active');
-        $(this).addClass('active');
-        $('#comments_info').empty();
-        $('.more').hide();
-        if ($('.table_title').eq(0).text() === "TWEET") {
-            replies();
-        }
-        else if ($('.table_title').eq(1).text() === "CHANNEL") {
-            comments("-");
-        }
-        else {
-            comments("facebook");
-        }
-    }
-});
-$('.more').click(function () {
-    if ($('.table_title').eq(0).text() === "TWEET") {
-        replies();
-    }
-    else if ($('.table_title').eq(1).text() === "CHANNEL") {
-        comments("-");
-    }
-    else {
-        comments("facebook");
-    }
-});
-$('.more_search').click(function () {
-    if (($('.table_title').eq(0).text() === "TWEET") || ($('.table_title').eq(1).text() === "CHANNEL")) {
-
-        var $tiles_comments = $('#comments_info');
-        var com_num = $('#comments_info > div').length;
-        for (var all_search = com_num; ((all_search < global_json_comments.comments_sub.length) && (all_search < com_num + 10)); all_search++) {
-            var time = global_json_comments.comments_date_sub[all_search];
-            var format_time = time.substring(8, 10) + '/' + time.substring(5, 7) + '/' + time.substring(0, 4) + ', ' + time.substring(12, 14) + ':' + time.substring(15, 17);
-
-            var src_str = global_json_comments.comments_sub[all_search];
-
-            var term;
-            var pattern;
-            for (var i = 0; i < fake_terms_search.length; i++) {
-                term = fake_terms_search[i].trim().replace(/(\s+)/, "(<[^>]+>)*$1(<[^>]+>)*");
-                if (arabic.test(src_str)) {
-                    pattern = new RegExp("(" + fake_terms_search[i].trim() + ")", "gi");
-                }
-                else {
-                    pattern = new RegExp("(\\b" + fake_terms_search[i].trim() + "\\b)", "gi");
-                }
-
-                src_str = src_str.replace(pattern, "<span class='highlight'>$1</span>");
-                src_str = src_str.replace(/(<mark>[^<>]*)((<[^>]+>)+)([^<>]*<\/mark>)/, "$1</span>$2<span>$4");
-            }
-            if (arabic.test(src_str)) {
-                $tiles_comments.append('<div data-index="' + all_search + '" class="ca-item" ><div class="ca-item-main" style="background-color: #8AA399"><span style="direction:rtl;text-align: right" class="value">' + src_str + '</span><p class="user_comment"><span style="font-weight: normal;font-size: 12px">by  </span><a href="' + global_json_comments.comments_url_sub[all_search] + '" target="_blank">' + global_json_comments.comments_author_sub[all_search] + '</a></p><p class="time_comment">' + format_time + '</p></div></div>');
-            }
-            else {
-                $tiles_comments.append('<div data-index="' + all_search + '" class="ca-item" ><div class="ca-item-main" style="background-color: #8AA399"><span class="value">' + src_str + '</span><p class="user_comment"><span style="font-weight: normal;font-size: 12px">by  </span><a href="' + global_json_comments.comments_url_sub[all_search] + '" target="_blank">' + global_json_comments.comments_author_sub[all_search] + '</a></p><p class="time_comment">' + format_time + '</p></div></div>');
-            }
-        }
-        if (all_search < com_num + 10) {
-            $('.more_search').hide();
-        }
-
-        var options_comments = {
-            autoResize: true,
-            container: $tiles_comments,
-            offset: 15,
-            itemWidth: 330,
-            outerOffset: 0
-        };
-        setTimeout(function () {
-            $tiles_comments.find('.ca-item').wookmark(options_comments);
-        }, 10);
-
-
-    }
-    else {
-
-
-        var $tiles_comments = $('#comments_info');
-        var com_num = $('#comments_info > div').length;
-        for (var all_search = com_num; ((all_search < global_json_comments.comments_sub.length) && (all_search < com_num + 10)); all_search++) {
-            var time = global_json_comments.comments_date_sub[all_search];
-            var format_time = time.substring(8, 10) + '/' + time.substring(5, 7) + '/' + time.substring(0, 4) + ', ' + time.substring(12, 14) + ':' + time.substring(15, 17);
-
-            var src_str = global_json_comments.comments_sub[all_search];
-
-            var term;
-            var pattern;
-            for (var i = 0; i < fake_terms_search.length; i++) {
-                term = fake_terms_search[i].trim().replace(/(\s+)/, "(<[^>]+>)*$1(<[^>]+>)*");
-                if (arabic.test(src_str)) {
-                    pattern = new RegExp("(" + fake_terms_search[i].trim() + ")", "gi");
-                }
-                else {
-                    pattern = new RegExp("(\\b" + fake_terms_search[i].trim() + "\\b)", "gi");
-                }
-
-                src_str = src_str.replace(pattern, "<span class='highlight'>$1</span>");
-                src_str = src_str.replace(/(<mark>[^<>]*)((<[^>]+>)+)([^<>]*<\/mark>)/, "$1</span>$2<span>$4");
-            }
-            if (arabic.test(src_str)) {
-                $tiles_comments.append('<div data-index="' + all_search + '" class="ca-item" ><div class="ca-item-main" style="background-color: #8AA399"><span style="direction:rtl;text-align: right" class="value">' + src_str + '</span><p class="time_comment alone">' + format_time + '</p></div></div>');
-            }
-            else {
-                $tiles_comments.append('<div data-index="' + all_search + '" class="ca-item" ><div class="ca-item-main" style="background-color: #8AA399"><span class="value">' + src_str + '</span><p class="time_comment alone">' + format_time + '</p></div></div>');
-            }
-        }
-        if (all_search < com_num + 10) {
-            $('.more_search').hide();
-        }
-
-        var options_comments = {
-            autoResize: true,
-            container: $tiles_comments,
-            offset: 15,
-            itemWidth: 330,
-            outerOffset: 0
-        };
-        setTimeout(function () {
-            $tiles_comments.find('.ca-item').wookmark(options_comments);
-        }, 10);
-    }
-});
-
 function verify_example(video_url) {
     var reprocess_param = "";
     if ($('#reprocess_check').is(":checked")) {
@@ -782,397 +543,778 @@ function verify_example(video_url) {
     }
     window.location.href = 'https://' + window.location.hostname + ':' + window.location.port + window.location.pathname + '?video=' + video_url.replace('&', '%26') + reprocess_param;
 }
-function load_youtube() {
-    var first_call = true;
-    $('#time_input').timepicker({
-        timeFormat: 'HH:mm',
-        interval: 60,
-        startHour: 0,
-        startMinutes: 0,
-        dynamic: false,
-        dropdown: true,
-        scrollbar: true
-    });
-    $('#date_input').datetimepicker({
-        timepicker: false,
-        format: 'd/m/Y',
-        maxDate: '+1970/01/01'
-    });
+
+var json_metadata = true, json_comments = true, json_debunk = true, json_location = true, json_ai = true, json_weather = true;
+function load_youtube(json) {
+
     var $tiles_thumbs = $('#thumb_info');
-    var interval_youtube = setInterval(function () {
+    var $tiles_comments = $('#comments_info');
+    $.ajax({
+        type: 'GET',
+        url: 'https://caa.iti.gr/caa/api/v4/videos/reports/' + json.media_id,
+        dataType: 'json',
+        success: function (json_inner) {
+
+            if (json_metadata) {
+                $('.twitter_p').attr('data-url', json_inner.verification_cues.twitter_search_url);
+                //title
+                if (json_inner.video.title !== "") {
+                    guessLanguage.detect(json_inner.video.title, function (language) {
+                        var translate_dom = '<p class="translate_wrapper_table"><img src="imgs/uk_flag.png"><span>Translate to English</span></p>';
+                        if (language === "en") {
+                            translate_dom = ""
+                        }
+                        $('#video_title').html('<span>' + json_inner.video.title + '</span>' + translate_dom);
+                        if (arabic.test(json_inner.video.title)) {
+                            $('#video_title').css({'direction': 'rtl', 'text-align': 'right'});
+                        }
+                    });
+                }
+                else if (json.sproc.status_metadata === "done") {
+                    $('#video_title').parent().remove();
+                    $('#video_yt_table_more tbody').append('<tr> <td>Title</td> <td>Not Available</td> </tr>');
+                }
+
+                //description
+                if (json_inner.video.description !== "") {
+                    guessLanguage.detect(json_inner.video.description, function (language) {
+                        var translate_dom = '<p class="translate_wrapper_table"><img src="imgs/uk_flag.png"><span>Translate to English</span></p>';
+                        if (language === "en") {
+                            translate_dom = ""
+                        }
+                        $('#video_description').html('<span>' + json_inner.video.description + '</span>' + translate_dom);
+                        if (arabic.test(json_inner.video.description)) {
+                            $('#video_description').css({'direction': 'rtl', 'text-align': 'right'});
+                        }
+                    });
+                }
+                else if (json.sproc.status_metadata === "done") {
+                    $('#video_description').parent().remove();
+                    $('#video_yt_table_more tbody').append('<tr> <td>Description</td> <td>Not Available</td> </tr>');
+                }
+
+                //publishedAt
+                if (json_inner.video.publishedAt !== "") {
+                    $('#video_upload_time').text(json_inner.video.publishedAt);
+                }
+                else if (json.sproc.status_metadata === "done") {
+                    $('#video_upload_time').parent().remove();
+                    $('#video_yt_table_more tbody').append('<tr> <td>Upload Time</td> <td>Not Available</td> </tr>');
+                }
+
+                //viewCount
+                if (json_inner.video.viewCount > -1) {
+                    $('#video_view_count').text(json_inner.video.viewCount);
+                }
+                else if (json.sproc.status_metadata === "done") {
+                    $('#video_view_count').parent().remove();
+                    $('#video_yt_table_more tbody').append('<tr> <td>View Count</td> <td>Not Available</td> </tr>');
+                }
+
+                //likeCount
+                if (json_inner.video.likeCount > -1) {
+                    $('#video_like_count').text(json_inner.video.likeCount);
+                }
+                else if (json.sproc.status_metadata === "done") {
+                    $('#video_like_count').parent().remove();
+                    $('#video_yt_table_more tbody').append('<tr> <td>Like Count</td> <td>Not Available</td> </tr>');
+                }
+
+                //dislikeCount
+                if (json_inner.video.dislikeCount > -1) {
+                    $('#video_dislike_count').text(json_inner.video.dislikeCount);
+                }
+                else if (json.sproc.status_metadata === "done") {
+                    $('#video_dislike_count').parent().remove();
+                    $('#video_yt_table_more tbody').append('<tr> <td>Dislike Count</td> <td>Not Available</td> </tr>');
+                }
+
+                //duration
+                if (json_inner.video.duration !== "") {
+                    $('#video_duration').text(json_inner.video.duration);
+                }
+                else if (json.sproc.status_metadata === "done") {
+                    $('#video_duration').parent().remove();
+                    $('#video_yt_table_more tbody').append('<tr> <td>Duration</td> <td>Not Available</td> </tr>');
+                }
+
+                //dimension
+                if (json_inner.video.dimension !== "") {
+                    $('#video_dimension').text(json_inner.video.dimension);
+                }
+                else if (json.sproc.status_metadata === "done") {
+                    $('#video_dimension').parent().remove();
+                    $('#video_yt_table_more tbody').append('<td>Dimension<img src="imgs/info_color.png" class="tooltip tooltipstered" data-tooltip-content="#tooltip_dimension"></td>');
+                }
+
+                //definition
+                if (json_inner.video.definition !== "") {
+                    $('#video_definition').text(json_inner.video.definition);
+                }
+                else if (json.sproc.status_metadata === "done") {
+                    $('#video_definition').parent().remove();
+                    $('#video_yt_table_more tbody').append('<td>Definition<img src="imgs/info_color.png" class="tooltip tooltipstered" data-tooltip-content="#tooltip_definition"></td>');
+                }
+
+                //licensedContent
+                if (json_inner.video.licensedContent !== "") {
+                    $('#video_licensed_content').text(json_inner.video.licensedContent);
+                }
+                else if (json.sproc.status_metadata === "done") {
+                    $('#video_licensed_content').parent().remove();
+                    $('#video_yt_table_more tbody').append('<tr> <td>Licensed Content<img src="imgs/info_color.png" class="tooltip tooltipstered" data-tooltip-content="#tooltip_licensed"></td> <td id="video_licensed_content">false</td> </tr>');
+                }
+
+                //id
+                if (json_inner.id !== "") {
+                    $('#video_id').html(json_inner.id);
+                }
+                else if (json.sproc.status_metadata === "done") {
+                    $('#video_id').parent().remove();
+                    $('#video_yt_table_more tbody').append('<tr> <td>ID</td> <td>Not Available</td> </tr>');
+                }
+
+                /* ---------------------------------- */
+
+                //id
+                if (json_inner.source.id !== "") {
+                    $('#channel_id').text(json_inner.source.id);
+                }
+                else if (json.sproc.status_metadata === "done") {
+                    $('#channel_id').parent().remove();
+                    $('#channel_yt_table_more tbody').append('<tr> <td>ID</td> <td>Not Available</td> </tr>');
+                }
+
+                //title
+                if (json_inner.source.title !== "") {
+                    $('#channel_title').text(json_inner.source.title);
+                }
+                else if (json.sproc.status_metadata === "done") {
+                    $('#channel_title').parent().remove();
+                    $('#channel_yt_table_more tbody').append('<tr> <td>Title</td> <td>Not Available</td> </tr>');
+                }
+
+                //aboutPage
+                if (json_inner.source.aboutPage !== "") {
+                    $('#channel_about_page').html('<a target="_blank" href="' + json_inner.source.aboutPage + '">' + json_inner.source.aboutPage + '</a>');
+                }
+                else if (json.sproc.status_metadata === "done") {
+                    $('#channel_about_page').parent().remove();
+                    $('#channel_yt_table_more tbody').append('<tr> <td>About Page</td> <td>Not Available</td> </tr>');
+                }
+
+                //url
+                if (json_inner.source.url !== "") {
+                    $('#channel_url').html('<a target="_blank" href="' + json_inner.source.url + '">' + json_inner.source.url + '</a>');
+                }
+                else if (json.sproc.status_metadata === "done") {
+                    $('#channel_url').parent().remove();
+                    $('#channel_yt_table_more tbody').append('<tr> <td>URL</td> <td>Not Available</td> </tr>');
+                }
+
+                //publishedAt
+                if (json_inner.source.publishedAt !== "") {
+                    $('#channel_created_time').text(json_inner.source.publishedAt);
+                }
+                else if (json.sproc.status_metadata === "done") {
+                    $('#channel_created_time').parent().remove();
+                    $('#channel_yt_table_more tbody').append('<tr> <td>Created Time</td> <td>Not Available</td> </tr>');
+                }
+
+                //country
+                if (json_inner.source.country !== "") {
+                    $('#channel_location').text(json_inner.source.country);
+                }
+                else if (json.sproc.status_metadata === "done") {
+                    $('#channel_location').parent().remove();
+                    $('#channel_yt_table_more tbody').append('<tr> <td>Location</td> <td>Not Available</td> </tr>');
+                }
+
+                //description
+                if (json_inner.source.description !== "") {
+                    guessLanguage.detect(json_inner.source.description, function (language) {
+                        var translate_dom = '<p class="translate_wrapper_table"><img src="imgs/uk_flag.png"><span>Translate to English</span></p>';
+                        if (language === "en") {
+                            translate_dom = ""
+                        }
+                        $('#channel_description').html('<span>' + json_inner.source.description + '</span>' + translate_dom);
+                        if (arabic.test(json_inner.source.description)) {
+                            $('#channel_description').css({'direction': 'rtl', 'text-align': 'right'});
+                        }
+                    });
+                }
+                else if (json.sproc.status_metadata === "done") {
+                    $('#channel_description').parent().remove();
+                    $('#channel_yt_table_more tbody').append('<tr> <td>Description</td> <td>Not Available</td> </tr>');
+                }
+
+                //viewCount
+                if (json_inner.source.viewCount > -1) {
+                    $('#channel_view_count').text(json_inner.source.viewCount);
+                }
+                else if (json.sproc.status_metadata === "done") {
+                    $('#channel_view_count').parent().remove();
+                    $('#channel_yt_table_more tbody').append('<tr> <td>View Count</td> <td>Not Available</td> </tr>');
+                }
+
+                //commentCount
+                if (json_inner.source.commentCount > -1) {
+                    $('#channel_comment_count').text(json_inner.source.commentCount);
+                }
+                else if (json.sproc.status_metadata === "done") {
+                    $('#channel_comment_count').parent().remove();
+                    $('#channel_yt_table_more tbody').append('<tr> <td>Comment Count</td> <td>Not Available</td> </tr>');
+                }
+
+                //subscriberCount
+                if (json_inner.source.subscriberCount > -1) {
+                    $('#channel_subscriber_count').text(json_inner.source.subscriberCount);
+                }
+                else if (json.sproc.status_metadata === "done") {
+                    $('#channel_subscriber_count').parent().remove();
+                    $('#channel_yt_table_more tbody').append('<tr> <td>Subscriber Count</td> <td>Not Available</td> </tr>');
+                }
+
+                //videoCount
+                if (json_inner.source.videoCount > -1) {
+                    $('#channel_video_count').text(json_inner.source.videoCount);
+                }
+                else if (json.sproc.status_metadata === "done") {
+                    $('#channel_video_count').parent().remove();
+                    $('#channel_yt_table_more tbody').append('<tr> <td>Video Count</td> <td>Not Available</td> </tr>');
+                }
+                //videoPerMonth
+                if (json_inner.verification_cues.channel_videos_per_month > -1) {
+                    $('#channel_videos_per_month').text(json_inner.verification_cues.channel_videos_per_month);
+                }
+                else if (json.sproc.status_metadata === "done") {
+                    $('#channel_videos_per_month').parent().remove();
+                    $('#channel_yt_table_more tbody').append('<tr> <td>Video Per Month</td> <td>Not Available</td> </tr>');
+                }
+
+                if ($('.preferred').length === 0 && json_inner.thumbnails.preferred.url != "") {
+                    $tiles_thumbs.append('<div class="ca-item" style="width:230px;"><div class="ca-item-main preferred"><img src="' + json_inner.thumbnails.preferred.url + '" style="width: 230px;"><p class="google">Reverse image search by:</p><ul class="reverse_list"><li class="link" data-url="' + json_inner.thumbnails.preferred.google_reverse_image_search + '">Google</li><li class="link" data-url="' + json_inner.thumbnails.preferred.yandex_reverse_image_search + '">Yandex</li></ul></div></div>');
+                    if (json_inner.thumbnails.preferred.in_video) {
+                        $('#alert_clickbait').slideDown();
+                        $(".ca-item-main").find("img[src='" + json_inner.thumbnails.preferred.url + "']").parents('.ca-item').css('border', '5px solid red');
+                    }
+                }
+
+                for (var i = $('#thumb_info .ca-item-other').length; i < json_inner.thumbnails.others.length; i++) {
+                    $tiles_thumbs.append('<div class="ca-item ca-item-other" style="width:230px"><div class="ca-item-main"><img src="' + json_inner.thumbnails.others[i].url + '" style="width: 230px;"><p class="google">Reverse image search by:</p><ul class="reverse_list"><li class="link" data-url="' + json_inner.thumbnails.others[i].google_reverse_image_search + '">Google</li><li class="link" data-url="' + json_inner.thumbnails.others[i].yandex_reverse_image_search + '">Yandex</li></ul></div></div>');
+                }
+
+                $tiles_thumbs.imagesLoaded(function () {
+                    var options_thumbs = {
+                        autoResize: true,
+                        container: $tiles_thumbs,
+                        offset: 15,
+                        itemWidth: 230,
+                        outerOffset: 0
+                    };
+                    $tiles_thumbs.find('.ca-item').wookmark(options_thumbs);
+                });
+            }
+            if (json.sproc.status_metadata === "done" && json_metadata) {
+                json_metadata = false;
+            }
+
+
+            if (json_comments) {
+                for (var c = $('.verified').length; c < json_inner.verification_comments.length; c++) {
+                    var src_str = json_inner.verification_comments[c].textDisplay;
+                    guessLanguage.detect(src_str, function (language) {
+                        var translate_dom = '<p class="translate_wrapper"><img src="imgs/uk_flag.png"><span>Translate to English</span></p>';
+                        if (language === "en") {
+                            translate_dom = ""
+                        }
+                        var fake_terms = " fake , lies , fake , wrong , lie , confirm , where , location , lying , false , incorrect , misleading , propaganda , liar , mensonges , faux , errone , mensonge , confirme , lieu , mentir , faux , inexact , trompeur , propagande , menteur , mentiras , falso , incorrecto , mentira , confirmado , donde , lugar , mitiendo , falso , incorrecto , enganoso , propaganda , mentiroso , l?gen , falsch , l?ge , best?tigt , wo , ort , l?gend , fehlerhaft , unrichtig , irref?hrend , l?gner , \u03C8\u03AD\u03BC\u03B1\u03C4\u03B1 , \u03C8\u03B5\u03CD\u03C4\u03B9\u03BA\u03BF , \u03BB\u03AC\u03B8\u03BF\u03C2 , \u03C8\u03AD\u03BC\u03B1 , \u03B5\u03C0\u03B9\u03B2\u03B5\u03B2\u03B1\u03B9\u03CE\u03BD\u03C9 , \u03C0\u03BF\u03C5 , \u03C4\u03BF\u03C0\u03BF\u03B8\u03B5\u03C3\u03AF\u03B1 , \u03C8\u03B5\u03C5\u03B4\u03AE\u03C2 , \u03B5\u03C3\u03C6\u03B1\u03BB\u03BC\u03AD\u03BD\u03BF , \u03BB\u03B1\u03BD\u03B8\u03B1\u03C3\u03BC\u03AD\u03BD\u03BF , \u03C0\u03B1\u03C1\u03B1\u03C0\u03BB\u03B1\u03BD\u03B7\u03C4\u03B9\u03BA\u03CC , \u03C0\u03C1\u03BF\u03C0\u03B1\u03B3\u03AC\u03BD\u03B4\u03B1 , \u03C8\u03B5\u03CD\u03C4\u03B7\u03C2 , \u0623\u0643\u0627\u0630\u064A\u0628 , \u0623\u0643\u0627\u0630\u064A\u0628 , \u063A\u0644\u0637\u0627\u0646 , \u0623\u0643\u0630\u0648\u0628\u0629\u060C \u0643\u0630\u0628 , \u0645\u0624\u0643\u062F , \u0623\u064A\u0646 , \u0645\u0643\u0627\u0646 , \u0643\u0630\u0628 , \u062E\u0627\u0637\u0626 , \u063A\u064A\u0631 \u0635\u062D\u064A\u062D , \u0645\u0636\u0644\u0644 , \u062F\u0639\u0627\u064A\u0629 , \u0643\u0627\u0630\u0628 , \u062F\u0631\u0648\u063A , \u062C\u0639\u0644\u06CC , \u0627\u0634\u062A\u0628\u0627\u0647 , \u062F\u0631\u0648\u063A , \u062A\u0623\u064A\u064A\u062F \u0634\u062F\u0647 , \u0643\u062C\u0627 , \u0645\u062D\u0644\u060C \u0645\u0643\u0627\u0646 , \u062F\u0631\u0648\u063A \u06AF\u0648 , \u063A\u0644\u0637\u060C \u0627\u0634\u062A\u0628\u0627\u0647\u060C \u062F\u0631\u0648\u063A\u06CC\u0646 , \u063A\u0644\u0637\u060C \u0627\u0634\u062A\u0628\u0627\u0647 , \u06AF\u0645\u0631\u0627\u0647 \u200C \u0643\u0646\u0646\u062F\u0647 , \u062A\u0628\u0644\u06CC\u063A\u0627\u062A \u0633\u06CC\u0627\u0633\u06CC\u060C \u067E\u0631\u0648\u067E\u0627\u06AF\u0627\u0646\u062F\u0627 , \u06A9\u0630\u0627\u0628".split(',');
+                        var term;
+                        var pattern;
+                        for (var i = 0; i < fake_terms.length; i++) {
+                            term = fake_terms[i].trim().replace(/(\s+)/, "(<[^>]+>)*$1(<[^>]+>)*");
+                            if (arabic.test(src_str)) {
+                                pattern = new RegExp("(" + fake_terms[i].trim() + ")", "gi");
+                            }
+                            else {
+                                pattern = new RegExp("(\\b" + fake_terms[i].trim() + "\\b)", "gi");
+                            }
+
+                            src_str = src_str.replace(pattern, "<span class='highlight'>$1</span>");
+                            src_str = src_str.replace(/(<mark>[^<>]*)((<[^>]+>)+)([^<>]*<\/mark>)/, "$1</span>$2<span>$4");
+                        }
+                        if (arabic.test(src_str)) {
+                            $tiles_comments.append('<div class="ca-item verified" ><div class="ca-item-main" style="background-color: #8AA399"><span style="direction:rtl;text-align: right" class="value">' + src_str + '</span>' + translate_dom + '<p class="user_comment"><span style="font-weight: normal;font-size: 12px">by  </span><a href="' + json_inner.verification_comments[c].authorURL + '" target="_blank">' + json_inner.verification_comments[c].authorDisplayName + '</a></p><p class="time_comment">' + json_inner.verification_comments[c].publishedAt + '</p></div></div>');
+                        }
+                        else {
+                            $tiles_comments.append('<div class="ca-item verified" ><div class="ca-item-main" style="background-color: #8AA399"><span class="value">' + src_str + '</span>' + translate_dom + '<p class="user_comment"><span style="font-weight: normal;font-size: 12px">by  </span><a href="' + json_inner.verification_comments[c].authorURL + '" target="_blank">' + json_inner.verification_comments[c].authorDisplayName + '</a></p><p class="time_comment">' + json_inner.verification_comments[c].publishedAt + '</p></div></div>');
+                        }
+                    });
+                }
+                if (json_inner.verification_comments.length === 10) {
+                    $('.more').show();
+                }
+                var options_comments = {
+                    autoResize: true,
+                    container: $tiles_comments,
+                    offset: 15,
+                    itemWidth: 330,
+                    outerOffset: 0
+                };
+                setTimeout(function () {
+                    $tiles_comments.find('.ca-item').wookmark(options_comments);
+                }, 10);
+            }
+            $('#verified').attr('data-id', json.media_id);
+            $('#all').attr('data-id', json.media_id);
+            $('#extr_links').attr('data-id', json.media_id);
+            if (json.sproc.status_comments === "done" && json_comments) {
+                json_comments = false;
+                $('#verified').html('VERIFICATION (' + json_inner.verification_cues.num_verification_comments + ')');
+                $('#all').html('ALL (' + json_inner.verification_cues.num_comments + ')');
+                $('#extr_links').html('LINKS (' + json_inner.verification_cues.num_link_comments + ')');
+                if (json_inner.verification_cues.num_verification_comments === 10) {
+                    $('.more').hide();
+                }
+                if (json_inner.verification_cues.num_verification_comments === 0) {
+                    $('#none_comments').text("No verification comments at the moment").show();
+                }
+                $('#alert_comments').remove();
+                $('.comments_search').show();
+            }
+
+
+            /*if (json.sproc.status_debunk === "done" && json_debunk) {
+             json_debunk = false;
+             $('.debunked').show();
+             if (json_inner.verification_cues.known_history.explanation !== "") {
+             $('.debunked').append('<p>' + json_inner.verification_cues.known_history.explanation + '</p>');
+             }
+             if (json_inner.verification_cues.known_history.known_facts !== "") {
+             $('.debunked').append('<p>' + json_inner.verification_cues.known_history.known_facts + '</p>');
+             }
+             if (json_inner.verification_cues.known_history.fact_source !== "") {
+             $('.debunked').append('<p>' + json_inner.verification_cues.known_history.fact_source + '</p>');
+             }
+             if (json_inner.verification_cues.known_history.label !== "") {
+             $('.debunked').append('<p>' + json_inner.verification_cues.known_history.label + '</p>');
+             }
+             if (json_inner.verification_cues.known_history.first_known_instance !== "") {
+             $('.debunked').append('<p>' + json_inner.verification_cues.known_history.first_known_instance + '</p>');
+             }
+             $('.debunked').append('<p>Is visual clickbait: ' + json_inner.verification_cues.is_visual_clickbait + '</p>');
+             }*/
+
+
+            if (json.sproc.status_location === "done" && json_location) {
+                json_location = false;
+                var locations = [];
+                if (json_inner.mentioned_locations.detected_locations.length === 0) {
+                    $('#video_locations').parent().remove();
+                    $('#video_yt_table tbody').append('<tr> <td>Mentioned Locations</td> <td>Not Available</td> </tr>');
+                }
+                else {
+                    for (var l = 0; l < json_inner.mentioned_locations.detected_locations.length; l++) {
+                        locations.push('<a href="' + json_inner.mentioned_locations.detected_locations[l].wikipedia_url + '" target="_blank">' + json_inner.mentioned_locations.detected_locations[l].location + '</a> (' + json_inner.mentioned_locations.detected_locations[l].text_source + ')')
+                    }
+                    $('#video_locations').append(locations.join(', '));
+                }
+            }
+
+            if (json.sproc.status_ai_verification === "done" && json_ai) {
+                json_ai = false;
+                $('.debunked').show();
+                $('.debunked').append('<p> Verification ai score: ' + json_inner.verification_cues.verification_ai_score + '</p>');
+            }
+
+
+            if (json.sproc.status_weather === "done" && json_weather) {
+                json_weather = false;
+            }
+
+            $('#loading_all,#cover,#cover_info,#loading_info').remove();
+            if (!($('.vis-timeline').length)) {
+                $('#cover_timeline,#loading_timeline').show();
+            }
+
+            $('#user_video').show();
+            $('.controls,.table_title,#weather_input,#channel_yt_table,#video_yt_table,.video_yt,.channel_yt').show();
+            $('.tooltip').tooltipster({"contentAsHTML": true});
+
+        },
+        error: function (e) {
+        },
+        async: true
+    });
+
+}
+function load_facebook(json, type) {
+    var $tiles_thumbs = $('#thumb_info');
+    var $tiles_comments = $('#comments_info');
+    if (type === "video") {
         $.ajax({
             type: 'GET',
-            url: 'https://caa.iti.gr/get_verificationV3?twtimeline=0&url=' + video_verify,
+            url: 'https://caa.iti.gr/caa/api/v4/videos/reports/' + json.media_id,
             dataType: 'json',
-            success: function (json) {
-                $('#alert_comments').stop().slideDown();
-                if (json.processing_status === "done") {
-                    abort_get();
-                    $('#analysis_info').slideUp();
+            success: function (json_inner) {
+                //if (json_metadata) {
+                $('.twitter_p').attr('data-url', json_inner.verification_cues.twitter_search_url);
+                if (json_inner.video.title !== "") {
+                    guessLanguage.detect(json_inner.video.title, function (language) {
+                        var translate_dom = '<p class="translate_wrapper_table"><img src="imgs/uk_flag.png"><span>Translate to English</span></p>';
+                        if (language === "en") {
+                            translate_dom = ""
+                        }
+                        $('#fb_video_title').html('<span>' + json_inner.video.title + '</span>' + translate_dom);
+                    });
+                }
+                else if (json.sproc.status_metadata === "done") {
+                    $('#fb_video_title').parent().remove();
+                    $('#video_fb_table_more tbody').append('<tr> <td>Title</td> <td>Not Available</td> </tr>');
+                }
+
+                if (json_inner.video.description !== "") {
+                    guessLanguage.detect(json_inner.video.description, function (language) {
+                        var translate_dom = '<p class="translate_wrapper_table"><img src="imgs/uk_flag.png"><span>Translate to English</span></p>';
+                        if (language === "en") {
+                            translate_dom = ""
+                        }
+                        $('#fb_video_description').html('<span>' + json_inner.video.description + '</span>' + translate_dom);
+                        if (arabic.test(json_inner.video.description)) {
+                            $('#fb_video_description').css({'direction': 'rtl', 'text-align': 'right'});
+                        }
+                    });
+                }
+                else if (json.sproc.status_metadata === "done") {
+                    $('#fb_video_description').parent().remove();
+                    $('#video_fb_table_more tbody').append('<tr> <td>Desctiption</td> <td>Not Available</td> </tr>');
+                }
+
+                if (json_inner.video.created_time !== "") {
+                    $('#fb_created_time').text(json_inner.video.created_time);
+                }
+                else if (json.sproc.status_metadata === "done") {
+                    $('#fb_created_time').parent().remove();
+                    $('#video_fb_table_more tbody').append('<tr> <td>Created Time</td> <td>Not Available</td> </tr>');
+                }
+
+
+                if (json_inner.video.updated_time !== "") {
+                    $('#fb_updated_time').text(json_inner.video.updated_time);
+                }
+                else if (json.sproc.status_metadata === "done") {
+                    $('#fb_updated_time').parent().remove();
+                    $('#video_fb_table_more tbody').append('<tr> <td>Updated Time<img src="imgs/info_color.png" class="tooltip tooltipstered" data-tooltip-content="#tooltip_updated_time"></td> <td id="fb_updated_time">2015-02-25, 08:18:58 (UTC)</td> </tr>');
+                }
+
+                if (json_inner.video.embeddable !== "") {
+                    $('#fb_embeddable').text(json_inner.video.embeddable);
+                }
+                else if (json.sproc.status_metadata === "done") {
+                    $('#fb_embeddable').parent().remove();
+                    $('#video_fb_table_more tbody').append('<tr> <td>Embeddable</td> <td>Not Available</td> </tr>');
+                }
+
+                if (json_inner.video.length !== "") {
+                    $('#fb_length').text(json_inner.video.length);
+                }
+                else if (json.sproc.status_metadata === "done") {
+                    $('#fb_length').parent().remove();
+                    $('#video_fb_table_more tbody').append('<tr> <td>Length</td> <td>Not Available</td> </tr>');
+                }
+
+                if (json_inner.video.privacy !== "") {
+                    $('#fb_privacy').text(json_inner.video.privacy);
+                }
+                else if (json.sproc.status_metadata === "done") {
+                    $('#fb_privacy').parent().remove();
+                    $('#video_fb_table_more tbody').append('<tr> <td>Privacy</td> <td>Not Available</td> </tr>');
+                }
+
+                if (json_inner.video.likes > -1) {
+                    $('#fb_likes').text(json_inner.video.likes);
+                }
+                else if (json.sproc.status_metadata === "done") {
+                    $('#fb_likes').parent().remove();
+                    $('#video_fb_table_more tbody').append('<tr> <td>Likes</td> <td>Not Available</td> </tr>');
+                }
+
+                if (json_inner.video.content_category !== "") {
+                    $('#fb_content_category').text(json_inner.video.content_category);
+                }
+                else if (json.sproc.status_metadata === "done") {
+                    $('#fb_content_category').parent().remove();
+                    $('#video_fb_table_more tbody').append('<tr> <td>Content Category</td> <td>Not Available</td> </tr>');
+                }
+
+                if (json_inner.video.content_tags.length > 0) {
+                    $('#fb_content_tags').text(json_inner.video.content_tags.join(','));
+                }
+                else if (json.sproc.status_metadata === "done") {
+                    $('#fb_content_tags').parent().remove();
+                    $('#video_fb_table_more tbody').append('<tr> <td>Content Tags</td> <td>Not Available</td> </tr>');
+                }
+
+                if (json_inner.id !== "") {
+                    $('#fb_video_id').text(json_inner.id);
+                }
+                else if (json.sproc.status_metadata === "done") {
+                    $('#fb_video_id').parent().remove();
+                    $('#video_fb_table_more tbody').append('<tr> <td>ID</td> <td>Not Available</td> </tr>');
+                }
+
+                if (json_inner.source.from !== "") {
+                    $('#fb_source').text(json_inner.source.from);
+                }
+                else if (json.sproc.status_metadata === "done") {
+                    $('#fb_source').parent().remove();
+                    $('#video_fb_table_more tbody').append('<tr> <td>Source</td> <td>Not Available</td> </tr>');
+                }
+
+                if ($('.preferred').length === 0 && json_inner.thumbnails.preferred.url != "") {
+                    $tiles_thumbs.append('<div class="ca-item" style="width:230px;"><div class="ca-item-main preferred"><img src="' + json_inner.thumbnails.preferred.url + '" style="width: 230px;"><p class="google">Reverse image search by:</p><ul class="reverse_list"><li class="link" data-url="' + json_inner.thumbnails.preferred.google_reverse_image_search + '">Google</li><li class="link" data-url="' + json_inner.thumbnails.preferred.yandex_reverse_image_search + '">Yandex</li></ul></div></div>');
+                    if (json_inner.thumbnails.preferred.in_video) {
+                        $('#alert_clickbait').slideDown();
+                        $(".ca-item-main").find("img[src='" + json_inner.thumbnails.preferred.url + "']").parents('.ca-item').css('border', '5px solid red');
+                    }
+                }
+                for (var i = $('#thumb_info .ca-item-other').length; i < json_inner.thumbnails.others.length; i++) {
+                    $tiles_thumbs.append('<div class="ca-item ca-item-other" style="width:230px"><div class="ca-item-main"><img src="' + json_inner.thumbnails.others[i].url + '" style="width: 230px;"><p class="google">Reverse image search by:</p><ul class="reverse_list"><li class="link" data-url="' + json_inner.thumbnails.others[i].google_reverse_image_search + '">Google</li><li class="link" data-url="' + json_inner.thumbnails.others[i].yandex_reverse_image_search + '">Yandex</li></ul></div></div>');
+                }
+
+                $tiles_thumbs.imagesLoaded(function () {
+                    var options_thumbs = {
+                        autoResize: true,
+                        container: $tiles_thumbs,
+                        offset: 15,
+                        itemWidth: 230,
+                        outerOffset: 0
+                    };
+                    $tiles_thumbs.find('.ca-item').wookmark(options_thumbs);
+                });
+                //}
+                if (json.sproc.status_metadata === "done" && json_metadata) {
+                    json_metadata = false;
+                }
+
+
+                if (json_comments) {
+                    for (var c = $('.verified').length; c < json_inner.verification_comments.length; c++) {
+                        var src_str = json_inner.verification_comments[c].textDisplay;
+                        guessLanguage.detect(src_str, function (language) {
+                            var translate_dom = '<p class="translate_wrapper"><img src="imgs/uk_flag.png"><span>Translate to English</span></p>';
+                            if (language === "en") {
+                                translate_dom = ""
+                            }
+                            var fake_terms = " fake , lies , fake , wrong , lie , confirm , where , location , lying , false , incorrect , misleading , propaganda , liar , mensonges , faux , errone , mensonge , confirme , lieu , mentir , faux , inexact , trompeur , propagande , menteur , mentiras , falso , incorrecto , mentira , confirmado , donde , lugar , mitiendo , falso , incorrecto , enganoso , propaganda , mentiroso , l?gen , falsch , l?ge , best?tigt , wo , ort , l?gend , fehlerhaft , unrichtig , irref?hrend , l?gner , \u03C8\u03AD\u03BC\u03B1\u03C4\u03B1 , \u03C8\u03B5\u03CD\u03C4\u03B9\u03BA\u03BF , \u03BB\u03AC\u03B8\u03BF\u03C2 , \u03C8\u03AD\u03BC\u03B1 , \u03B5\u03C0\u03B9\u03B2\u03B5\u03B2\u03B1\u03B9\u03CE\u03BD\u03C9 , \u03C0\u03BF\u03C5 , \u03C4\u03BF\u03C0\u03BF\u03B8\u03B5\u03C3\u03AF\u03B1 , \u03C8\u03B5\u03C5\u03B4\u03AE\u03C2 , \u03B5\u03C3\u03C6\u03B1\u03BB\u03BC\u03AD\u03BD\u03BF , \u03BB\u03B1\u03BD\u03B8\u03B1\u03C3\u03BC\u03AD\u03BD\u03BF , \u03C0\u03B1\u03C1\u03B1\u03C0\u03BB\u03B1\u03BD\u03B7\u03C4\u03B9\u03BA\u03CC , \u03C0\u03C1\u03BF\u03C0\u03B1\u03B3\u03AC\u03BD\u03B4\u03B1 , \u03C8\u03B5\u03CD\u03C4\u03B7\u03C2 , \u0623\u0643\u0627\u0630\u064A\u0628 , \u0623\u0643\u0627\u0630\u064A\u0628 , \u063A\u0644\u0637\u0627\u0646 , \u0623\u0643\u0630\u0648\u0628\u0629\u060C \u0643\u0630\u0628 , \u0645\u0624\u0643\u062F , \u0623\u064A\u0646 , \u0645\u0643\u0627\u0646 , \u0643\u0630\u0628 , \u062E\u0627\u0637\u0626 , \u063A\u064A\u0631 \u0635\u062D\u064A\u062D , \u0645\u0636\u0644\u0644 , \u062F\u0639\u0627\u064A\u0629 , \u0643\u0627\u0630\u0628 , \u062F\u0631\u0648\u063A , \u062C\u0639\u0644\u06CC , \u0627\u0634\u062A\u0628\u0627\u0647 , \u062F\u0631\u0648\u063A , \u062A\u0623\u064A\u064A\u062F \u0634\u062F\u0647 , \u0643\u062C\u0627 , \u0645\u062D\u0644\u060C \u0645\u0643\u0627\u0646 , \u062F\u0631\u0648\u063A \u06AF\u0648 , \u063A\u0644\u0637\u060C \u0627\u0634\u062A\u0628\u0627\u0647\u060C \u062F\u0631\u0648\u063A\u06CC\u0646 , \u063A\u0644\u0637\u060C \u0627\u0634\u062A\u0628\u0627\u0647 , \u06AF\u0645\u0631\u0627\u0647 \u200C \u0643\u0646\u0646\u062F\u0647 , \u062A\u0628\u0644\u06CC\u063A\u0627\u062A \u0633\u06CC\u0627\u0633\u06CC\u060C \u067E\u0631\u0648\u067E\u0627\u06AF\u0627\u0646\u062F\u0627 , \u06A9\u0630\u0627\u0628".split(',');
+                            var term;
+                            var pattern;
+                            for (var i = 0; i < fake_terms.length; i++) {
+                                term = fake_terms[i].trim().replace(/(\s+)/, "(<[^>]+>)*$1(<[^>]+>)*");
+                                if (arabic.test(src_str)) {
+                                    pattern = new RegExp("(" + fake_terms[i].trim() + ")", "gi");
+                                }
+                                else if (json.sproc.status_metadata === "done") {
+                                    pattern = new RegExp("(\\b" + fake_terms[i].trim() + "\\b)", "gi");
+                                }
+
+                                src_str = src_str.replace(pattern, "<span class='highlight'>$1</span>");
+                                src_str = src_str.replace(/(<mark>[^<>]*)((<[^>]+>)+)([^<>]*<\/mark>)/, "$1</span>$2<span>$4");
+                            }
+                            if (arabic.test(src_str)) {
+                                $tiles_comments.append('<div class="ca-item verified" ><div class="ca-item-main" style="background-color: #8AA399"><span style="direction:rtl;text-align: right" class="value">' + src_str + '</span>' + translate_dom + '<p class="time_comment">' + json_inner.verification_comments[c].publishedAt + '</p></div></div>');
+                            }
+                            else {
+                                $tiles_comments.append('<div class="ca-item verified" ><div class="ca-item-main" style="background-color: #8AA399"><span class="value">' + src_str + '</span>' + translate_dom + '<p class="time_comment">' + json_inner.verification_comments[c].publishedAt + '</p></div></div>');
+                            }
+                        });
+                    }
+                    if (json_inner.verification_comments.length === 10) {
+                        $('.more').show();
+                    }
+                    var options_comments = {
+                        autoResize: true,
+                        container: $tiles_comments,
+                        offset: 15,
+                        itemWidth: 330,
+                        outerOffset: 0
+                    };
+                    setTimeout(function () {
+                        $tiles_comments.find('.ca-item').wookmark(options_comments);
+                    }, 10);
+                }
+                $('#verified').attr('data-id', json.media_id);
+                $('#all').attr('data-id', json.media_id);
+                $('#extr_links').attr('data-id', json.media_id);
+                if (json.sproc.status_comments === "done" && json_comments) {
+                    json_comments = false;
+                    $('#verified').html('VERIFICATION (' + json_inner.verification_cues.num_verification_comments + ')');
+                    $('#all').html('ALL (' + json_inner.verification_cues.num_comments + ')');
+                    $('#extr_links').html('LINKS (' + json_inner.verification_cues.num_link_comments + ')');
+                    if (json_inner.verification_cues.num_verification_comments === 10) {
+                        $('.more').hide();
+                    }
+
+                    if (json_inner.verification_cues.num_verification_comments === 0) {
+                        $('#none_comments').text('No verification comments at the moment').show();
+                    }
+
+                    $('#alert_comments').remove();
                     $('.comments_search').show();
-                    clearInterval(interval_youtube);
-                    $('#alert_comments').stop().slideUp();
                 }
-                global_json = json;
 
-                $('#locations .location_name').remove();
-                var empty_location = true;
-                if (json.video_recording_location_description !== "") {
-                    empty_location = false;
-                    if (json.video_description_mentioned_locations.length > 0) {
-                        $('#locations').append('<p class="location_name" data-name="' + json.video_recording_location_description + '"><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>' + json.video_recording_location_description + ',</p>')
+                /*if (json.sproc.status_debunk === "done" && json_debunk) {
+                 json_debunk = false;
+                 $('.debunked').show();
+                 if (json_inner.verification_cues.known_history.explanation !== "") {
+                 $('.debunked').append('<p>' + json_inner.verification_cues.known_history.explanation + '</p>');
+                 }
+                 if (json_inner.verification_cues.known_history.known_facts !== "") {
+                 $('.debunked').append('<p>' + json_inner.verification_cues.known_history.known_facts + '</p>');
+                 }
+                 if (json_inner.verification_cues.known_history.fact_source !== "") {
+                 $('.debunked').append('<p>' + json_inner.verification_cues.known_history.fact_source + '</p>');
+                 }
+                 if (json_inner.verification_cues.known_history.label !== "") {
+                 $('.debunked').append('<p>' + json_inner.verification_cues.known_history.label + '</p>');
+                 }
+                 if (json_inner.verification_cues.known_history.first_known_instance !== "") {
+                 $('.debunked').append('<p>' + json_inner.verification_cues.known_history.first_known_instance + '</p>');
+                 }
+                 $('.debunked').append('<p>Is visual clickbait: ' + json_inner.verification_cues.is_visual_clickbait + '</p>');
+                 }*/
+
+
+                if (json.sproc.status_location === "done" && json_location) {
+                    json_location = false;
+                    var locations = [];
+                    if (json_inner.mentioned_locations.detected_locations.length === 0) {
+                        $('#fb_video_locations').parent().remove();
+                        $('#video_fb_table tbody').append('<tr> <td>Mentioned Locations</td> <td>Not Available</td> </tr>');
                     }
                     else {
-                        $('#locations').append('<p class="location_name" data-name="' + json.video_recording_location_description + '"><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>' + json.video_recording_location_description + '</p>')
-                    }
-                }
-                for (var l = 0; l < json.video_description_mentioned_locations.length; l++) {
-                    empty_location = false;
-                    if (l === json.video_description_mentioned_locations.length - 1) {
-                        $('#locations').append('<p class="location_name" data-name="' + json.video_description_mentioned_locations[l] + '"><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>' + json.video_description_mentioned_locations[l] + '</p>')
-                    }
-                    else {
-                        $('#locations').append('<p class="location_name" data-name="' + json.video_description_mentioned_locations[l] + '"><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>' + json.video_description_mentioned_locations[l] + ',</p>')
-                    }
-                }
-                if (empty_location) {
-                    $('#locations').append('<p class="location_name" style="cursor: default">-</p>')
-                }
-
-                $('#times .location_name').remove();
-                var empty_time = true;
-                if (json.video_upload_time !== "") {
-                    empty_time = false;
-                    var time = json.video_upload_time;
-                    var format_time = time.substring(8, 10) + '/' + time.substring(5, 7) + '/' + time.substring(0, 4) + ' ' + time.substring(12, 14) + ':00';
-
-                    $('#times .location_title').after('<p class="location_name" data-time="' + format_time + '"><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>' + format_time + '</p>')
-                }
-                if (json.video_recording_time !== "") {
-                    empty_time = false;
-                    var time = json.video_recording_time;
-                    var format_time = time.substring(8, 10) + '/' + time.substring(5, 7) + '/' + time.substring(0, 4) + ' ' + time.substring(12, 14) + ':00';
-
-                    $('#times .location_title').after('<p class="location_name" data-time="' + format_time + '"><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>' + format_time + '</p>')
-                }
-                if (empty_time) {
-                    $('#times .location_title').after('<p class="location_name" style="cursor: default">-</p>')
-                }
-                var video_locations = "", channel_locations = "";
-                for (var v = 0; v < json.video_description_mentioned_locations.length; v++) {
-                    if (v === json.video_description_mentioned_locations.length - 1) {
-                        video_locations += "<span>" + json.video_description_mentioned_locations[v] + "</span>";
-                    }
-                    else {
-                        video_locations += "<span>" + json.video_description_mentioned_locations[v] + "</span>, ";
+                        for (var l = 0; l < json_inner.mentioned_locations.detected_locations.length; l++) {
+                            locations.push('<a href="' + json_inner.mentioned_locations.detected_locations[l].wikipedia_url + '" target="_blank">' + json_inner.mentioned_locations.detected_locations[l].location + '</a> (' + json_inner.mentioned_locations.detected_locations[l].text_source + ')')
+                        }
+                        $('#fb_video_locations').append(locations.join(', '));
                     }
                 }
 
-                for (var c = 0; c < json.channel_description_mentioned_locations.length; c++) {
-                    if (c === json.channel_description_mentioned_locations.length - 1) {
-                        channel_locations += "<span>" + json.channel_description_mentioned_locations[c] + "</span>";
-                    }
-                    else {
-                        channel_locations += "<span>" + json.channel_description_mentioned_locations[c] + "</span>, ";
-                    }
+                if (json.sproc.status_ai_verification === "done" && json_ai) {
+                    json_ai = false;
+                    $('.debunked').show();
+                    $('.debunked').append('<p> Verification ai score: ' + json_inner.verification_cues.verification_ai_score + '</p>');
                 }
 
+
+                if (json.sproc.status_weather === "done" && json_weather) {
+                    json_weather = false;
+                }
+
+                $('#loading_all,#cover,#cover_info,#loading_info').remove();
+                if (!($('.vis-timeline').length)) {
+                    $('#cover_timeline,#loading_timeline').show();
+                }
                 $('#user_video').show();
-                $('.twitter_p').attr('data-url', json.twitter_search_url);
-                if (json.isDebunked !== "") {
-                    $('.debunked').html(json.isDebunked).slideDown();
+                $('.controls,.table_title,#weather_input,#video_fb_table,#user_fb_table,.video_fb').show();
+                $('.tooltip').tooltipster({"contentAsHTML": true});
+
+
+            },
+            error: function (e) {
+            },
+            async: true
+        });
+    }
+    else {
+        $.ajax({
+            type: 'GET',
+            url: 'https://caa.iti.gr/caa/api/v4/images/reports/' + json.media_id,
+            dataType: 'json',
+            success: function (json_inner) {
+
+                $('.twitter_p').attr('data-url', json_inner.verification_cues.twitter_search_url);
+                if (json_inner.image.caption !== "") {
+                    guessLanguage.detect(json_inner.image.caption, function (language) {
+                        var translate_dom = '<p class="translate_wrapper_table"><img src="imgs/uk_flag.png"><span>Translate to English</span></p>';
+                        if (language === "en") {
+                            translate_dom = ""
+                        }
+                        $('#fb_image_title').html('<span>' + json_inner.image.caption + '</span>' + translate_dom);
+                    });
                 }
-                if (json.video_id !== "") {
-                    $('#video_id').html(json.video_id);
-                }
-                else {
-                    if (json.processing_status === "done") {
-                        $('#video_id').parent().remove();
-                        $('#video_yt_table_more tbody').append('<tr> <td>ID</td> <td>Not Available</td> </tr>');
-                    }
+                else if (json.sproc.status_metadata === "done") {
+                    $('#fb_image_title').parent().remove();
+                    $('#image_fb_table_more tbody').append('<tr> <td>Caption</td> <td>Not Available</td> </tr>');
                 }
 
-                if (json.video_title !== "") {
-                    $('#video_title').text(json.video_title);
-                    if (arabic.test(json.video_title)) {
-                        $('#video_title').css({'direction': 'rtl', 'text-align': 'right'});
-                    }
+
+                if (json_inner.image.updated_time !== "") {
+                    $('#fb_updated_time_image').text(json_inner.image.updated_time);
                 }
-                else {
-                    if (json.processing_status === "done") {
-                        $('#video_title').parent().remove();
-                        $('#video_yt_table_more tbody').append('<tr> <td>Title</td> <td>Not Available</td> </tr>');
-                    }
+                else if (json.sproc.status_metadata === "done") {
+                    $('#fb_updated_time_image').parent().remove();
+                    $('#image_fb_table_more tbody').append('<tr> <td>Updated Time</td> <td>Not Available</td> </tr>');
                 }
 
-                if (json.video_description !== "") {
-                    $('#video_description').text(json.video_description);
-                    if (arabic.test(json.video_description)) {
-                        $('#video_description').css({'direction': 'rtl', 'text-align': 'right'});
-                    }
+                if (json_inner.id !== "") {
+                    $('#fb_image_id').text(json_inner.id);
                 }
-                else {
-                    if (json.processing_status === "done") {
-                        $('#video_description').parent().remove();
-                        $('#video_yt_table_more tbody').append('<tr> <td>Description</td> <td>Not Available</td> </tr>');
-                    }
+                else if (json.sproc.status_metadata === "done") {
+                    $('#fb_image_id').parent().remove();
+                    $('#image_fb_table_more tbody').append('<tr> <td>ID</td> <td>Not Available</td> </tr>');
                 }
 
-                if (video_locations !== "") {
-                    $('#video_locations').html(video_locations);
+                if (json_inner.image.can_tag !== "") {
+                    $('#fb_image_tag').text(json_inner.image.can_tag);
                 }
-                else {
-                    if (json.processing_status === "done") {
-                        $('#video_locations').parent().remove();
-                        $('#video_yt_table_more tbody').append('<tr> <td>Description Mentioned Locations</td> <td>Not Available</td> </tr>');
-                    }
+                else if (json.sproc.status_metadata === "done") {
+                    $('#fb_image_tag').parent().remove();
+                    $('#image_fb_table_more tbody').append('<tr> <td>Can Tag</td> <td>Not Available</td> </tr>');
                 }
 
-                if (json.video_upload_time !== "") {
-                    $('#video_upload_time').text(json.video_upload_time);
+                if (json_inner.image.created_time !== "") {
+                    $('#fb_image_created').text(json_inner.image.created_time);
                 }
-                else {
-                    if (json.processing_status === "done") {
-                        $('#video_upload_time').parent().remove();
-                        $('#video_yt_table_more tbody').append('<tr> <td>Upload Time</td> <td>Not Available</td> </tr>');
-                    }
+                else if (json.sproc.status_metadata === "done") {
+                    $('#fb_image_created').parent().remove();
+                    $('#image_fb_table_more tbody').append('<tr> <td>Created Time</td> <td>Not Available</td> </tr>');
                 }
 
-                if (json.video_view_count !== "") {
-                    $('#video_view_count').text(json.video_view_count);
+                if (json_inner.image.width !== "") {
+                    $('#fb_image_width').text(json_inner.image.width);
                 }
-                else {
-                    if (json.processing_status === "done") {
-                        $('#video_view_count').parent().remove();
-                        $('#video_yt_table_more tbody').append('<tr> <td>View Count</td> <td>Not Available</td> </tr>');
-                    }
+                else if (json.sproc.status_metadata === "done") {
+                    $('#fb_image_width').parent().remove();
+                    $('#image_fb_table_more tbody').append('<tr> <td>Width</td> <td>Not Available</td> </tr>');
                 }
 
-                if (json.video_like_count !== "") {
-                    $('#video_like_count').text(json.video_like_count);
+                if (json_inner.image.height !== "") {
+                    $('#fb_image_height').text(json_inner.image.height);
                 }
-                else {
-                    if (json.processing_status === "done") {
-                        $('#video_like_count').parent().remove();
-                        $('#video_yt_table_more tbody').append('<tr> <td>Like Count</td> <td>Not Available</td> </tr>');
-                    }
+                else if (json.sproc.status_metadata === "done") {
+                    $('#fb_image_height').parent().remove();
+                    $('#image_fb_table_more tbody').append('<tr> <td>Height</td> <td>Not Available</td> </tr>');
                 }
 
-                if (json.video_dislike_count !== "") {
-                    $('#video_dislike_count').text(json.video_dislike_count);
+                if (json_inner.image.alt_text !== "") {
+                    $('#fb_image_alt').text(json_inner.image.alt_text);
                 }
-                else {
-                    if (json.processing_status === "done") {
-                        $('#video_dislike_count').parent().remove();
-                        $('#video_yt_table_more tbody').append('<tr> <td>Dislike Count</td> <td>Not Available</td> </tr>');
-                    }
+                else if (json.sproc.status_metadata === "done") {
+                    $('#fb_image_alt').parent().remove();
+                    $('#image_fb_table_more tbody').append('<tr> <td>Alt Text</td> <td>Not Available</td> </tr>');
                 }
 
-                if (json.video_comment_count !== "") {
-                    $('#video_comment_count').text(json.video_comment_count);
+                if (json_inner.source.from !== "") {
+                    $('#fb_source').text(json_inner.source.from);
                 }
-                else {
-                    if (json.processing_status === "done") {
-                        $('#video_comment_count').parent().remove();
-                        $('#video_yt_table_more tbody').append('<tr> <td>Comment Count</td> <td>Not Available</td> </tr>');
-                    }
+                else if (json.sproc.status_metadata === "done") {
+                    $('#fb_source').parent().remove();
+                    $('#image_fb_table_more tbody').append('<tr> <td>Source</td> <td>Not Available</td> </tr>');
                 }
 
-                if (json.num_verification_comments !== "") {
-                    $('#video_verification_comment_count').text(json.verification_comments.length);
-                }
-                else {
-                    if (json.processing_status === "done") {
-                        $('#video_verification_comment_count').parent().remove();
-                        $('#video_yt_table_more tbody').append('<tr> <td>Verification Comment Count</td> <td>Not Available</td> </tr>');
-                    }
-                }
-
-                if (json.video_duration !== "") {
-                    $('#video_duration').text(json.video_duration);
-                }
-                else {
-                    if (json.processing_status === "done") {
-                        $('#video_duration').parent().remove();
-                        $('#video_yt_table_more tbody').append('<tr> <td>Duration</td> <td>Not Available</td> </tr>');
-                    }
-                }
-
-                if (json.video_dimension !== "") {
-                    $('#video_dimension').text(json.video_dimension);
-                }
-                else {
-                    if (json.processing_status === "done") {
-                        $('#video_dimension').parent().remove();
-                        $('#video_yt_table_more tbody').append('<td>Dimension<img src="imgs/info_color.png" class="tooltip tooltipstered" data-tooltip-content="#tooltip_dimension"></td>');
-                    }
-                }
-
-                if (json.video_definition !== "") {
-                    $('#video_definition').text(json.video_definition);
-                }
-                else {
-                    if (json.processing_status === "done") {
-                        $('#video_definition').parent().remove();
-                        $('#video_yt_table_more tbody').append('<td>Definition<img src="imgs/info_color.png" class="tooltip tooltipstered" data-tooltip-content="#tooltip_definition"></td>');
-                    }
-                }
-
-                if (json.video_licensed_content !== "") {
-                    $('#video_licensed_content').text(json.video_licensed_content);
-                }
-                else {
-                    if (json.processing_status === "done") {
-                        $('#video_licensed_content').parent().remove();
-                        $('#video_yt_table_more tbody').append('<tr> <td>Licensed Content<img src="imgs/info_color.png" class="tooltip tooltipstered" data-tooltip-content="#tooltip_licensed"></td> <td id="video_licensed_content">false</td> </tr>');
-                    }
-                }
-
-                if (json.video_recording_location_description !== "") {
-                    $('#video_recording_location_description').text(json.video_recording_location_description);
-                }
-                else {
-                    if (json.processing_status === "done") {
-                        $('#video_recording_location_description').parent().remove();
-                        $('#video_yt_table_more tbody').append('<tr> <td>Recording Location Description</td> <td>Not Available</td> </tr>');
-                    }
-                }
-
-                if (json.video_recording_time !== "") {
-                    $('#video_recording_time').text(json.video_recording_time);
-                }
-                else {
-                    if (json.processing_status === "done") {
-                        $('#video_recording_time').parent().remove();
-                        $('#video_yt_table_more tbody').append('<tr> <td>Recording Time</td> <td>Not Available</td> </tr>');
-                    }
-                }
-
-                if (json.channel_id !== "") {
-                    $('#channel_id').text(json.channel_id);
-                }
-                else {
-                    if (json.processing_status === "done") {
-                        $('#channel_id').parent().remove();
-                        $('#channel_yt_table_more tbody').append('<tr> <td>Id</td> <td>Not Available</td> </tr>');
-                    }
-                }
-
-                if (json.channel_description !== "") {
-                    $('#channel_description').text(json.channel_description);
-                    if (arabic.test(json.channel_description)) {
-                        $('#channel_description').css({'direction': 'rtl', 'text-align': 'right'});
-                    }
-                }
-                else {
-                    if (json.processing_status === "done") {
-                        $('#channel_description').parent().remove();
-                        $('#channel_yt_table_more tbody').append('<tr> <td>Description</td> <td>Not Available</td> </tr>');
-                    }
-                }
-
-                if (channel_locations !== "") {
-                    $('#channel_locations').html(channel_locations);
-                }
-                else {
-                    if (json.processing_status === "done") {
-                        $('#channel_locations').parent().remove();
-                        $('#channel_yt_table_more tbody').append('<tr> <td>Description Mentioned Locations</td> <td>Not Available</td> </tr>');
-                    }
-                }
-
-                if (json.channel_created_time !== "") {
-                    $('#channel_created_time').text(json.channel_created_time);
-                }
-                else {
-                    if (json.processing_status === "done") {
-                        $('#channel_created_time').parent().remove();
-                        $('#channel_yt_table_more tbody').append('<tr> <td>Created Time</td> <td>Not Available</td> </tr>');
-                    }
-                }
-
-                if (json.channel_location !== "Not available") {
-                    $('#channel_location').text(json.channel_location);
-                }
-                else {
-                    if (json.processing_status === "done") {
-                        $('#channel_location').parent().remove();
-                        $('#channel_yt_table_more tbody').append('<tr> <td>Location</td> <td>Not Available</td> </tr>');
-                    }
-                }
-
-                if (json.channel_view_count !== "") {
-                    $('#channel_view_count').text(json.channel_view_count);
-                }
-                else {
-                    if (json.processing_status === "done") {
-                        $('#channel_view_count').parent().remove();
-                        $('#channel_yt_table_more tbody').append('<tr> <td>View Count</td> <td>Not Available</td> </tr>');
-                    }
-                }
-
-                if (json.channel_comment_count !== "") {
-                    $('#channel_comment_count').text(json.channel_comment_count);
-                }
-                else {
-                    if (json.processing_status === "done") {
-                        $('#channel_comment_count').parent().remove();
-                        $('#channel_yt_table_more tbody').append('<tr> <td>Comment Count</td> <td>Not Available</td> </tr>');
-                    }
-                }
-
-                if (json.channel_subscriber_count !== "") {
-                    $('#channel_subscriber_count').text(json.channel_subscriber_count);
-                }
-                else {
-                    if (json.processing_status === "done") {
-                        $('#channel_subscriber_count').parent().remove();
-                        $('#channel_yt_table_more tbody').append('<tr> <td>Subscriber Count</td> <td>Not Available</td> </tr>');
-                    }
-                }
-
-                if (json.channel_video_count !== "") {
-                    $('#channel_video_count').text(json.channel_video_count);
-                }
-                else {
-                    if (json.processing_status === "done") {
-                        $('#channel_video_count').parent().remove();
-                        $('#channel_yt_table_more tbody').append('<tr> <td>Video Count</td> <td>Not Available</td> </tr>');
-                    }
-                }
-
-                if (json.channel_videos_per_month !== "") {
-                    $('#channel_videos_per_month').text(json.channel_videos_per_month);
-                }
-                else {
-                    if (json.processing_status === "done") {
-                        $('#channel_videos_per_month').parent().remove();
-                        $('#channel_yt_table_more tbody').append('<tr> <td>Video Per Month</td> <td>Not Available</td> </tr>');
-                    }
-                }
-
-                if (json.channel_url !== "") {
-                    $('#channel_url').html('<a target="_blank" href="' + json.channel_url + '">' + json.channel_url + '</a>');
-                }
-                else {
-                    if (json.processing_status === "done") {
-                        $('#channel_url').parent().remove();
-                        $('#channel_yt_table_more tbody').append('<tr> <td>URL</td> <td>Not Available</td> </tr>');
-                    }
-                }
-
-                if (json.channel_about_page !== "") {
-                    $('#channel_about_page').html('<a target="_blank" href="' + json.channel_about_page + '">' + json.channel_about_page + '</a>');
-                }
-                else {
-                    if (json.processing_status === "done") {
-                        $('#channel_about_page').parent().remove();
-                        $('#channel_yt_table_more tbody').append('<tr> <td>About Page</td> <td>Not Available</td> </tr>');
-                    }
-                }
-
-                for (var i = $('#thumb_info .ca-item').length; i < json.video_thumbnails.length; i++) {
-                    $tiles_thumbs.append('<div class="ca-item" style="width:230px"><div class="ca-item-main"><img src="' + json.video_thumbnails[i] + '" style="width: 230px;"><p class="google">Reverse image search by:</p><ul class="reverse_list"><li class="link" data-url="' + json.reverse_image_thumbnails_search_url_google[i] + '">Google</li><li class="link" data-url="' + json.reverse_image_thumbnails_search_url_yandex[i] + '">Yandex</li></ul></div></div>');
+                for (var i = $('#thumb_info .ca-item-other').length; i < json_inner.representations.length; i++) {
+                    $tiles_thumbs.append('<div class="ca-item ca-item-other" style="width:230px"><div class="ca-item-main"><p class="google">Dimension: ' + json_inner.representations[i].width + ' x ' + json_inner.representations[i].height + '</p><img src="' + json_inner.representations[i].source + '" style="width: 230px;"><p class="google">Reverse image search by:</p><ul class="reverse_list"><li class="link" data-url="' + json_inner.representations[i].google_reverse_image_search + '">Google</li><li class="link" data-url="' + json_inner.representations[i].yandex_reverse_image_search + '">Yandex</li></ul></div></div>');
                 }
 
                 $tiles_thumbs.imagesLoaded(function () {
@@ -1186,871 +1328,433 @@ function load_youtube() {
                     $tiles_thumbs.find('.ca-item').wookmark(options_thumbs);
                 });
 
-                $('#verified').html('VERIFICATION (' + json.verification_comments.length + ')');
-                $('#all').html('ALL (' + json.video_comments.length + ')');
-                verification_comments = [];
-                for (var k = 0; k < json.verification_comments.length; k++) {
-                    verification_comments.push(json.verification_comments[k]);
-                }
-                if ($('.filter.active').attr('id') === "all") {
-                    if (global_json.video_comments.length > $('#comments_info .ca-item').length) {
-                        $('.more').show();
+                if (json.sproc.status_location === "done" && json_location) {
+                    json_location = false;
+                    var locations = [];
+                    if (json_inner.mentioned_locations.detected_locations.length === 0) {
+                        $('#fb_image_locations').parent().remove();
+                        $('#image_fb_table_more tbody').append('<tr> <td>Mentioned Locations</td> <td>Not Available</td> </tr>');
                     }
                     else {
-                        $('.more').hide();
+                        for (var l = 0; l < json_inner.mentioned_locations.detected_locations.length; l++) {
+                            locations.push('<a href="' + json_inner.mentioned_locations.detected_locations[l].wikipedia_url + '" target="_blank">' + json_inner.mentioned_locations.detected_locations[l].location + '</a> (' + json_inner.mentioned_locations.detected_locations[l].text_source + ')')
+                        }
+                        $('#fb_image_locations').append(locations.join(', '));
                     }
                 }
-                else {
-                    if (verification_comments.length > $('#comments_info .ca-item').length) {
+
+
+                if (json.sproc.status_weather === "done" && json_weather) {
+                    json_weather = false;
+                }
+
+                if (json_comments) {
+                    for (var c = $('.verified').length; c < json_inner.verification_comments.length; c++) {
+                        var src_str = json_inner.verification_comments[c].textDisplay;
+                        guessLanguage.detect(src_str, function (language) {
+                            var translate_dom = '<p class="translate_wrapper"><img src="imgs/uk_flag.png"><span>Translate to English</span></p>';
+                            if (language === "en") {
+                                translate_dom = ""
+                            }
+                            var fake_terms = " fake , lies , fake , wrong , lie , confirm , where , location , lying , false , incorrect , misleading , propaganda , liar , mensonges , faux , errone , mensonge , confirme , lieu , mentir , faux , inexact , trompeur , propagande , menteur , mentiras , falso , incorrecto , mentira , confirmado , donde , lugar , mitiendo , falso , incorrecto , enganoso , propaganda , mentiroso , l?gen , falsch , l?ge , best?tigt , wo , ort , l?gend , fehlerhaft , unrichtig , irref?hrend , l?gner , \u03C8\u03AD\u03BC\u03B1\u03C4\u03B1 , \u03C8\u03B5\u03CD\u03C4\u03B9\u03BA\u03BF , \u03BB\u03AC\u03B8\u03BF\u03C2 , \u03C8\u03AD\u03BC\u03B1 , \u03B5\u03C0\u03B9\u03B2\u03B5\u03B2\u03B1\u03B9\u03CE\u03BD\u03C9 , \u03C0\u03BF\u03C5 , \u03C4\u03BF\u03C0\u03BF\u03B8\u03B5\u03C3\u03AF\u03B1 , \u03C8\u03B5\u03C5\u03B4\u03AE\u03C2 , \u03B5\u03C3\u03C6\u03B1\u03BB\u03BC\u03AD\u03BD\u03BF , \u03BB\u03B1\u03BD\u03B8\u03B1\u03C3\u03BC\u03AD\u03BD\u03BF , \u03C0\u03B1\u03C1\u03B1\u03C0\u03BB\u03B1\u03BD\u03B7\u03C4\u03B9\u03BA\u03CC , \u03C0\u03C1\u03BF\u03C0\u03B1\u03B3\u03AC\u03BD\u03B4\u03B1 , \u03C8\u03B5\u03CD\u03C4\u03B7\u03C2 , \u0623\u0643\u0627\u0630\u064A\u0628 , \u0623\u0643\u0627\u0630\u064A\u0628 , \u063A\u0644\u0637\u0627\u0646 , \u0623\u0643\u0630\u0648\u0628\u0629\u060C \u0643\u0630\u0628 , \u0645\u0624\u0643\u062F , \u0623\u064A\u0646 , \u0645\u0643\u0627\u0646 , \u0643\u0630\u0628 , \u062E\u0627\u0637\u0626 , \u063A\u064A\u0631 \u0635\u062D\u064A\u062D , \u0645\u0636\u0644\u0644 , \u062F\u0639\u0627\u064A\u0629 , \u0643\u0627\u0630\u0628 , \u062F\u0631\u0648\u063A , \u062C\u0639\u0644\u06CC , \u0627\u0634\u062A\u0628\u0627\u0647 , \u062F\u0631\u0648\u063A , \u062A\u0623\u064A\u064A\u062F \u0634\u062F\u0647 , \u0643\u062C\u0627 , \u0645\u062D\u0644\u060C \u0645\u0643\u0627\u0646 , \u062F\u0631\u0648\u063A \u06AF\u0648 , \u063A\u0644\u0637\u060C \u0627\u0634\u062A\u0628\u0627\u0647\u060C \u062F\u0631\u0648\u063A\u06CC\u0646 , \u063A\u0644\u0637\u060C \u0627\u0634\u062A\u0628\u0627\u0647 , \u06AF\u0645\u0631\u0627\u0647 \u200C \u0643\u0646\u0646\u062F\u0647 , \u062A\u0628\u0644\u06CC\u063A\u0627\u062A \u0633\u06CC\u0627\u0633\u06CC\u060C \u067E\u0631\u0648\u067E\u0627\u06AF\u0627\u0646\u062F\u0627 , \u06A9\u0630\u0627\u0628".split(',');
+                            var term;
+                            var pattern;
+                            for (var i = 0; i < fake_terms.length; i++) {
+                                term = fake_terms[i].trim().replace(/(\s+)/, "(<[^>]+>)*$1(<[^>]+>)*");
+                                if (arabic.test(src_str)) {
+                                    pattern = new RegExp("(" + fake_terms[i].trim() + ")", "gi");
+                                }
+                                else if (json.sproc.status_metadata === "done") {
+                                    pattern = new RegExp("(\\b" + fake_terms[i].trim() + "\\b)", "gi");
+                                }
+
+                                src_str = src_str.replace(pattern, "<span class='highlight'>$1</span>");
+                                src_str = src_str.replace(/(<mark>[^<>]*)((<[^>]+>)+)([^<>]*<\/mark>)/, "$1</span>$2<span>$4");
+                            }
+                            if (arabic.test(src_str)) {
+                                $tiles_comments.append('<div class="ca-item verified" ><div class="ca-item-main" style="background-color: #8AA399"><span style="direction:rtl;text-align: right" class="value">' + src_str + '</span>' + translate_dom + '<p class="time_comment">' + json_inner.verification_comments[c].publishedAt + '</p></div></div>');
+                            }
+                            else {
+                                $tiles_comments.append('<div class="ca-item verified" ><div class="ca-item-main" style="background-color: #8AA399"><span class="value">' + src_str + '</span>' + translate_dom + '<p class="time_comment">' + json_inner.verification_comments[c].publishedAt + '</p></div></div>');
+                            }
+                        });
+                    }
+                    if (json_inner.verification_comments.length === 10) {
                         $('.more').show();
                     }
-                    else {
+                    var options_comments = {
+                        autoResize: true,
+                        container: $tiles_comments,
+                        offset: 15,
+                        itemWidth: 330,
+                        outerOffset: 0
+                    };
+                    setTimeout(function () {
+                        $tiles_comments.find('.ca-item').wookmark(options_comments);
+                    }, 10);
+                }
+                $('#verified').attr('data-id', json.media_id);
+                $('#all').attr('data-id', json.media_id);
+                $('#extr_links').attr('data-id', json.media_id);
+                if (json.sproc.status_comments === "done" && json_comments) {
+                    json_comments = false;
+                    $('#verified').html('VERIFICATION (' + json_inner.verification_cues.num_verification_comments + ')');
+                    $('#all').html('ALL (' + json_inner.verification_cues.num_comments + ')');
+                    $('#extr_links').html('LINKS (' + json_inner.verification_cues.num_link_comments + ')');
+                    if (json_inner.verification_cues.num_verification_comments === 10) {
                         $('.more').hide();
                     }
+                    if (json_inner.verification_cues.num_verification_comments === 0) {
+                        $('#none_comments').text('No verification comments at the moment').show();
+                    }
+
+                    $('#alert_comments').remove();
+                    $('.comments_search').show();
                 }
-                if ((first_call) && (json.verification_comments.length > 0)) {
-                    comments("-");
-                    first_call = false
-                }
+
 
                 $('#loading_all,#cover,#cover_info,#loading_info').remove();
                 if (!($('.vis-timeline').length)) {
                     $('#cover_timeline,#loading_timeline').show();
                 }
-
-                $('.controls,.table_title,#weather_input,#channel_yt_table,#video_yt_table,.video_yt,.channel_yt').show();
-                if ((json.video_comments.length === 0) && (json.processing_status === "done")) {
-                    $('.controls').hide();
-                    $('.comments_search').html("No comments, at the moment").css({
-                        'margin-top': '20px',
-                        'text-decoration': 'none',
-                        'pointer-events': 'none'
-                    });
-                }
+                $('#user_video').show();
+                $('.controls,.table_title,#weather_input,#image_fb_table,#user_fb_table,.image_fb').show();
                 $('.tooltip').tooltipster({"contentAsHTML": true});
             },
             error: function (e) {
             },
             async: true
         });
-    }, 1000);
+    }
+
+
 }
-function load_facebook() {
-    var first_call = true;
-    $('#time_input').timepicker({
-        timeFormat: 'HH:mm',
-        interval: 60,
-        startHour: 0,
-        startMinutes: 0,
-        dynamic: false,
-        dropdown: true,
-        scrollbar: true
-    });
-    $('#date_input').datetimepicker({
-        timepicker: false,
-        format: 'd/m/Y',
-        maxDate: '+1970/01/01'
-    });
+function load_twitter_video(json) {
+    $('.twitter_p').remove();
+    var $tiles_comments = $('#comments_info');
     var $tiles_thumbs = $('#thumb_info');
-    var interval_facebook = setInterval(function () {
-        $.ajax({
-            type: 'GET',
-            url: 'https://caa.iti.gr/get_verificationV3?twtimeline=0&url=' + video_verify + "&fb_access_token=" + fb_access_token,
-            dataType: 'json',
-            success: function (json) {
-                $('#alert_comments').stop().slideDown();
-                global_json = json;
-                if (json.processing_status === "done") {
-                    abort_get();
-                    $('#analysis_info').slideUp();
-                    $('.comments_search').show();
-                    clearInterval(interval_facebook);
-                    $('#alert_comments').stop().slideUp();
-                }
-
-
-                $('#locations .location_name').remove();
-                var empty_location = true;
-                if (json.from_location_city !== "") {
-                    empty_location = false;
-                    if (json.video_description_mentioned_locations.length > 0) {
-                        $('#locations').append('<p class="location_name" data-name="' + json.from_location_city + '"><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>' + json.from_location_city + ',</p>')
-                    }
-                    else {
-                        $('#locations').append('<p class="location_name" data-name="' + json.from_location_city + '"><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>' + json.from_location_city + '</p>')
-                    }
-                }
-                for (var l = 0; l < json.video_description_mentioned_locations.length; l++) {
-                    empty_location = false;
-                    if (l === json.video_description_mentioned_locations.length - 1) {
-                        $('#locations').append('<p class="location_name" data-name="' + json.video_description_mentioned_locations[l] + '"><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>' + json.video_description_mentioned_locations[l] + '</p>')
-                    }
-                    else {
-                        $('#locations').append('<p class="location_name" data-name="' + json.video_description_mentioned_locations[l] + '"><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>' + json.video_description_mentioned_locations[l] + ',</p>')
-                    }
-                }
-                if (empty_location) {
-                    $('#locations').append('<p class="location_name" style="cursor: default">-</p>')
-                }
-
-                var empty_time = true;
-                $('#times .location_name').remove();
-                if (json.created_time !== "") {
-                    empty_time = false;
-                    var time = json.created_time;
-                    var format_time = time.substring(8, 10) + '/' + time.substring(5, 7) + '/' + time.substring(0, 4) + ' ' + time.substring(12, 14) + ':00';
-
-                    $('#times .location_title').after('<p class="location_name" data-time="' + format_time + '"><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>' + format_time + '</p>');
-
-                }
-                if (json.updated_time !== "") {
-                    empty_time = false;
-                    var time = json.updated_time;
-                    var format_time = time.substring(8, 10) + '/' + time.substring(5, 7) + '/' + time.substring(0, 4) + ' ' + time.substring(12, 14) + ':00';
-                    $('#times .location_title').after('<p class="location_name" data-time="' + format_time + '"><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>' + format_time + '</p>')
-                }
-                if (empty_time) {
-                    $('#times .location_title').after('<p class="location_name" style="cursor: default">-</p>')
-                }
-
-
-                var video_locations = "";
-                for (var v = 0; v < json.video_description_mentioned_locations.length; v++) {
-                    if (v === json.video_description_mentioned_locations.length - 1) {
-                        video_locations += "<span>" + json.video_description_mentioned_locations[v] + "</span>";
-                    }
-                    else {
-                        video_locations += "<span>" + json.video_description_mentioned_locations[v] + "</span>, ";
-                    }
-                }
-
-                $('#user_video').show();
-                if (json.isDebunked !== "") {
-                    $('.debunked').html(json.isDebunked).slideDown();
-                }
-
-                if (json.title !== "") {
-                    $('#fb_video_title').text(json.title);
-                }
-                else {
-                    if (json.processing_status === "done") {
-                        $('#fb_video_title').parent().remove();
-                        $('#video_fb_table_more tbody').append('<tr> <td>Title</td> <td>Not Available</td> </tr>');
-                    }
-                }
-
-                if (json.video_id !== "") {
-                    $('#fb_video_id').text(json.video_id);
-                }
-                else {
-                    if (json.processing_status === "done") {
-                        $('#fb_video_id').parent().remove();
-                        $('#video_fb_table_more tbody').append('<tr> <td>ID</td> <td>Not Available</td> </tr>');
-                    }
-                }
-
-                if (json.content_category !== "") {
-                    $('#fb_content_category').text(json.content_category);
-                }
-                else {
-                    if (json.processing_status === "done") {
-                        $('#fb_content_category').parent().remove();
-                        $('#video_fb_table_more tbody').append('<tr> <td>Content Category</td> <td>Not Available</td> </tr>');
-                    }
-                }
-
-                if (json.content_tags.length > 0) {
-                    $('#fb_content_tags').text(json.content_tags);
-                }
-                else {
-                    if (json.processing_status === "done") {
-                        $('#fb_content_tags').parent().remove();
-                        $('#video_fb_table_more tbody').append('<tr> <td>Content Tags</td> <td>Not Available</td> </tr>');
-                    }
-                }
-
-                if (json.video_description !== "") {
-                    $('#fb_video_description').text(json.video_description);
-                    if (arabic.test(json.video_description)) {
-                        $('#fb_video_description').css({'direction': 'rtl', 'text-align': 'right'});
-                    }
-                }
-                else {
-                    if (json.processing_status === "done") {
-                        $('#fb_video_description').parent().remove();
-                        $('#video_fb_table_more tbody').append('<tr> <td>Desctiption</td> <td>Not Available</td> </tr>');
-                    }
-                }
-
-                if (video_locations !== "") {
-                    $('#fb_video_locations').html(video_locations);
-                }
-                else {
-                    if (json.processing_status === "done") {
-                        $('#fb_video_locations').parent().remove();
-                        $('#video_fb_table_more tbody').append('<tr> <td>Description Mentioned Locations</td> <td>Not Available</td> </tr>');
-                    }
-                }
-
-                if (json.created_time !== "") {
-                    $('#fb_created_time').text(json.created_time);
-                }
-                else {
-                    if (json.processing_status === "done") {
-                        $('#fb_created_time').parent().remove();
-                        $('#video_fb_table_more tbody').append('<tr> <td>Created Time</td> <td>Not Available</td> </tr>');
-                    }
-                }
-
-                if (json.updated_time !== "") {
-                    $('#fb_updated_time').text(json.updated_time);
-                }
-                else {
-                    if (json.processing_status === "done") {
-                        $('#fb_updated_time').parent().remove();
-                        $('#video_fb_table_more tbody').append('<tr> <td>Updated Time<img src="imgs/info_color.png" class="tooltip tooltipstered" data-tooltip-content="#tooltip_updated_time"></td> <td id="fb_updated_time">2015-02-25, 08:18:58 (UTC)</td> </tr>');
-                    }
-                }
-
-                if (json.total_comment_count !== "") {
-                    $('#fb_total_comment_count').text(json.total_comment_count);
-                }
-                else {
-                    if (json.processing_status === "done") {
-                        $('#fb_total_comment_count').parent().remove();
-                        $('#video_fb_table_more tbody').append('<tr> <td>Comments</td> <td>Not Available</td> </tr>');
-                    }
-                }
-
-                if (json.num_verification_comments !== "") {
-                    $('#fb_total_verification_comment_count').text(json.verification_comments.length);
-                }
-                else {
-                    if (json.processing_status === "done") {
-                        $('#fb_total_verification_comment_count').parent().remove();
-                        $('#video_fb_table_more tbody').append('<tr> <td>Verification Comments</td> <td>Not Available</td> </tr>');
-                    }
-                }
-
-                if (json.embeddable !== "") {
-                    $('#fb_embeddable').text(json.embeddable);
-                }
-                else {
-                    if (json.processing_status === "done") {
-                        $('#fb_embeddable').parent().remove();
-                        $('#video_fb_table_more tbody').append('<tr> <td>Embeddable</td> <td>Not Available</td> </tr>');
-                    }
-                }
-
-                if (json.length !== "") {
-                    $('#fb_length').text(json.length);
-                }
-                else {
-                    if (json.processing_status === "done") {
-                        $('#fb_length').parent().remove();
-                        $('#video_fb_table_more tbody').append('<tr> <td>Length</td> <td>Not Available</td> </tr>');
-                    }
-                }
-
-                if (json.picture !== "") {
-                    $('#fb_picture').html('<img id="imgtab" class="small" src="' + json.picture + '">');
-                }
-                else {
-                    if (json.processing_status === "done") {
-                        $('#fb_picture').parent().remove();
-                        $('#video_fb_table_more tbody').append('<tr> <td>Picture</td> <td>Not Available</td> </tr>');
-                    }
-                }
-
-                if (json.privacy !== "") {
-                    $('#fb_privacy').text(json.privacy);
-                }
-                else {
-                    if (json.processing_status === "done") {
-                        $('#fb_privacy').parent().remove();
-                        $('#video_fb_table_more tbody').append('<tr> <td>Privacy</td> <td>Not Available</td> </tr>');
-                    }
-                }
-
-                if (json.from !== "") {
-                    $('#fb_source').text(json.from);
-                }
-                else {
-                    if (json.processing_status === "done") {
-                        $('#fb_source').parent().remove();
-                        $('#video_fb_table_more tbody').append('<tr> <td>User Source</td> <td>Not Available</td> </tr>');
-                    }
-                }
-
-                for (var i = $('#thumb_info .ca-item').length; i < json.video_thumbnails.length; i++) {
-                    $tiles_thumbs.append('<div class="ca-item" style="width:230px"><div class="ca-item-main"><img src="' + json.video_thumbnails[i] + '" style="width: 230px;"><p class="google">Reverse image search by:</p><ul class="reverse_list"><li class="link" data-url="' + json.reverse_image_thumbnails_search_url_google[i] + '">Google</li><li class="link" data-url="' + json.reverse_image_thumbnails_search_url_yandex[i] + '">Yandex</li></ul></div></div>');
-                }
-
-                $tiles_thumbs.imagesLoaded(function () {
-                    var options_thumbs = {
-                        autoResize: true,
-                        container: $tiles_thumbs,
-                        offset: 15,
-                        itemWidth: 230,
-                        outerOffset: 0
-                    };
-                    $tiles_thumbs.find('.ca-item').wookmark(options_thumbs);
-                });
-
-                $('#verified').html('VERIFICATION (' + json.verification_comments.length + ')');
-                $('#all').html('ALL (' + json.video_comments.length + ')');
-                verification_comments = [];
-                for (var k = 0; k < json.verification_comments.length; k++) {
-                    verification_comments.push(json.verification_comments[k]);
-                }
-
-                if ($('.filter.active').attr('id') === "all") {
-                    if (global_json.video_comments.length > $('#comments_info .ca-item').length) {
-                        $('.more').show();
-                    }
-                    else {
-                        $('.more').hide();
-                    }
-                }
-                else {
-                    if (verification_comments.length > $('#comments_info .ca-item').length) {
-                        $('.more').show();
-                    }
-                    else {
-                        $('.more').hide();
-                    }
-                }
-                if ((first_call) && (json.verification_comments.length > 0)) {
-                    comments("facebook");
-                    first_call = false
-                }
-
-                $('#loading_all,#cover,#cover_info,#loading_info').remove();
-                if (!($('.vis-timeline').length)) {
-                    $('#cover_timeline,#loading_timeline').show();
-                }
-                $('.controls,.table_title,#weather_input,#video_fb_table,#user_fb_table,.video_fb').show();
-                if ((json.video_comments.length === 0) && (json.processing_status === "done")) {
-                    $('.controls').hide();
-                    $('.comments_search').html("No comments, at the moment").css({
-                        'margin-top': '20px',
-                        'text-decoration': 'none',
-                        'pointer-events': 'none'
+    $.ajax({
+        type: 'GET',
+        url: 'https://caa.iti.gr/caa/api/v4/videos/reports/' + json.media_id,
+        dataType: 'json',
+        success: function (json_inner) {
+            if (json_metadata) {
+                if (json_inner.video.full_text !== "") {
+                    guessLanguage.detect(json_inner.video.full_text, function (language) {
+                        var translate_dom = '<p class="translate_wrapper_table"><img src="imgs/uk_flag.png"><span>Translate to English</span></p>';
+                        if (language === "en") {
+                            translate_dom = ""
+                        }
+                        $('#tw_tweet_text').html('<span>' + json_inner.video.full_text + '</span>' + translate_dom);
                     });
                 }
-                $('.tooltip').tooltipster({"contentAsHTML": true});
-            },
-            error: function () {
+                else if (json.sproc.status_metadata === "done") {
+                    $('#tw_tweet_text').parent().remove();
+                    $('#tweet_tw_table_more tbody').append('<tr> <td>Text</td> <td>Not Available</td> </tr>');
+                }
 
-            },
-            async: true
-        });
-    }, 1000);
 
-}
-function load_twitter_video() {
-    var first_call = true;
-    $('#time_input').timepicker({
-        timeFormat: 'HH:mm',
-        interval: 60,
-        startHour: 0,
-        startMinutes: 0,
-        dynamic: false,
-        dropdown: true,
-        scrollbar: true
-    });
-    $('#date_input').datetimepicker({
-        timepicker: false,
-        format: 'd/m/Y',
-        maxDate: '+1970/01/01'
-    });
-    var $tiles_thumbs = $('#thumb_info');
-    var interval_twitter = setInterval(function () {
-        $.ajax({
-            type: 'GET',
-            url: 'https://caa.iti.gr/get_verificationV3?twtimeline=0&url=' + video_verify,
-            dataType: 'json',
-            success: function (json) {
+                if (json_inner.video.created_at !== "") {
+                    $('#tw_tweet_created_time').text(json_inner.video.created_at);
+                }
+                else if (json.sproc.status_metadata === "done") {
+                    $('#tw_tweet_created_time').parent().remove();
+                    $('#tweet_tw_table_more tbody').append('<tr> <td>Created Time</td> <td>Not Available</td> </tr>');
+                }
 
-                $('#alert_comments').stop().slideDown();
-                if (json.embedded_youtube !== "") {
+                if (json_inner.video.source !== "") {
+                    $('#tw_tweet_source').text(json_inner.video.source);
+                }
+                else if (json.sproc.status_metadata === "done") {
+                    $('#tw_tweet_source').parent().remove();
+                    $('#tweet_tw_table_more tbody').append('<tr> <td>Source</td> <td>Not Available</td> </tr>');
+                }
+
+                if (json_inner.video.retweet_count > -1) {
+                    $('#tw_tweet_rt').text(json_inner.video.retweet_count);
+                }
+                else if (json.sproc.status_metadata === "done") {
+                    $('#tw_tweet_rt').parent().remove();
+                    $('#tweet_tw_table_more tbody').append('<tr> <td>Retweet Count</td> <td>Not Available</td> </tr>');
+                }
+
+                if (json_inner.video.favorite_count > -1) {
+                    $('#tw_tweet_fav').text(json_inner.video.favorite_count);
+                }
+                else if (json.sproc.status_metadata === "done") {
+                    $('#tw_tweet_fav').parent().remove();
+                    $('#tweet_tw_table_more tbody').append('<tr> <td>Favorite Count</td> <td>Not Available</td> </tr>');
+                }
+
+                if (json_inner.video.lang !== "") {
+                    $('#tw_tweet_lang').text(json_inner.video.lang);
+                }
+                else if (json.sproc.status_metadata === "done") {
+                    $('#tw_tweet_lang').parent().remove();
+                    $('#tweet_tw_table_more tbody').append('<tr> <td>Language</td> <td>Not Available</td> </tr>');
+                }
+
+                if (json_inner.video.embedded_youtube !== "") {
                     $('.embedded_yt').show();
-                    $('.embedded_yt a').attr('href', 'index.html?video=' + json.embedded_youtube.replace('&', '%26'));
-                }
-                global_json = json;
-                if (json.processing_status === "done") {
-                    abort_get();
-                    $('#analysis_info').slideUp();
-                    clearInterval(interval_twitter);
-                    $('.comments_search').show();
-                    $('#alert_comments').stop().slideUp();
+                    $('.embedded_yt a').attr('href', 'index.html?video=' + json_inner.video.embedded_youtube.replace('&', '%26'));
                 }
 
-                $('#locations .location_name').remove();
-                var empty_location = true;
-                if (json.user_location !== "") {
-                    empty_location = false;
-                    if ((json.user_description_mentioned_locations.length > 0) || (json.tweet_text_mentioned_locations.length > 0)) {
-                        $('#locations').append('<p class="location_name" data-name="' + json.user_location + '"><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>' + json.user_location + ',</p>')
-                    }
-                    else {
-                        $('#locations').append('<p class="location_name" data-name="' + json.user_location + '"><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>' + json.user_location + '</p>')
-                    }
+                if (json_inner.verification_cues.tweet_verification_label != null) {
+                    $('#tw_tweet_verification').text(json_inner.verification_cues.tweet_verification_label);
                 }
-                for (var l = 0; l < json.user_description_mentioned_locations.length; l++) {
-                    empty_location = false;
-                    if (l === json.user_description_mentioned_locations.length - 1) {
-                        if (json.tweet_text_mentioned_locations.length > 0) {
-                            $('#locations').append('<p class="location_name" data-name="' + json.user_description_mentioned_locations[l] + '"><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>' + json.user_description_mentioned_locations[l] + ',</p>')
-                        }
-                        else {
-                            $('#locations').append('<p class="location_name" data-name="' + json.user_description_mentioned_locations[l] + '"><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>' + json.user_description_mentioned_locations[l] + '</p>')
-                        }
-                    }
-                    else {
-                        $('#locations').append('<p class="location_name" data-name="' + json.user_description_mentioned_locations[l] + '"><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>' + json.user_description_mentioned_locations[l] + ',</p>')
-                    }
-                }
-                for (var l = 0; l < json.tweet_text_mentioned_locations.length; l++) {
-                    empty_location = false;
-                    if (l === json.tweet_text_mentioned_locations.length - 1) {
-                        $('#locations').append('<p class="location_name" data-name="' + json.tweet_text_mentioned_locations[l] + '"><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>' + json.tweet_text_mentioned_locations[l] + '</p>')
-                    }
-                    else {
-                        $('#locations').append('<p class="location_name" data-name="' + json.tweet_text_mentioned_locations[l] + '"><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>' + json.tweet_text_mentioned_locations[l] + ',</p>')
-                    }
-                }
-                if (empty_location) {
-                    $('#locations').append('<p class="location_name" style="cursor: default">-</p>')
-                }
-
-
-                $('#times .location_name').remove();
-                if (json.created_at !== "") {
-                    var time = json.created_at;
-                    var format_time = time.substring(8, 10) + '/' + time.substring(5, 7) + '/' + time.substring(0, 4) + ' ' + time.substring(12, 14) + ':00';
-
-                    $('#times .location_title').after('<p class="location_name" data-time="' + format_time + '"><span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>' + format_time + '</p>');
-
-                }
-                else {
-                    $('#times .location_title').after('<p class="location_name" style="cursor: default">-</p>')
-                }
-
-
-                var tweet_text_locations = "";
-                for (var v = 0; v < json.tweet_text_mentioned_locations.length; v++) {
-                    if (v === json.tweet_text_mentioned_locations.length - 1) {
-                        tweet_text_locations += "<span>" + json.tweet_text_mentioned_locations[v] + "</span>";
-                    }
-                    else {
-                        tweet_text_locations += "<span>" + json.tweet_text_mentioned_locations[v] + "</span>, ";
-                    }
-                }
-
-                var user_description_locations = "";
-                for (v = 0; v < json.user_description_mentioned_locations.length; v++) {
-                    if (v === json.user_description_mentioned_locations.length - 1) {
-                        user_description_locations += "<span>" + json.user_description_mentioned_locations[v] + "</span>";
-                    }
-                    else {
-                        user_description_locations += "<span>" + json.user_description_mentioned_locations[v] + "</span>, ";
-                    }
+                else if (json.sproc.status_metadata === "done") {
+                    $('#tw_tweet_verification').parent().remove();
+                    $('#tweet_tw_table_more tbody').append('<tr> <td>Verification Label</td> <td>Not Available</td> </tr>');
                 }
 
                 var hashtags = "";
-                for (v = 0; v < json.hashtags.length; v++) {
-                    if (v === json.hashtags.length - 1) {
-                        hashtags += "<span>#" + json.hashtags[v] + "</span>";
+                for (v = 0; v < json_inner.video.hashtags.length; v++) {
+                    if (v === json_inner.video.hashtags.length - 1) {
+                        hashtags += "<span>#" + json_inner.video.hashtags[v] + "</span>";
                     }
                     else {
-                        hashtags += "<span>#" + json.hashtags[v] + "</span>, ";
-                    }
-                }
-
-                var urls = "";
-                for (v = 0; v < json.urls.length; v++) {
-                    if (v === json.urls.length - 1) {
-                        urls += '<a target="_blank" href="' + json.urls[v] + '">' + json.urls[v] + '</a>';
-                    }
-                    else {
-                        urls += '<a target="_blank" href="' + json.urls[v] + '">' + json.urls[v] + '</a>, ';
-                    }
-                }
-
-                var users_mentions = "";
-                for (v = 0; v < json.user_mentions.length; v++) {
-                    if (v === json.user_mentions.length - 1) {
-                        users_mentions += "<span>@" + json.user_mentions[v] + "</span>";
-                    }
-                    else {
-                        users_mentions += "<span>@" + json.user_mentions[v] + "</span>, ";
-                    }
-                }
-
-                var video_urls = "";
-                for (v = 0; v < json.video_info_url.length; v++) {
-                    if (v === json.video_info_url.length - 1) {
-                        video_urls += '<a target="_blank" href="' + json.video_info_url[v] + '">' + json.video_info_url[v] + '</a>';
-                    }
-                    else {
-                        video_urls += '<a target="_blank" href="' + json.video_info_url[v] + '">' + json.video_info_url[v] + '</a>, ';
-                    }
-                }
-
-                var bitrate = "";
-                for (v = 0; v < json.video_info_bitrate.length; v++) {
-                    if (v === json.video_info_bitrate.length - 1) {
-                        bitrate += "<span>" + json.video_info_bitrate[v] + "</span>";
-                    }
-                    else {
-                        bitrate += "<span>" + json.video_info_bitrate[v] + "</span>, ";
-                    }
-                }
-
-                $('#user_video').show();
-                if (json.isDebunked !== "") {
-                    $('.debunked').html(json.isDebunked).slideDown();
-                }
-                if (json.id_str !== "") {
-                    $('#tw_tweet_id').text(json.id_str);
-                }
-                else {
-                    if (json.processing_status === "done") {
-                        $('#tw_tweet_id').parent().remove();
-                        $('#tweet_tw_table_more tbody').append('<tr> <td>ID</td> <td>Not Available</td> </tr>');
-                    }
-                }
-
-                if (json.full_text !== "") {
-                    $('#tw_tweet_text').text(json.full_text);
-                }
-                else {
-                    if (json.processing_status === "done") {
-                        $('#tw_tweet_text').parent().remove();
-                        $('#tweet_tw_table_more tbody').append('<tr> <td>Text</td> <td>Not Available</td> </tr>');
-                    }
-                }
-
-                if (json.created_at !== "") {
-                    $('#tw_tweet_created_time').text(json.created_at);
-                }
-                else {
-                    if (json.processing_status === "done") {
-                        $('#tw_tweet_created_time').parent().remove();
-                        $('#tweet_tw_table_more tbody').append('<tr> <td>Created Time</td> <td>Not Available</td> </tr>');
-                    }
-                }
-
-                if (json.source !== "") {
-                    $('#tw_tweet_source').html('<a target="_blank" href="' + json.source_url + '">' + json.source + '</a>');
-                }
-                else {
-                    if (json.processing_status === "done") {
-                        $('#tw_tweet_source').parent().remove();
-                        $('#tweet_tw_table_more tbody').append('<tr> <td>Source</td> <td>Not Available</td> </tr>');
-                    }
-                }
-
-                if (tweet_text_locations !== "") {
-                    $('#tw_tweet_mentioned_locations').html(tweet_text_locations);
-                }
-                else {
-                    if (json.processing_status === "done") {
-                        $('#tw_tweet_mentioned_locations').parent().remove();
-                        $('#tweet_tw_table_more tbody').append('<tr> <td>Text Mentioned Locations</td> <td>Not Available</td> </tr>');
-                    }
-                }
-
-                if (json.retweet_count !== "") {
-                    $('#tw_tweet_rt').text(json.retweet_count);
-                }
-                else {
-                    if (json.processing_status === "done") {
-                        $('#tw_tweet_rt').parent().remove();
-                        $('#tweet_tw_table_more tbody').append('<tr> <td>Retweet Count</td> <td>Not Available</td> </tr>');
-                    }
-                }
-
-                if (json.favorite_count !== "") {
-                    $('#tw_tweet_fav').text(json.favorite_count);
-                }
-                else {
-                    if (json.processing_status === "done") {
-                        $('#tw_tweet_fav').parent().remove();
-                        $('#tweet_tw_table_more tbody').append('<tr> <td>Favorite Count</td> <td>Not Available</td> </tr>');
-                    }
-                }
-
-                if (json.verification_replies_count !== "") {
-                    $('#tw_tweet_ver_comments').text(json.verification_replies.length);
-                }
-                else {
-                    if (json.processing_status === "done") {
-                        $('#tw_tweet_ver_comments').parent().remove();
-                        $('#tweet_tw_table_more tbody').append('<tr> <td>Verifivation Comments</td> <td>Not Available</td> </tr>');
+                        hashtags += "<span>#" + json_inner.video.hashtags[v] + "</span>, ";
                     }
                 }
 
                 if (hashtags !== "") {
                     $('#tw_tweet_hashtags').html(hashtags);
                 }
-                else {
-                    if (json.processing_status === "done") {
-                        $('#tw_tweet_hashtags').parent().remove();
-                        $('#tweet_tw_table_more tbody').append('<tr> <td>Hashtags</td> <td>Not Available</td> </tr>');
+                else if (json.sproc.status_metadata === "done") {
+                    $('#tw_tweet_hashtags').parent().remove();
+                    $('#tweet_tw_table_more tbody').append('<tr> <td>Hashtags</td> <td>Not Available</td> </tr>');
+                }
+
+
+                var urls = "";
+                for (v = 0; v < json_inner.video.urls.length; v++) {
+                    if (v === json_inner.video.urls.length - 1) {
+                        urls += '<a target="_blank" href="' + json_inner.video.urls[v] + '">' + json_inner.video.urls[v] + '</a>';
+                    }
+                    else {
+                        urls += '<a target="_blank" href="' + json_inner.video.urls[v] + '">' + json_inner.video.urls[v] + '</a>, ';
                     }
                 }
+
 
                 if (urls !== "") {
                     $('#tw_tweet_urls').html(urls);
                 }
-                else {
-                    if (json.processing_status === "done") {
-                        $('#tw_tweet_urls').parent().remove();
-                        $('#tweet_tw_table_more tbody').append('<tr> <td>URLs</td> <td>Not Available</td> </tr>');
+                else if (json.sproc.status_metadata === "done") {
+                    $('#tw_tweet_urls').parent().remove();
+                    $('#tweet_tw_table_more tbody').append('<tr> <td>URLs</td> <td>Not Available</td> </tr>');
+                }
+
+
+                var users_mentions = "";
+                for (v = 0; v < json_inner.video.user_mentions.length; v++) {
+                    if (v === json_inner.video.user_mentions.length - 1) {
+                        users_mentions += "<span>@" + json_inner.video.user_mentions[v] + "</span>";
+                    }
+                    else {
+                        users_mentions += "<span>@" + json_inner.video.user_mentions[v] + "</span>, ";
                     }
                 }
 
                 if (users_mentions !== "") {
                     $('#tw_tweet_users_mentions').html(users_mentions);
                 }
-                else {
-                    if (json.processing_status === "done") {
-                        $('#tw_tweet_users_mentions').parent().remove();
-                        $('#tweet_tw_table_more tbody').append('<tr> <td>Users Mentions</td> <td>Not Available</td> </tr>');
+                else if (json.sproc.status_metadata === "done") {
+                    $('#tw_tweet_users_mentions').parent().remove();
+                    $('#tweet_tw_table_more tbody').append('<tr> <td>Users Mentions</td> <td>Not Available</td> </tr>');
+                }
+
+
+                var video_urls = "";
+                for (v = 0; v < json_inner.video.video_info.urls.length; v++) {
+                    if (v === json_inner.video.video_info.urls.length - 1) {
+                        video_urls += '<a target="_blank" href="' + json_inner.video.video_info.urls[v] + '">' + json_inner.video.video_info.urls[v] + '</a>';
+                    }
+                    else {
+                        video_urls += '<a target="_blank" href="' + json_inner.video.video_info.urls[v] + '">' + json_inner.video.video_info.urls[v] + '</a>, ';
                     }
                 }
 
-                if (json.lang !== "") {
-                    $('#tw_tweet_lang').text(json.lang);
-                }
-                else {
-                    if (json.processing_status === "done") {
-                        $('#tw_tweet_lang').parent().remove();
-                        $('#tweet_tw_table_more tbody').append('<tr> <td>Language</td> <td>Not Available</td> </tr>');
+                var bitrate = "";
+                for (v = 0; v < json_inner.video.video_info.bitrate.length; v++) {
+                    if (v === json_inner.video.video_info.bitrate.length - 1) {
+                        bitrate += "<span>" + json_inner.video.video_info.bitrate[v] + "</span>";
+                    }
+                    else {
+                        bitrate += "<span>" + json_inner.video.video_info.bitrate[v] + "</span>, ";
                     }
                 }
 
-                if (json.embedded_youtube !== "") {
+                if (json_inner.video.embedded_youtube !== "") {
                     $('#tw_tweet_aspect').html('<p class="empty_cell">Tweet contains embedded YouTube video. Submit the YouTube video to CAA for analysis <a href="index.html?video=' + json.embedded_youtube.replace('&', '%26') + '" target="_blank">here</a></p>');
                     $('#tw_tweet_duration').html('<p class="empty_cell">Tweet contains embedded YouTube video. Submit the YouTube video to CAA for analysis <a href="index.html?video=' + json.embedded_youtube.replace('&', '%26') + '" target="_blank">here</a></p>');
                     $('#tw_tweet_url').removeClass('link').html('<p class="empty_cell">Tweet contains embedded YouTube video. Submit the YouTube video to CAA for analysis <a href="index.html?video=' + json.embedded_youtube.replace('&', '%26') + '" target="_blank">here</a></p>');
                     $('#tw_tweet_bitrate').html('<p class="empty_cell">Tweet contains embedded YouTube video. Submit the YouTube video to CAA for analysis <a href="index.html?video=' + json.embedded_youtube.replace('&', '%26') + '" target="_blank">here</a></p>');
                 }
-                else {
-                    if (json.video_info_aspect_ratio !== "") {
-                        $('#tw_tweet_aspect').text(json.video_info_aspect_ratio);
+                else if (json.sproc.status_metadata === "done") {
+                    if (json_inner.video.video_info.aspect_ratio !== "") {
+                        $('#tw_tweet_aspect').text(json_inner.video.video_info.aspect_ratio);
                     }
-                    else {
-                        if (json.processing_status === "done") {
-                            $('#tw_tweet_aspect').parent().remove();
-                            $('#tweet_tw_table_more tbody').append('<tr> <td>Video Aspect Ratio</td> <td>Not Available</td> </tr>');
-                        }
+                    else if (json.sproc.status_metadata === "done") {
+                        $('#tw_tweet_aspect').parent().remove();
+                        $('#tweet_tw_table_more tbody').append('<tr> <td>Video Aspect Ratio</td> <td>Not Available</td> </tr>');
                     }
 
-                    if (json.video_info_duration !== "") {
-                        $('#tw_tweet_duration').text(json.video_info_duration);
+                    if (json_inner.video.video_info.duration !== "") {
+                        $('#tw_tweet_duration').text(json_inner.video.video_info.duration);
                     }
-                    else {
-                        if (json.processing_status === "done") {
-                            $('#tw_tweet_duration').parent().remove();
-                            $('#tweet_tw_table_more tbody').append('<tr> <td>Video Duration</td> <td>Not Available</td> </tr>');
-                        }
+                    else if (json.sproc.status_metadata === "done") {
+                        $('#tw_tweet_duration').parent().remove();
+                        $('#tweet_tw_table_more tbody').append('<tr> <td>Video Duration</td> <td>Not Available</td> </tr>');
                     }
 
                     if (video_urls !== "") {
                         $('#tw_tweet_url').html(video_urls);
                     }
-                    else {
-                        if (json.processing_status === "done") {
-                            $('#tw_tweet_url').parent().remove();
-                            $('#tweet_tw_table_more tbody').append('<tr> <td>Video URL</td> <td>Not Available</td> </tr>');
-                        }
+                    else if (json.sproc.status_metadata === "done") {
+                        $('#tw_tweet_url').parent().remove();
+                        $('#tweet_tw_table_more tbody').append('<tr> <td>Video URL</td> <td>Not Available</td> </tr>');
                     }
 
                     if (bitrate !== "") {
                         $('#tw_tweet_bitrate').html(bitrate);
                     }
+                    else if (json.sproc.status_metadata === "done") {
+                        $('#tw_tweet_bitrate').parent().remove();
+                        $('#tweet_tw_table_more tbody').append('<tr> <td>Video Bitrate</td> <td>Not Available</td> </tr>');
+                    }
+                }
+
+                if (json_inner.id !== "") {
+                    $('#tw_tweet_id').text(json_inner.id);
+                }
+                else if (json.sproc.status_metadata === "done") {
+                    $('#tw_tweet_id').parent().remove();
+                    $('#tweet_tw_table_more tbody').append('<tr> <td>ID</td> <td>Not Available</td> </tr>');
+                }
+
+                if (json_inner.source.user_name !== "") {
+                    $('#tw_user_username').text(json_inner.source.user_name);
+                }
+                else if (json.sproc.status_metadata === "done") {
+                    $('#tw_user_username').parent().remove();
+                    $('#user_tw_table_more tbody').append('<tr> <td>Username</td> <td>Not Available</td> </tr>');
+                }
+
+                if (json_inner.source.user_screen_name !== "") {
+                    $('#tw_user_screenname').html('<a target="_blank" href="https://pipl.com/search/?q=' + json_inner.source.user_screen_name + '&l=&sloc=&in=6">' + json_inner.source.user_screen_name + '</a>');
+                }
+                else if (json.sproc.status_metadata === "done") {
+                    $('#tw_user_screenname').parent().remove();
+                    $('#user_tw_table_more tbody').append('<tr> <td>Screen Name</td> <td>Not Available</td> </tr>');
+                }
+
+                if (json_inner.source.user_location !== "") {
+                    $('#tw_user_location').text(json_inner.source.user_location);
+                }
+                else if (json.sproc.status_metadata === "done") {
+                    $('#tw_user_location').parent().remove();
+                    $('#user_tw_table_more tbody').append('<tr> <td>Location</td> <td>Not Available</td> </tr>');
+                }
+
+                if (json_inner.source.user_description !== "") {
+                    $('#tw_user_desc').text(json_inner.source.user_description);
+                }
+                else if (json.sproc.status_metadata === "done") {
+                    $('#tw_user_desc').parent().remove();
+                    $('#user_tw_table_more tbody').append('<tr> <td>Description</td> <td>Not Available</td> </tr>');
+                }
+
+                if (json_inner.source.user_protected !== "") {
+                    $('#tw_user_protected').text(json_inner.source.user_protected);
+                }
+                else if (json.sproc.status_metadata === "done") {
+                    $('#tw_user_protected').parent().remove();
+                    $('#user_tw_table_more tbody').append('<tr> <td>Protected</td> <td>Not Available</td> </tr>');
+                }
+
+                if (json_inner.source.user_verified !== "") {
+                    $('#tw_user_verified').text(json_inner.source.user_verified);
+                }
+                else if (json.sproc.status_metadata === "done") {
+                    $('#tw_user_verified').parent().remove();
+                    $('#user_tw_table_more tbody').append('<tr> <td>Verified</td> <td>Not Available</td> </tr>');
+                }
+
+
+                if (json_inner.source.user_followers_count !== "") {
+                    $('#tw_user_followers').text(json_inner.source.user_followers_count);
+                }
+                else if (json.sproc.status_metadata === "done") {
+                    $('#tw_user_followers').parent().remove();
+                    $('#user_tw_table_more tbody').append('<tr> <td>Followers</td> <td>Not Available</td> </tr>');
+                }
+
+                if (json_inner.source.user_friends_count !== "") {
+                    $('#tw_user_friends').text(json_inner.source.user_friends_count);
+                }
+                else if (json.sproc.status_metadata === "done") {
+                    $('#tw_user_friends').parent().remove();
+                    $('#user_tw_table_more tbody').append('<tr> <td>Firends</td> <td>Not Available</td> </tr>');
+                }
+
+                if (json_inner.source.user_listed_count !== "") {
+                    $('#tw_user_listed').text(json_inner.source.user_listed_count);
+                }
+                else if (json.sproc.status_metadata === "done") {
+                    $('#tw_user_listed').parent().remove();
+                    $('#user_tw_table_more tbody').append('<tr> <td>Listed</td> <td>Not Available</td> </tr>');
+                }
+
+                if (json_inner.source.user_favourites_count !== "") {
+                    $('#tw_user_favourites').text(json_inner.source.user_favourites_count);
+                }
+                else if (json.sproc.status_metadata === "done") {
+                    $('#tw_user_favourites').parent().remove();
+                    $('#user_tw_table_more tbody').append('<tr> <td>Favorites</td> <td>Not Available</td> </tr>');
+                }
+
+                if (json_inner.source.user_statuses_count !== "") {
+                    $('#tw_user_statuses').text(json_inner.source.user_statuses_count);
+                }
+                else if (json.sproc.status_metadata === "done") {
+                    $('#tw_user_statuses').parent().remove();
+                    $('#user_tw_table_more tbody').append('<tr> <td>Statuses</td> <td>Not Available</td> </tr>');
+                }
+
+                if (json_inner.source.user_created_at !== "") {
+                    $('#tw_user_created').text(json_inner.source.user_created_at);
+                }
+                else if (json.sproc.status_metadata === "done") {
+                    $('#tw_user_created').parent().remove();
+                    $('#user_tw_table_more tbody').append('<tr> <td>Created Time</td> <td>Not Available</td> </tr>');
+                }
+
+
+                if (json_inner.source.user_screen_name !== "") {
+                    $('#tw_user_profile_img').html('<img id="imgtab2" class="small" src="https://avatars.io/twitter/' + json_inner.source.user_screen_name + '">');
+                }
+                else if (json.sproc.status_metadata === "done") {
+                    $('#tw_user_profile_img').parent().remove();
+                    $('#user_tw_table_more tbody').append('<tr> <td>Profile Image</td> <td>Not Available</td> </tr>');
+                }
+
+                if (json_inner.source.user_url !== "") {
+                    $('#tw_user_url').html('<a href="' + json_inner.source.user_url + '" target="_blank">' + json_inner.source.user_url + '</a>');
+                }
+                else if (json.sproc.status_metadata === "done") {
+                    $('#tw_user_url').parent().remove();
+                    $('#user_tw_table_more tbody').append('<tr> <td>URL</td> <td>Not Available</td> </tr>');
+                }
+
+                if ($('.preferred').length === 0 && json_inner.thumbnails.preferred.url != "") {
+                    if (json_inner.thumbnails.preferred.in_video) {
+                        $('#alert_clickbait').slideDown();
+                        $tiles_thumbs.append('<div class="ca-item" style="width:230px;border: 5px solid red;"><div class="ca-item-main"><img src="' + json_inner.thumbnails.preferred.url + '" style="width: 230px;"><p class="google">Reverse image search by:</p><ul class="reverse_list"><li class="link" data-url="' + json_inner.thumbnails.preferred.google_reverse_image_search + '">Google</li><li class="link" data-url="' + json_inner.thumbnails.preferred.yandex_reverse_image_search + '">Yandex</li></ul></div></div>');
+                    }
                     else {
-                        if (json.processing_status === "done") {
-                            $('#tw_tweet_bitrate').parent().remove();
-                            $('#tweet_tw_table_more tbody').append('<tr> <td>Video Bitrate</td> <td>Not Available</td> </tr>');
-                        }
+                        $tiles_thumbs.append('<div class="ca-item" style="width:230px;"><div class="ca-item-main"><img src="' + json_inner.thumbnails.preferred.url + '" style="width: 230px;"><p class="google">Reverse image search by:</p><ul class="reverse_list"><li class="link" data-url="' + json_inner.thumbnails.preferred.google_reverse_image_search + '">Google</li><li class="link" data-url="' + json_inner.thumbnails.preferred.yandex_reverse_image_search + '">Yandex</li></ul></div></div>');
                     }
-                }
-                $('#tw_tweet_verification').text(json.tweet_verification_label);
-
-
-                if (json.user_name !== "") {
-                    $('#tw_user_username').text(json.user_name);
-                }
-                else {
-                    if (json.processing_status === "done") {
-                        $('#tw_user_username').parent().remove();
-                        $('#user_tw_table_more tbody').append('<tr> <td>Username</td> <td>Not Available</td> </tr>');
-                    }
-                }
-
-                if (json.user_name !== "") {
-                    $('#tw_user_screenname').html('<a target="_blank" href="https://pipl.com/search/?q=' + json.user_screen_name + '&l=&sloc=&in=6">' + json.user_screen_name + '</a>');
-                }
-                else {
-                    if (json.processing_status === "done") {
-                        $('#tw_user_screenname').parent().remove();
-                        $('#user_tw_table_more tbody').append('<tr> <td>Screen Name</td> <td>Not Available</td> </tr>');
-                    }
-                }
-
-                if (json.user_location !== "") {
-                    $('#tw_user_location').text(json.user_location);
-                }
-                else {
-                    if (json.processing_status === "done") {
-                        $('#tw_user_location').parent().remove();
-                        $('#user_tw_table_more tbody').append('<tr> <td>Location</td> <td>Not Available</td> </tr>');
-                    }
-                }
-
-                if (user_description_locations !== "") {
-                    $('#tw_user_description_locations').html(user_description_locations);
-                }
-                else {
-                    if (json.processing_status === "done") {
-                        $('#tw_user_description_locations').parent().remove();
-                        $('#user_tw_table_more tbody').append('<tr> <td>Description Mentioned Locations</td> <td>Not Available</td> </tr>');
-                    }
-                }
-
-                if (json.user_url !== "") {
-                    $('#tw_user_url').html('<a href="' + json.user_url + '" target="_blank">' + json.user_url + '</a>');
-                }
-                else {
-                    if (json.processing_status === "done") {
-                        $('#tw_user_url').parent().remove();
-                        $('#user_tw_table_more tbody').append('<tr> <td>URL</td> <td>Not Available</td> </tr>');
-                    }
-                }
-
-                if (json.user_description !== "") {
-                    $('#tw_user_desc').text(json.user_description);
-                }
-                else {
-                    if (json.processing_status === "done") {
-                        $('#tw_user_desc').parent().remove();
-                        $('#user_tw_table_more tbody').append('<tr> <td>Description</td> <td>Not Available</td> </tr>');
-                    }
-                }
-
-                if (json.user_protected !== "") {
-                    $('#tw_user_protected').text(json.user_protected);
-                }
-                else {
-                    if (json.processing_status === "done") {
-                        $('#tw_user_protected').parent().remove();
-                        $('#user_tw_table_more tbody').append('<tr> <td>Protected</td> <td>Not Available</td> </tr>');
-                    }
-                }
-
-                if (json.user_verified !== "") {
-                    $('#tw_user_verified').text(json.user_verified);
-                }
-                else {
-                    if (json.processing_status === "done") {
-                        $('#tw_user_verified').parent().remove();
-                        $('#user_tw_table_more tbody').append('<tr> <td>Verified</td> <td>Not Available</td> </tr>');
-                    }
-                }
-
-                if (json.user_followers_count !== "") {
-                    $('#tw_user_followers').text(json.user_followers_count);
-                }
-                else {
-                    if (json.processing_status === "done") {
-                        $('#tw_user_followers').parent().remove();
-                        $('#user_tw_table_more tbody').append('<tr> <td>Followers</td> <td>Not Available</td> </tr>');
-                    }
-                }
-
-                if (json.user_friends_count !== "") {
-                    $('#tw_user_friends').text(json.user_friends_count);
-                }
-                else {
-                    if (json.processing_status === "done") {
-                        $('#tw_user_friends').parent().remove();
-                        $('#user_tw_table_more tbody').append('<tr> <td>Firends</td> <td>Not Available</td> </tr>');
-                    }
-                }
-
-                if (json.user_listed_count !== "") {
-                    $('#tw_user_listed').text(json.user_listed_count);
-                }
-                else {
-                    if (json.processing_status === "done") {
-                        $('#tw_user_listed').parent().remove();
-                        $('#user_tw_table_more tbody').append('<tr> <td>Listed</td> <td>Not Available</td> </tr>');
-                    }
-                }
-
-                if (json.user_favourites_count !== "") {
-                    $('#tw_user_favourites').text(json.user_favourites_count);
-                }
-                else {
-                    if (json.processing_status === "done") {
-                        $('#tw_user_favourites').parent().remove();
-                        $('#user_tw_table_more tbody').append('<tr> <td>Favorites</td> <td>Not Available</td> </tr>');
-                    }
-                }
-
-                if (json.user_statuses_count !== "") {
-                    $('#tw_user_statuses').text(json.user_statuses_count);
-                }
-                else {
-                    if (json.processing_status === "done") {
-                        $('#tw_user_statuses').parent().remove();
-                        $('#user_tw_table_more tbody').append('<tr> <td>Statuses</td> <td>Not Available</td> </tr>');
-                    }
-                }
-
-                if (json.user_lang !== "") {
-                    $('#tw_user_lang').text(json.user_lang);
-                }
-                else {
-                    if (json.processing_status === "done") {
-                        $('#tw_user_lang').parent().remove();
-                        $('#user_tw_table_more tbody').append('<tr> <td>Language</td> <td>Not Available</td> </tr>');
-                    }
-                }
-
-                if (json.user_created_at !== "") {
-                    $('#tw_user_created').text(json.user_created_at);
-                }
-                else {
-                    if (json.processing_status === "done") {
-                        $('#tw_user_created').parent().remove();
-                        $('#user_tw_table_more tbody').append('<tr> <td>Created Time</td> <td>Not Available</td> </tr>');
-                    }
-                }
-
-                if (json.user_screen_name !== "") {
-                    $('#tw_user_profile_img').html('<img id="imgtab2" class="small" src="https://avatars.io/twitter/' + json.user_screen_name + '">');
-                }
-                else {
-                    if (json.processing_status === "done") {
-                        $('#tw_user_profile_img').parent().remove();
-                        $('#user_tw_table_more tbody').append('<tr> <td>Profile Image</td> <td>Not Available</td> </tr>');
-                    }
-                }
-
-                if (json.media_url !== "") {
-                    $('#alert_thumbs').slideUp();
-                    if ($('#thumb_info .ca-item').length === 0) {
-                        $tiles_thumbs.append('<div class="ca-item" style="width:230px"><div class="ca-item-main"><img src="' + json.media_url + '" style="width: 230px;"><p class="google">Reverse image search by:</p><ul class="reverse_list"><li class="link" data-url="' + json.reverse_image_thumbnails_search_url_google + '">Google</li><li class="link" data-url="' + json.reverse_image_thumbnails_search_url_yandex + '">Yandex</li></ul></div></div>');
-                    }
-                }
-                else {
-                    $('#alert_thumbs').slideDown();
-                    $('#alert_thumbs a').attr('href', 'index.html?video=' + json.embedded_youtube.replace('&', '%26'));
                 }
 
                 $tiles_thumbs.imagesLoaded(function () {
@@ -2064,67 +1768,506 @@ function load_twitter_video() {
                     $tiles_thumbs.find('.ca-item').wookmark(options_thumbs);
                 });
 
-                if (json.replies_overflow === "false") {
-                    $('#verified').html('VERIFICATION (' + json.verification_replies.length + ')');
-                    $('#all').html('ALL (' + json.replies.length + ')');
-                    verification_comments = [];
-                    for (var k = 0; k < json.verification_replies.length; k++) {
-                        verification_comments.push(json.verification_replies[k]);
-                    }
+            }
+            if (json.sproc.status_metadata === "done" && json_metadata) {
+                json_metadata = false;
+            }
 
-                    if ($('.filter.active').attr('id') === "all") {
-                        if (global_json.replies.length > $('#comments_info .ca-item').length) {
-                            $('.more').show();
+
+            if (json_comments) {
+                for (var c = $('.verified').length; c < json_inner.verification_comments.length; c++) {
+                    var src_str = json_inner.verification_comments[c].textDisplay;
+                    guessLanguage.detect(src_str, function (language) {
+                        var translate_dom = '<p class="translate_wrapper"><img src="imgs/uk_flag.png"><span>Translate to English</span></p>';
+                        if (language === "en") {
+                            translate_dom = ""
+                        }
+                        var fake_terms = " fake , lies , fake , wrong , lie , confirm , where , location , lying , false , incorrect , misleading , propaganda , liar , mensonges , faux , errone , mensonge , confirme , lieu , mentir , faux , inexact , trompeur , propagande , menteur , mentiras , falso , incorrecto , mentira , confirmado , donde , lugar , mitiendo , falso , incorrecto , enganoso , propaganda , mentiroso , l?gen , falsch , l?ge , best?tigt , wo , ort , l?gend , fehlerhaft , unrichtig , irref?hrend , l?gner , \u03C8\u03AD\u03BC\u03B1\u03C4\u03B1 , \u03C8\u03B5\u03CD\u03C4\u03B9\u03BA\u03BF , \u03BB\u03AC\u03B8\u03BF\u03C2 , \u03C8\u03AD\u03BC\u03B1 , \u03B5\u03C0\u03B9\u03B2\u03B5\u03B2\u03B1\u03B9\u03CE\u03BD\u03C9 , \u03C0\u03BF\u03C5 , \u03C4\u03BF\u03C0\u03BF\u03B8\u03B5\u03C3\u03AF\u03B1 , \u03C8\u03B5\u03C5\u03B4\u03AE\u03C2 , \u03B5\u03C3\u03C6\u03B1\u03BB\u03BC\u03AD\u03BD\u03BF , \u03BB\u03B1\u03BD\u03B8\u03B1\u03C3\u03BC\u03AD\u03BD\u03BF , \u03C0\u03B1\u03C1\u03B1\u03C0\u03BB\u03B1\u03BD\u03B7\u03C4\u03B9\u03BA\u03CC , \u03C0\u03C1\u03BF\u03C0\u03B1\u03B3\u03AC\u03BD\u03B4\u03B1 , \u03C8\u03B5\u03CD\u03C4\u03B7\u03C2 , \u0623\u0643\u0627\u0630\u064A\u0628 , \u0623\u0643\u0627\u0630\u064A\u0628 , \u063A\u0644\u0637\u0627\u0646 , \u0623\u0643\u0630\u0648\u0628\u0629\u060C \u0643\u0630\u0628 , \u0645\u0624\u0643\u062F , \u0623\u064A\u0646 , \u0645\u0643\u0627\u0646 , \u0643\u0630\u0628 , \u062E\u0627\u0637\u0626 , \u063A\u064A\u0631 \u0635\u062D\u064A\u062D , \u0645\u0636\u0644\u0644 , \u062F\u0639\u0627\u064A\u0629 , \u0643\u0627\u0630\u0628 , \u062F\u0631\u0648\u063A , \u062C\u0639\u0644\u06CC , \u0627\u0634\u062A\u0628\u0627\u0647 , \u062F\u0631\u0648\u063A , \u062A\u0623\u064A\u064A\u062F \u0634\u062F\u0647 , \u0643\u062C\u0627 , \u0645\u062D\u0644\u060C \u0645\u0643\u0627\u0646 , \u062F\u0631\u0648\u063A \u06AF\u0648 , \u063A\u0644\u0637\u060C \u0627\u0634\u062A\u0628\u0627\u0647\u060C \u062F\u0631\u0648\u063A\u06CC\u0646 , \u063A\u0644\u0637\u060C \u0627\u0634\u062A\u0628\u0627\u0647 , \u06AF\u0645\u0631\u0627\u0647 \u200C \u0643\u0646\u0646\u062F\u0647 , \u062A\u0628\u0644\u06CC\u063A\u0627\u062A \u0633\u06CC\u0627\u0633\u06CC\u060C \u067E\u0631\u0648\u067E\u0627\u06AF\u0627\u0646\u062F\u0627 , \u06A9\u0630\u0627\u0628".split(',');
+                        var term;
+                        var pattern;
+                        for (var i = 0; i < fake_terms.length; i++) {
+                            term = fake_terms[i].trim().replace(/(\s+)/, "(<[^>]+>)*$1(<[^>]+>)*");
+                            if (arabic.test(src_str)) {
+                                pattern = new RegExp("(" + fake_terms[i].trim() + ")", "gi");
+                            }
+                            else {
+                                pattern = new RegExp("(\\b" + fake_terms[i].trim() + "\\b)", "gi");
+                            }
+
+                            src_str = src_str.replace(pattern, "<span class='highlight'>$1</span>");
+                            src_str = src_str.replace(/(<mark>[^<>]*)((<[^>]+>)+)([^<>]*<\/mark>)/, "$1</span>$2<span>$4");
+                        }
+                        if (arabic.test(src_str)) {
+                            $tiles_comments.append('<div class="ca-item verified" ><div class="ca-item-main" style="background-color: #8AA399"><span style="direction:rtl;text-align: right" class="value">' + src_str + '</span>' + translate_dom + '<p class="user_comment"><span style="font-weight: normal;font-size: 12px">by  </span><a href="' + json_inner.verification_comments[c].authorURL + '" target="_blank">' + json_inner.verification_comments[c].authorDisplayName + '</a></p><p class="time_comment">' + json_inner.verification_comments[c].publishedAt + '</p></div></div>');
                         }
                         else {
-                            $('.more').hide();
+                            $tiles_comments.append('<div class="ca-item verified" ><div class="ca-item-main" style="background-color: #8AA399"><span class="value">' + src_str + '</span>' + translate_dom + '<p class="user_comment"><span style="font-weight: normal;font-size: 12px">by  </span><a href="' + json_inner.verification_comments[c].authorURL + '" target="_blank">' + json_inner.verification_comments[c].authorDisplayName + '</a></p><p class="time_comment">' + json_inner.verification_comments[c].publishedAt + '</p></div></div>');
                         }
-                    }
-                    else {
-                        if (verification_comments.length > $('#comments_info .ca-item').length) {
-                            $('.more').show();
-                        }
-                        else {
-                            $('.more').hide();
-                        }
-                    }
-                    if ((first_call) && (json.verification_replies.length > 0)) {
-                        replies();
-                        first_call = false
-                    }
-                }
-                else {
-                    $('#verified').html('VERIFICATION (-)');
-                    $('#all').html('ALL (-)');
-                    verification_comments = [];
-                    $('.more').hide();
-                    $('#alert_comments').hide();
-                    $('#alert_comments_overflow').stop().slideDown();
-                }
-
-                $('#loading_all,#cover,#cover_info,#loading_info').remove();
-                if (!($('.vis-timeline').length)) {
-                    $('#cover_timeline,#loading_timeline').show();
-                }
-                $('.controls,.table_title,#weather_input,#tweet_tw_table,#user_tw_table,.video_tw,.user_tw').show();
-                if ((json.replies.length === 0) && (json.processing_status === "done")) {
-                    $('.controls').hide();
-                    $('.comments_search').html("No comments, at the moment").css({
-                        'margin-top': '20px',
-                        'text-decoration': 'none',
-                        'pointer-events': 'none'
                     });
                 }
-                $('.tooltip').tooltipster({"contentAsHTML": true});
-            },
-            error: function () {
 
+                if (json_inner.verification_comments.length === 10) {
+                    $('.more').show();
+                }
+
+                var options_comments = {
+                    autoResize: true,
+                    container: $tiles_comments,
+                    offset: 15,
+                    itemWidth: 330,
+                    outerOffset: 0
+                };
+                setTimeout(function () {
+                    $tiles_comments.find('.ca-item').wookmark(options_comments);
+                }, 10);
+            }
+            $('#verified').attr('data-id', json.media_id);
+            $('#all').attr('data-id', json.media_id);
+            $('#extr_links').attr('data-id', json.media_id);
+            if (json.sproc.status_comments === "done" && json_comments) {
+                json_comments = false;
+                $('#verified').html('VERIFICATION (' + json_inner.verification_cues.num_verification_comments + ')');
+                $('#all').html('ALL (' + json_inner.verification_cues.num_comments + ')');
+                $('#extr_links').html('LINKS (' + json_inner.verification_cues.num_link_comments + ')');
+                if (json_inner.verification_cues.num_verification_comments === 10) {
+                    $('.more').hide();
+                }
+                if (json_inner.verification_cues.num_verification_comments === 0) {
+                    $('#none_comments').text('No verification comments at the moment').show();
+                }
+                $('#alert_comments').remove();
+                $('.comments_search').show();
+            }
+
+
+            /* if (json.sproc.status_debunk === "done" && json_debunk) {
+             json_debunk = false;
+             $('.debunked').show();
+             if (json_inner.verification_cues.known_history.explanation !== "") {
+             $('.debunked').append('<p>' + json_inner.verification_cues.known_history.explanation + '</p>');
+             }
+             if (json_inner.verification_cues.known_history.known_facts !== "") {
+             $('.debunked').append('<p>' + json_inner.verification_cues.known_history.known_facts + '</p>');
+             }
+             if (json_inner.verification_cues.known_history.fact_source !== "") {
+             $('.debunked').append('<p>' + json_inner.verification_cues.known_history.fact_source + '</p>');
+             }
+             if (json_inner.verification_cues.known_history.label !== "") {
+             $('.debunked').append('<p>' + json_inner.verification_cues.known_history.label + '</p>');
+             }
+             if (json_inner.verification_cues.known_history.first_known_instance !== "") {
+             $('.debunked').append('<p>' + json_inner.verification_cues.known_history.first_known_instance + '</p>');
+
+             }
+             $('.debunked').append('<p>Is visual clickbait: ' + json_inner.verification_cues.is_visual_clickbait + '</p>');
+             }*/
+
+
+            if (json.sproc.status_location === "done" && json_location) {
+                json_location = false;
+                var locations = [];
+                if (json_inner.mentioned_locations.detected_locations.length === 0) {
+                    $('#tw_tweet_mentioned_locations').parent().remove();
+                    $('#tweet_tw_table tbody').append('<tr> <td>Mentioned Locations</td> <td>Not Available</td> </tr>');
+                }
+                else {
+
+                    for (var l = 0; l < json_inner.mentioned_locations.detected_locations.length; l++) {
+                        locations.push('<a href="' + json_inner.mentioned_locations.detected_locations[l].wikipedia_url + '" target="_blank">' + json_inner.mentioned_locations.detected_locations[l].location + '</a> (' + json_inner.mentioned_locations.detected_locations[l].text_source + ')')
+                    }
+                    $('#tw_tweet_mentioned_locations').append(locations.join(', '));
+                }
+            }
+
+
+            if (json.sproc.status_ai_verification === "done" && json_ai) {
+                json_ai = false;
+                $('.debunked').show();
+                $('.debunked').append('<p> Verification ai score: ' + json_inner.verification_cues.verification_ai_score + '</p>');
+            }
+
+
+            if (json.sproc.status_weather === "done" && json_weather) {
+                json_weather = false;
+            }
+
+            $('#loading_all,#cover,#cover_info,#loading_info').remove();
+            if (!($('.vis-timeline').length)) {
+                $('#cover_timeline,#loading_timeline').show();
+            }
+            $('#user_video').show();
+            $('.controls,.table_title,#weather_input,#tweet_tw_table,#user_tw_table,.video_tw,.user_tw').show();
+            $('.tooltip').tooltipster({"contentAsHTML": true});
+
+        },
+        error: function (e) {
+        },
+        async: true
+    });
+
+}
+
+$('.filter').click(function () {
+    var $this = $(this);
+    if (!($this.hasClass(('active')))) {
+        $('.controls').find('.filter').removeClass('active');
+        $this.addClass('active');
+        $('#comments_info').empty();
+        $('.more').hide();
+        var type = "";
+        var color = "";
+        var none_comments = "";
+        switch ($this.attr('id')) {
+            case 'all':
+                type = "coms";
+                color = "#95B8D1";
+                none_comments = "No comments at the moment"
+                break;
+            case 'extr_links':
+                type = "linkcoms";
+                color = "#9593D9";
+                none_comments = "No link comments at the moment"
+                break;
+            case 'verified' :
+                type = "vercoms";
+                color = "#8AA399";
+                none_comments = "No verification comments at the moment"
+                break;
+        }
+        if (($('.table_title').eq(0).text() === "IMAGE")) {
+            $.ajax({
+                type: 'GET',
+                url: 'https://caa.iti.gr/caa/api/v4/images/reports/' + $this.attr('data-id') + '/comments?ncomments=10&page=1&type=' + type,
+                dataType: 'json',
+                success: function (json_inner) {
+                    var $tiles_comments = $('#comments_info');
+                    $('#none_comments').hide();
+                    for (var c = 0; c < json_inner.comments.length; c++) {
+                        var src_str = json_inner.comments[c].textDisplay;
+                        guessLanguage.detect(src_str, function (language) {
+                            var translate_dom = '<p class="translate_wrapper"><img src="imgs/uk_flag.png"><span>Translate to English</span></p>';
+                            if (language === "en") {
+                                translate_dom = ""
+                            }
+                            if (type === "vercoms") {
+                                var fake_terms = " fake , lies , fake , wrong , lie , confirm , where , location , lying , false , incorrect , misleading , propaganda , liar , mensonges , faux , errone , mensonge , confirme , lieu , mentir , faux , inexact , trompeur , propagande , menteur , mentiras , falso , incorrecto , mentira , confirmado , donde , lugar , mitiendo , falso , incorrecto , enganoso , propaganda , mentiroso , l?gen , falsch , l?ge , best?tigt , wo , ort , l?gend , fehlerhaft , unrichtig , irref?hrend , l?gner , \u03C8\u03AD\u03BC\u03B1\u03C4\u03B1 , \u03C8\u03B5\u03CD\u03C4\u03B9\u03BA\u03BF , \u03BB\u03AC\u03B8\u03BF\u03C2 , \u03C8\u03AD\u03BC\u03B1 , \u03B5\u03C0\u03B9\u03B2\u03B5\u03B2\u03B1\u03B9\u03CE\u03BD\u03C9 , \u03C0\u03BF\u03C5 , \u03C4\u03BF\u03C0\u03BF\u03B8\u03B5\u03C3\u03AF\u03B1 , \u03C8\u03B5\u03C5\u03B4\u03AE\u03C2 , \u03B5\u03C3\u03C6\u03B1\u03BB\u03BC\u03AD\u03BD\u03BF , \u03BB\u03B1\u03BD\u03B8\u03B1\u03C3\u03BC\u03AD\u03BD\u03BF , \u03C0\u03B1\u03C1\u03B1\u03C0\u03BB\u03B1\u03BD\u03B7\u03C4\u03B9\u03BA\u03CC , \u03C0\u03C1\u03BF\u03C0\u03B1\u03B3\u03AC\u03BD\u03B4\u03B1 , \u03C8\u03B5\u03CD\u03C4\u03B7\u03C2 , \u0623\u0643\u0627\u0630\u064A\u0628 , \u0623\u0643\u0627\u0630\u064A\u0628 , \u063A\u0644\u0637\u0627\u0646 , \u0623\u0643\u0630\u0648\u0628\u0629\u060C \u0643\u0630\u0628 , \u0645\u0624\u0643\u062F , \u0623\u064A\u0646 , \u0645\u0643\u0627\u0646 , \u0643\u0630\u0628 , \u062E\u0627\u0637\u0626 , \u063A\u064A\u0631 \u0635\u062D\u064A\u062D , \u0645\u0636\u0644\u0644 , \u062F\u0639\u0627\u064A\u0629 , \u0643\u0627\u0630\u0628 , \u062F\u0631\u0648\u063A , \u062C\u0639\u0644\u06CC , \u0627\u0634\u062A\u0628\u0627\u0647 , \u062F\u0631\u0648\u063A , \u062A\u0623\u064A\u064A\u062F \u0634\u062F\u0647 , \u0643\u062C\u0627 , \u0645\u062D\u0644\u060C \u0645\u0643\u0627\u0646 , \u062F\u0631\u0648\u063A \u06AF\u0648 , \u063A\u0644\u0637\u060C \u0627\u0634\u062A\u0628\u0627\u0647\u060C \u062F\u0631\u0648\u063A\u06CC\u0646 , \u063A\u0644\u0637\u060C \u0627\u0634\u062A\u0628\u0627\u0647 , \u06AF\u0645\u0631\u0627\u0647 \u200C \u0643\u0646\u0646\u062F\u0647 , \u062A\u0628\u0644\u06CC\u063A\u0627\u062A \u0633\u06CC\u0627\u0633\u06CC\u060C \u067E\u0631\u0648\u067E\u0627\u06AF\u0627\u0646\u062F\u0627 , \u06A9\u0630\u0627\u0628".split(',');
+                                var term;
+                                var pattern;
+                                for (var i = 0; i < fake_terms.length; i++) {
+                                    term = fake_terms[i].trim().replace(/(\s+)/, "(<[^>]+>)*$1(<[^>]+>)*");
+                                    if (arabic.test(src_str)) {
+                                        pattern = new RegExp("(" + fake_terms[i].trim() + ")", "gi");
+                                    }
+                                    else {
+                                        pattern = new RegExp("(\\b" + fake_terms[i].trim() + "\\b)", "gi");
+                                    }
+
+                                    src_str = src_str.replace(pattern, "<span class='highlight'>$1</span>");
+                                    src_str = src_str.replace(/(<mark>[^<>]*)((<[^>]+>)+)([^<>]*<\/mark>)/, "$1</span>$2<span>$4");
+                                }
+                            }
+                            if (type === "linkcoms") {
+                                src_str = linkify(src_str);
+                            }
+
+                            if (($('.table_title').eq(0).text() === "TWEET") || ($('.table_title').eq(1).text() === "CHANNEL")) {
+                                if (arabic.test(src_str)) {
+                                    $tiles_comments.append('<div class="ca-item verified" ><div class="ca-item-main" style="background-color: ' + color + '"><span style="direction:rtl;text-align: right" class="value">' + src_str + '</span>' + translate_dom + '<p class="user_comment"><span style="font-weight: normal;font-size: 12px">by  </span><a href="' + json_inner.comments[c].authorURL + '" target="_blank">' + json_inner.comments[c].authorDisplayName + '</a></p><p class="time_comment">' + json_inner.comments[c].publishedAt + '</p></div></div>');
+                                }
+                                else {
+                                    $tiles_comments.append('<div class="ca-item verified" ><div class="ca-item-main" style="background-color: ' + color + '"><span class="value">' + src_str + '</span>' + translate_dom + '<p class="user_comment"><span style="font-weight: normal;font-size: 12px">by  </span><a href="' + json_inner.comments[c].authorURL + '" target="_blank">' + json_inner.comments[c].authorDisplayName + '</a></p><p class="time_comment">' + json_inner.comments[c].publishedAt + '</p></div></div>');
+                                }
+                            }
+                            else {
+                                if (arabic.test(src_str)) {
+                                    $tiles_comments.append('<div class="ca-item verified" ><div class="ca-item-main" style="background-color: ' + color + '"><span style="direction:rtl;text-align: right" class="value">' + src_str + '</span>' + translate_dom + '<p class="time_comment">' + json_inner.comments[c].publishedAt + '</p></div></div>');
+                                }
+                                else {
+                                    $tiles_comments.append('<div class="ca-item verified" ><div class="ca-item-main" style="background-color: ' + color + '"><span class="value">' + src_str + '</span>' + translate_dom + '<p class="time_comment">' + json_inner.comments[c].publishedAt + '</p></div></div>');
+                                }
+                            }
+
+                        });
+                    }
+                    if (json_inner.comments.length === 0) {
+                        $('#none_comments').text(none_comments).show();
+                        $('#comments_info').css('height', 0);
+                    }
+                    if (json_inner.pagination.total_comments > 10) {
+                        $('.more').show();
+                    }
+                    var options_comments = {
+                        autoResize: true,
+                        container: $tiles_comments,
+                        offset: 15,
+                        itemWidth: 330,
+                        outerOffset: 0
+                    };
+                    setTimeout(function () {
+                        $tiles_comments.find('.ca-item').wookmark(options_comments);
+                    }, 10);
+                },
+                error: function (e) {
+                },
+                async: true
+            });
+        }
+        else {
+            $.ajax({
+                type: 'GET',
+                url: 'https://caa.iti.gr/caa/api/v4/videos/reports/' + $this.attr('data-id') + '/comments?ncomments=10&page=1&type=' + type,
+                dataType: 'json',
+                success: function (json_inner) {
+                    var $tiles_comments = $('#comments_info');
+                    $('#none_comments').hide();
+                    for (var c = 0; c < json_inner.comments.length; c++) {
+                        var src_str = json_inner.comments[c].textDisplay;
+                        guessLanguage.detect(src_str, function (language) {
+                            var translate_dom = '<p class="translate_wrapper"><img src="imgs/uk_flag.png"><span>Translate to English</span></p>';
+                            if (language === "en") {
+                                translate_dom = ""
+                            }
+                            if (type === "vercoms") {
+                                var fake_terms = " fake , lies , fake , wrong , lie , confirm , where , location , lying , false , incorrect , misleading , propaganda , liar , mensonges , faux , errone , mensonge , confirme , lieu , mentir , faux , inexact , trompeur , propagande , menteur , mentiras , falso , incorrecto , mentira , confirmado , donde , lugar , mitiendo , falso , incorrecto , enganoso , propaganda , mentiroso , l?gen , falsch , l?ge , best?tigt , wo , ort , l?gend , fehlerhaft , unrichtig , irref?hrend , l?gner , \u03C8\u03AD\u03BC\u03B1\u03C4\u03B1 , \u03C8\u03B5\u03CD\u03C4\u03B9\u03BA\u03BF , \u03BB\u03AC\u03B8\u03BF\u03C2 , \u03C8\u03AD\u03BC\u03B1 , \u03B5\u03C0\u03B9\u03B2\u03B5\u03B2\u03B1\u03B9\u03CE\u03BD\u03C9 , \u03C0\u03BF\u03C5 , \u03C4\u03BF\u03C0\u03BF\u03B8\u03B5\u03C3\u03AF\u03B1 , \u03C8\u03B5\u03C5\u03B4\u03AE\u03C2 , \u03B5\u03C3\u03C6\u03B1\u03BB\u03BC\u03AD\u03BD\u03BF , \u03BB\u03B1\u03BD\u03B8\u03B1\u03C3\u03BC\u03AD\u03BD\u03BF , \u03C0\u03B1\u03C1\u03B1\u03C0\u03BB\u03B1\u03BD\u03B7\u03C4\u03B9\u03BA\u03CC , \u03C0\u03C1\u03BF\u03C0\u03B1\u03B3\u03AC\u03BD\u03B4\u03B1 , \u03C8\u03B5\u03CD\u03C4\u03B7\u03C2 , \u0623\u0643\u0627\u0630\u064A\u0628 , \u0623\u0643\u0627\u0630\u064A\u0628 , \u063A\u0644\u0637\u0627\u0646 , \u0623\u0643\u0630\u0648\u0628\u0629\u060C \u0643\u0630\u0628 , \u0645\u0624\u0643\u062F , \u0623\u064A\u0646 , \u0645\u0643\u0627\u0646 , \u0643\u0630\u0628 , \u062E\u0627\u0637\u0626 , \u063A\u064A\u0631 \u0635\u062D\u064A\u062D , \u0645\u0636\u0644\u0644 , \u062F\u0639\u0627\u064A\u0629 , \u0643\u0627\u0630\u0628 , \u062F\u0631\u0648\u063A , \u062C\u0639\u0644\u06CC , \u0627\u0634\u062A\u0628\u0627\u0647 , \u062F\u0631\u0648\u063A , \u062A\u0623\u064A\u064A\u062F \u0634\u062F\u0647 , \u0643\u062C\u0627 , \u0645\u062D\u0644\u060C \u0645\u0643\u0627\u0646 , \u062F\u0631\u0648\u063A \u06AF\u0648 , \u063A\u0644\u0637\u060C \u0627\u0634\u062A\u0628\u0627\u0647\u060C \u062F\u0631\u0648\u063A\u06CC\u0646 , \u063A\u0644\u0637\u060C \u0627\u0634\u062A\u0628\u0627\u0647 , \u06AF\u0645\u0631\u0627\u0647 \u200C \u0643\u0646\u0646\u062F\u0647 , \u062A\u0628\u0644\u06CC\u063A\u0627\u062A \u0633\u06CC\u0627\u0633\u06CC\u060C \u067E\u0631\u0648\u067E\u0627\u06AF\u0627\u0646\u062F\u0627 , \u06A9\u0630\u0627\u0628".split(',');
+                                var term;
+                                var pattern;
+                                for (var i = 0; i < fake_terms.length; i++) {
+                                    term = fake_terms[i].trim().replace(/(\s+)/, "(<[^>]+>)*$1(<[^>]+>)*");
+                                    if (arabic.test(src_str)) {
+                                        pattern = new RegExp("(" + fake_terms[i].trim() + ")", "gi");
+                                    }
+                                    else {
+                                        pattern = new RegExp("(\\b" + fake_terms[i].trim() + "\\b)", "gi");
+                                    }
+
+                                    src_str = src_str.replace(pattern, "<span class='highlight'>$1</span>");
+                                    src_str = src_str.replace(/(<mark>[^<>]*)((<[^>]+>)+)([^<>]*<\/mark>)/, "$1</span>$2<span>$4");
+                                }
+                            }
+                            if (type === "linkcoms") {
+                                src_str = linkify(src_str);
+                            }
+
+                            if (($('.table_title').eq(0).text() === "TWEET") || ($('.table_title').eq(1).text() === "CHANNEL")) {
+                                if (arabic.test(src_str)) {
+                                    $tiles_comments.append('<div class="ca-item verified" ><div class="ca-item-main" style="background-color: ' + color + '"><span style="direction:rtl;text-align: right" class="value">' + src_str + '</span>' + translate_dom + '<p class="user_comment"><span style="font-weight: normal;font-size: 12px">by  </span><a href="' + json_inner.comments[c].authorURL + '" target="_blank">' + json_inner.comments[c].authorDisplayName + '</a></p><p class="time_comment">' + json_inner.comments[c].publishedAt + '</p></div></div>');
+                                }
+                                else {
+                                    $tiles_comments.append('<div class="ca-item verified" ><div class="ca-item-main" style="background-color: ' + color + '"><span class="value">' + src_str + '</span>' + translate_dom + '<p class="user_comment"><span style="font-weight: normal;font-size: 12px">by  </span><a href="' + json_inner.comments[c].authorURL + '" target="_blank">' + json_inner.comments[c].authorDisplayName + '</a></p><p class="time_comment">' + json_inner.comments[c].publishedAt + '</p></div></div>');
+                                }
+                            }
+                            else {
+                                if (arabic.test(src_str)) {
+                                    $tiles_comments.append('<div class="ca-item verified" ><div class="ca-item-main" style="background-color: ' + color + '"><span style="direction:rtl;text-align: right" class="value">' + src_str + '</span>' + translate_dom + '<p class="time_comment">' + json_inner.comments[c].publishedAt + '</p></div></div>');
+                                }
+                                else {
+                                    $tiles_comments.append('<div class="ca-item verified" ><div class="ca-item-main" style="background-color: ' + color + '"><span class="value">' + src_str + '</span>' + translate_dom + '<p class="time_comment">' + json_inner.comments[c].publishedAt + '</p></div></div>');
+                                }
+                            }
+
+                        });
+                    }
+                    if (json_inner.comments.length === 0) {
+                        $('#none_comments').text(none_comments).show();
+                        $('#comments_info').css('height', 0);
+                    }
+                    if (json_inner.pagination.total_comments > 10) {
+                        $('.more').show();
+                    }
+                    var options_comments = {
+                        autoResize: true,
+                        container: $tiles_comments,
+                        offset: 15,
+                        itemWidth: 330,
+                        outerOffset: 0
+                    };
+                    setTimeout(function () {
+                        $tiles_comments.find('.ca-item').wookmark(options_comments);
+                    }, 10);
+                },
+                error: function (e) {
+                },
+                async: true
+            });
+        }
+
+    }
+});
+$('.more').click(function () {
+    var type = "";
+    var color = ""
+    switch ($('.filter.active').attr('id')) {
+        case 'all':
+            type = "coms";
+            color = "#95B8D1";
+            break;
+        case 'extr_links':
+            type = "linkcoms";
+            color = "#9593D9";
+            break;
+        case 'verified' :
+            type = "vercoms";
+            color = "#8AA399";
+            break;
+    }
+    var page = $('#comments_info .ca-item').length / 10 + 1;
+
+    if (($('.table_title').eq(0).text() === "IMAGE")) {
+        $.ajax({
+            type: 'GET',
+            url: 'https://caa.iti.gr/caa/api/v4/images/reports/' + $('.filter.active').attr('data-id') + '/comments?ncomments=10&page=' + page + '&type=' + type,
+            dataType: 'json',
+            success: function (json_inner) {
+                var $tiles_comments = $('#comments_info');
+                for (var c = 0; c < json_inner.comments.length; c++) {
+                    var src_str = json_inner.comments[c].textDisplay;
+                    guessLanguage.detect(src_str, function (language) {
+                        var translate_dom = '<p class="translate_wrapper"><img src="imgs/uk_flag.png"><span>Translate to English</span></p>';
+                        if (language === "en") {
+                            translate_dom = ""
+                        }
+                        if (type === "vercoms") {
+                            var fake_terms = " fake , lies , fake , wrong , lie , confirm , where , location , lying , false , incorrect , misleading , propaganda , liar , mensonges , faux , errone , mensonge , confirme , lieu , mentir , faux , inexact , trompeur , propagande , menteur , mentiras , falso , incorrecto , mentira , confirmado , donde , lugar , mitiendo , falso , incorrecto , enganoso , propaganda , mentiroso , l?gen , falsch , l?ge , best?tigt , wo , ort , l?gend , fehlerhaft , unrichtig , irref?hrend , l?gner , \u03C8\u03AD\u03BC\u03B1\u03C4\u03B1 , \u03C8\u03B5\u03CD\u03C4\u03B9\u03BA\u03BF , \u03BB\u03AC\u03B8\u03BF\u03C2 , \u03C8\u03AD\u03BC\u03B1 , \u03B5\u03C0\u03B9\u03B2\u03B5\u03B2\u03B1\u03B9\u03CE\u03BD\u03C9 , \u03C0\u03BF\u03C5 , \u03C4\u03BF\u03C0\u03BF\u03B8\u03B5\u03C3\u03AF\u03B1 , \u03C8\u03B5\u03C5\u03B4\u03AE\u03C2 , \u03B5\u03C3\u03C6\u03B1\u03BB\u03BC\u03AD\u03BD\u03BF , \u03BB\u03B1\u03BD\u03B8\u03B1\u03C3\u03BC\u03AD\u03BD\u03BF , \u03C0\u03B1\u03C1\u03B1\u03C0\u03BB\u03B1\u03BD\u03B7\u03C4\u03B9\u03BA\u03CC , \u03C0\u03C1\u03BF\u03C0\u03B1\u03B3\u03AC\u03BD\u03B4\u03B1 , \u03C8\u03B5\u03CD\u03C4\u03B7\u03C2 , \u0623\u0643\u0627\u0630\u064A\u0628 , \u0623\u0643\u0627\u0630\u064A\u0628 , \u063A\u0644\u0637\u0627\u0646 , \u0623\u0643\u0630\u0648\u0628\u0629\u060C \u0643\u0630\u0628 , \u0645\u0624\u0643\u062F , \u0623\u064A\u0646 , \u0645\u0643\u0627\u0646 , \u0643\u0630\u0628 , \u062E\u0627\u0637\u0626 , \u063A\u064A\u0631 \u0635\u062D\u064A\u062D , \u0645\u0636\u0644\u0644 , \u062F\u0639\u0627\u064A\u0629 , \u0643\u0627\u0630\u0628 , \u062F\u0631\u0648\u063A , \u062C\u0639\u0644\u06CC , \u0627\u0634\u062A\u0628\u0627\u0647 , \u062F\u0631\u0648\u063A , \u062A\u0623\u064A\u064A\u062F \u0634\u062F\u0647 , \u0643\u062C\u0627 , \u0645\u062D\u0644\u060C \u0645\u0643\u0627\u0646 , \u062F\u0631\u0648\u063A \u06AF\u0648 , \u063A\u0644\u0637\u060C \u0627\u0634\u062A\u0628\u0627\u0647\u060C \u062F\u0631\u0648\u063A\u06CC\u0646 , \u063A\u0644\u0637\u060C \u0627\u0634\u062A\u0628\u0627\u0647 , \u06AF\u0645\u0631\u0627\u0647 \u200C \u0643\u0646\u0646\u062F\u0647 , \u062A\u0628\u0644\u06CC\u063A\u0627\u062A \u0633\u06CC\u0627\u0633\u06CC\u060C \u067E\u0631\u0648\u067E\u0627\u06AF\u0627\u0646\u062F\u0627 , \u06A9\u0630\u0627\u0628".split(',');
+                            var term;
+                            var pattern;
+                            for (var i = 0; i < fake_terms.length; i++) {
+                                term = fake_terms[i].trim().replace(/(\s+)/, "(<[^>]+>)*$1(<[^>]+>)*");
+                                if (arabic.test(src_str)) {
+                                    pattern = new RegExp("(" + fake_terms[i].trim() + ")", "gi");
+                                }
+                                else {
+                                    pattern = new RegExp("(\\b" + fake_terms[i].trim() + "\\b)", "gi");
+                                }
+
+                                src_str = src_str.replace(pattern, "<span class='highlight'>$1</span>");
+                                src_str = src_str.replace(/(<mark>[^<>]*)((<[^>]+>)+)([^<>]*<\/mark>)/, "$1</span>$2<span>$4");
+                            }
+                        }
+                        if (type === "linkcoms") {
+                            src_str = linkify(src_str);
+                        }
+
+                        if (($('.table_title').eq(0).text() === "TWEET") || ($('.table_title').eq(1).text() === "CHANNEL")) {
+                            if (arabic.test(src_str)) {
+                                $tiles_comments.append('<div class="ca-item verified" ><div class="ca-item-main" style="background-color: ' + color + '"><span style="direction:rtl;text-align: right" class="value">' + src_str + '</span>' + translate_dom + '<p class="user_comment"><span style="font-weight: normal;font-size: 12px">by  </span><a href="' + json_inner.comments[c].authorURL + '" target="_blank">' + json_inner.comments[c].authorDisplayName + '</a></p><p class="time_comment">' + json_inner.comments[c].publishedAt + '</p></div></div>');
+                            }
+                            else {
+                                $tiles_comments.append('<div class="ca-item verified" ><div class="ca-item-main" style="background-color: ' + color + '"><span class="value">' + src_str + '</span>' + translate_dom + '<p class="user_comment"><span style="font-weight: normal;font-size: 12px">by  </span><a href="' + json_inner.comments[c].authorURL + '" target="_blank">' + json_inner.comments[c].authorDisplayName + '</a></p><p class="time_comment">' + json_inner.comments[c].publishedAt + '</p></div></div>');
+                            }
+                        }
+                        else {
+                            if (arabic.test(src_str)) {
+                                $tiles_comments.append('<div class="ca-item verified" ><div class="ca-item-main" style="background-color: ' + color + '"><span style="direction:rtl;text-align: right" class="value">' + src_str + '</span>' + translate_dom + '<p class="time_comment">' + json_inner.comments[c].publishedAt + '</p></div></div>');
+                            }
+                            else {
+                                $tiles_comments.append('<div class="ca-item verified" ><div class="ca-item-main" style="background-color: ' + color + '"><span class="value">' + src_str + '</span>' + translate_dom + '<p class="time_comment">' + json_inner.comments[c].publishedAt + '</p></div></div>');
+                            }
+                        }
+
+                    });
+                }
+                if (json_inner.pagination.total_comments > page * 10) {
+                    $('.more').show();
+                }
+                else {
+                    $('.more').hide();
+                }
+                var options_comments = {
+                    autoResize: true,
+                    container: $tiles_comments,
+                    offset: 15,
+                    itemWidth: 330,
+                    outerOffset: 0
+                };
+                setTimeout(function () {
+                    $tiles_comments.find('.ca-item').wookmark(options_comments);
+                }, 10);
+            },
+            error: function (e) {
             },
             async: true
         });
-    }, 1000);
+    }
+    else {
+        $.ajax({
+            type: 'GET',
+            url: 'https://caa.iti.gr/caa/api/v4/videos/reports/' + $('.filter.active').attr('data-id') + '/comments?ncomments=10&page=' + page + '&type=' + type,
+            dataType: 'json',
+            success: function (json_inner) {
+                var $tiles_comments = $('#comments_info');
+                for (var c = 0; c < json_inner.comments.length; c++) {
+                    var src_str = json_inner.comments[c].textDisplay;
+                    guessLanguage.detect(src_str, function (language) {
+                        var translate_dom = '<p class="translate_wrapper"><img src="imgs/uk_flag.png"><span>Translate to English</span></p>';
+                        if (language === "en") {
+                            translate_dom = ""
+                        }
+                        if (type === "vercoms") {
+                            var fake_terms = " fake , lies , fake , wrong , lie , confirm , where , location , lying , false , incorrect , misleading , propaganda , liar , mensonges , faux , errone , mensonge , confirme , lieu , mentir , faux , inexact , trompeur , propagande , menteur , mentiras , falso , incorrecto , mentira , confirmado , donde , lugar , mitiendo , falso , incorrecto , enganoso , propaganda , mentiroso , l?gen , falsch , l?ge , best?tigt , wo , ort , l?gend , fehlerhaft , unrichtig , irref?hrend , l?gner , \u03C8\u03AD\u03BC\u03B1\u03C4\u03B1 , \u03C8\u03B5\u03CD\u03C4\u03B9\u03BA\u03BF , \u03BB\u03AC\u03B8\u03BF\u03C2 , \u03C8\u03AD\u03BC\u03B1 , \u03B5\u03C0\u03B9\u03B2\u03B5\u03B2\u03B1\u03B9\u03CE\u03BD\u03C9 , \u03C0\u03BF\u03C5 , \u03C4\u03BF\u03C0\u03BF\u03B8\u03B5\u03C3\u03AF\u03B1 , \u03C8\u03B5\u03C5\u03B4\u03AE\u03C2 , \u03B5\u03C3\u03C6\u03B1\u03BB\u03BC\u03AD\u03BD\u03BF , \u03BB\u03B1\u03BD\u03B8\u03B1\u03C3\u03BC\u03AD\u03BD\u03BF , \u03C0\u03B1\u03C1\u03B1\u03C0\u03BB\u03B1\u03BD\u03B7\u03C4\u03B9\u03BA\u03CC , \u03C0\u03C1\u03BF\u03C0\u03B1\u03B3\u03AC\u03BD\u03B4\u03B1 , \u03C8\u03B5\u03CD\u03C4\u03B7\u03C2 , \u0623\u0643\u0627\u0630\u064A\u0628 , \u0623\u0643\u0627\u0630\u064A\u0628 , \u063A\u0644\u0637\u0627\u0646 , \u0623\u0643\u0630\u0648\u0628\u0629\u060C \u0643\u0630\u0628 , \u0645\u0624\u0643\u062F , \u0623\u064A\u0646 , \u0645\u0643\u0627\u0646 , \u0643\u0630\u0628 , \u062E\u0627\u0637\u0626 , \u063A\u064A\u0631 \u0635\u062D\u064A\u062D , \u0645\u0636\u0644\u0644 , \u062F\u0639\u0627\u064A\u0629 , \u0643\u0627\u0630\u0628 , \u062F\u0631\u0648\u063A , \u062C\u0639\u0644\u06CC , \u0627\u0634\u062A\u0628\u0627\u0647 , \u062F\u0631\u0648\u063A , \u062A\u0623\u064A\u064A\u062F \u0634\u062F\u0647 , \u0643\u062C\u0627 , \u0645\u062D\u0644\u060C \u0645\u0643\u0627\u0646 , \u062F\u0631\u0648\u063A \u06AF\u0648 , \u063A\u0644\u0637\u060C \u0627\u0634\u062A\u0628\u0627\u0647\u060C \u062F\u0631\u0648\u063A\u06CC\u0646 , \u063A\u0644\u0637\u060C \u0627\u0634\u062A\u0628\u0627\u0647 , \u06AF\u0645\u0631\u0627\u0647 \u200C \u0643\u0646\u0646\u062F\u0647 , \u062A\u0628\u0644\u06CC\u063A\u0627\u062A \u0633\u06CC\u0627\u0633\u06CC\u060C \u067E\u0631\u0648\u067E\u0627\u06AF\u0627\u0646\u062F\u0627 , \u06A9\u0630\u0627\u0628".split(',');
+                            var term;
+                            var pattern;
+                            for (var i = 0; i < fake_terms.length; i++) {
+                                term = fake_terms[i].trim().replace(/(\s+)/, "(<[^>]+>)*$1(<[^>]+>)*");
+                                if (arabic.test(src_str)) {
+                                    pattern = new RegExp("(" + fake_terms[i].trim() + ")", "gi");
+                                }
+                                else {
+                                    pattern = new RegExp("(\\b" + fake_terms[i].trim() + "\\b)", "gi");
+                                }
 
-}
+                                src_str = src_str.replace(pattern, "<span class='highlight'>$1</span>");
+                                src_str = src_str.replace(/(<mark>[^<>]*)((<[^>]+>)+)([^<>]*<\/mark>)/, "$1</span>$2<span>$4");
+                            }
+                        }
+                        if (type === "linkcoms") {
+                            src_str = linkify(src_str);
+                        }
+
+                        if (($('.table_title').eq(0).text() === "TWEET") || ($('.table_title').eq(1).text() === "CHANNEL")) {
+                            if (arabic.test(src_str)) {
+                                $tiles_comments.append('<div class="ca-item verified" ><div class="ca-item-main" style="background-color: ' + color + '"><span style="direction:rtl;text-align: right" class="value">' + src_str + '</span>' + translate_dom + '<p class="user_comment"><span style="font-weight: normal;font-size: 12px">by  </span><a href="' + json_inner.comments[c].authorURL + '" target="_blank">' + json_inner.comments[c].authorDisplayName + '</a></p><p class="time_comment">' + json_inner.comments[c].publishedAt + '</p></div></div>');
+                            }
+                            else {
+                                $tiles_comments.append('<div class="ca-item verified" ><div class="ca-item-main" style="background-color: ' + color + '"><span class="value">' + src_str + '</span>' + translate_dom + '<p class="user_comment"><span style="font-weight: normal;font-size: 12px">by  </span><a href="' + json_inner.comments[c].authorURL + '" target="_blank">' + json_inner.comments[c].authorDisplayName + '</a></p><p class="time_comment">' + json_inner.comments[c].publishedAt + '</p></div></div>');
+                            }
+                        }
+                        else {
+                            if (arabic.test(src_str)) {
+                                $tiles_comments.append('<div class="ca-item verified" ><div class="ca-item-main" style="background-color: ' + color + '"><span style="direction:rtl;text-align: right" class="value">' + src_str + '</span>' + translate_dom + '<p class="time_comment">' + json_inner.comments[c].publishedAt + '</p></div></div>');
+                            }
+                            else {
+                                $tiles_comments.append('<div class="ca-item verified" ><div class="ca-item-main" style="background-color: ' + color + '"><span class="value">' + src_str + '</span>' + translate_dom + '<p class="time_comment">' + json_inner.comments[c].publishedAt + '</p></div></div>');
+                            }
+                        }
+
+                    });
+                }
+                if (json_inner.pagination.total_comments > page * 10) {
+                    $('.more').show();
+                }
+                else {
+                    $('.more').hide();
+                }
+                var options_comments = {
+                    autoResize: true,
+                    container: $tiles_comments,
+                    offset: 15,
+                    itemWidth: 330,
+                    outerOffset: 0
+                };
+                setTimeout(function () {
+                    $tiles_comments.find('.ca-item').wookmark(options_comments);
+                }, 10);
+            },
+            error: function (e) {
+            },
+            async: true
+        });
+    }
+
+});
+
+
 var weather_json;
 function get_weather() {
     if (!($('#weather_btn').hasClass("disable_btn"))) {
@@ -2699,7 +2842,6 @@ var keywordand = [];
 $('#search_but').click(function () {
     keywordand = [];
     keywordor = [];
-    $('#loading').show();
     $('#comments_table').slideUp(800, function () {
     });
 
@@ -2748,34 +2890,231 @@ $('#search_but').click(function () {
         }
     });
 
-
     $('#comments_info').empty().height(0);
-    $('.more,.controls,.more_search').hide();
-    if ($('.table_title').eq(0).text() === "TWEET") {
-        comments_search("-", keywordand.join(','), keywordor.join(','));
-    }
-    else if ($('.table_title').eq(1).text() === "CHANNEL") {
-        comments_search("-", keywordand.join(','), keywordor.join(','));
+    $('.more,.controls,.more_search,#none_comments').hide();
+    comments_search_all(keywordand.join(','), keywordor.join(','))
+});
+
+function comments_search_all(keywordand, keywordor) {
+    if (($('.table_title').eq(0).text() === "IMAGE")) {
+        $.ajax({
+            type: 'GET',
+            url: 'https://caa.iti.gr/caa/api/v4/images/reports/' + $('#all').attr('data-id') + '/freetextcomments?keywordsor=' + keywordor + '&keywordsand=' + keywordand + "&ncomments=10&page=1",
+            dataType: 'json',
+            success: function (json_inner) {
+                var $tiles_comments = $('#comments_info');
+                for (var c = 0; c < json_inner.comments.length; c++) {
+                    var src_str = json_inner.comments[c].textDisplay;
+                    guessLanguage.detect(src_str, function (language) {
+                        var translate_dom = '<p class="translate_wrapper"><img src="imgs/uk_flag.png"><span>Translate to English</span></p>';
+                        if (language === "en") {
+                            translate_dom = ""
+                        }
+
+                        if (($('.table_title').eq(0).text() === "TWEET") || ($('.table_title').eq(1).text() === "CHANNEL")) {
+                            if (arabic.test(src_str)) {
+                                $tiles_comments.append('<div class="ca-item verified" ><div class="ca-item-main" style="background-color: #95B8D1"><span style="direction:rtl;text-align: right" class="value">' + src_str + '</span>' + translate_dom + '<p class="user_comment"><span style="font-weight: normal;font-size: 12px">by  </span><a href="' + json_inner.comments[c].authorURL + '" target="_blank">' + json_inner.comments[c].authorDisplayName + '</a></p><p class="time_comment">' + json_inner.comments[c].publishedAt + '</p></div></div>');
+                            }
+                            else {
+                                $tiles_comments.append('<div class="ca-item verified" ><div class="ca-item-main" style="background-color: #95B8D1"><span class="value">' + src_str + '</span>' + translate_dom + '<p class="user_comment"><span style="font-weight: normal;font-size: 12px">by  </span><a href="' + json_inner.comments[c].authorURL + '" target="_blank">' + json_inner.comments[c].authorDisplayName + '</a></p><p class="time_comment">' + json_inner.comments[c].publishedAt + '</p></div></div>');
+                            }
+                        }
+                        else {
+                            if (arabic.test(src_str)) {
+                                $tiles_comments.append('<div class="ca-item verified" ><div class="ca-item-main" style="background-color: #95B8D1"><span style="direction:rtl;text-align: right" class="value">' + src_str + '</span>' + translate_dom + '<p class="time_comment">' + json_inner.comments[c].publishedAt + '</p></div></div>');
+                            }
+                            else {
+                                $tiles_comments.append('<div class="ca-item verified" ><div class="ca-item-main" style="background-color: #95B8D1"><span class="value">' + src_str + '</span>' + translate_dom + '<p class="time_comment">' + json_inner.comments[c].publishedAt + '</p></div></div>');
+                            }
+                        }
+
+                    });
+                }
+                if (json_inner.comments.length === 0) {
+                    $('#none_comments').text("No comments matching criteria").show();
+                    $('#comments_info').css('height', 0);
+                }
+                if (json_inner.pagination.total_comments > 10) {
+                    $('.more_search').attr('data-url', json_inner.pagination.next).show();
+                }
+                var options_comments = {
+                    autoResize: true,
+                    container: $tiles_comments,
+                    offset: 15,
+                    itemWidth: 330,
+                    outerOffset: 0
+                };
+                setTimeout(function () {
+                    $tiles_comments.find('.ca-item').wookmark(options_comments);
+                }, 10);
+            },
+            error: function (e) {
+            },
+            async: true
+        });
     }
     else {
-        comments_search("facebook", keywordand.join(','), keywordor.join(','));
+        $.ajax({
+            type: 'GET',
+            url: 'https://caa.iti.gr/caa/api/v4/videos/reports/' + $('#all').attr('data-id') + '/freetextcomments?keywordsor=' + keywordor + '&keywordsand=' + keywordand + "&ncomments=10&page=1",
+            dataType: 'json',
+            success: function (json_inner) {
+                var $tiles_comments = $('#comments_info');
+                for (var c = 0; c < json_inner.comments.length; c++) {
+                    var src_str = json_inner.comments[c].textDisplay;
+                    guessLanguage.detect(src_str, function (language) {
+                        var translate_dom = '<p class="translate_wrapper"><img src="imgs/uk_flag.png"><span>Translate to English</span></p>';
+                        if (language === "en") {
+                            translate_dom = ""
+                        }
+
+                        if (($('.table_title').eq(0).text() === "TWEET") || ($('.table_title').eq(1).text() === "CHANNEL")) {
+                            if (arabic.test(src_str)) {
+                                $tiles_comments.append('<div class="ca-item verified" ><div class="ca-item-main" style="background-color: #95B8D1"><span style="direction:rtl;text-align: right" class="value">' + src_str + '</span>' + translate_dom + '<p class="user_comment"><span style="font-weight: normal;font-size: 12px">by  </span><a href="' + json_inner.comments[c].authorURL + '" target="_blank">' + json_inner.comments[c].authorDisplayName + '</a></p><p class="time_comment">' + json_inner.comments[c].publishedAt + '</p></div></div>');
+                            }
+                            else {
+                                $tiles_comments.append('<div class="ca-item verified" ><div class="ca-item-main" style="background-color: #95B8D1"><span class="value">' + src_str + '</span>' + translate_dom + '<p class="user_comment"><span style="font-weight: normal;font-size: 12px">by  </span><a href="' + json_inner.comments[c].authorURL + '" target="_blank">' + json_inner.comments[c].authorDisplayName + '</a></p><p class="time_comment">' + json_inner.comments[c].publishedAt + '</p></div></div>');
+                            }
+                        }
+                        else {
+                            if (arabic.test(src_str)) {
+                                $tiles_comments.append('<div class="ca-item verified" ><div class="ca-item-main" style="background-color: #95B8D1"><span style="direction:rtl;text-align: right" class="value">' + src_str + '</span>' + translate_dom + '<p class="time_comment">' + json_inner.comments[c].publishedAt + '</p></div></div>');
+                            }
+                            else {
+                                $tiles_comments.append('<div class="ca-item verified" ><div class="ca-item-main" style="background-color: #95B8D1"><span class="value">' + src_str + '</span>' + translate_dom + '<p class="time_comment">' + json_inner.comments[c].publishedAt + '</p></div></div>');
+                            }
+                        }
+
+                    });
+                }
+                if (json_inner.comments.length === 0) {
+                    $('#none_comments').text("No comments matching criteria").show();
+                    $('#comments_info').css('height', 0);
+                }
+                if (json_inner.pagination.total_comments > 10) {
+                    $('.more_search').attr('data-url', json_inner.pagination.next).show();
+                }
+                var options_comments = {
+                    autoResize: true,
+                    container: $tiles_comments,
+                    offset: 15,
+                    itemWidth: 330,
+                    outerOffset: 0
+                };
+                setTimeout(function () {
+                    $tiles_comments.find('.ca-item').wookmark(options_comments);
+                }, 10);
+            },
+            error: function (e) {
+            },
+            async: true
+        });
     }
-});
+
+}
+$('.more_search').click(function () {
+    $.ajax({
+        type: 'GET',
+        url: 'https://caa.iti.gr' + $(this).attr('data-url'),
+        dataType: 'json',
+        success: function (json_inner) {
+            var $tiles_comments = $('#comments_info');
+            for (var c = 0; c < json_inner.comments.length; c++) {
+                var src_str = json_inner.comments[c].textDisplay;
+                guessLanguage.detect(src_str, function (language) {
+                    var translate_dom = '<p class="translate_wrapper"><img src="imgs/uk_flag.png"><span>Translate to English</span></p>';
+                    if (language === "en") {
+                        translate_dom = ""
+                    }
+
+                    if (($('.table_title').eq(0).text() === "TWEET") || ($('.table_title').eq(1).text() === "CHANNEL")) {
+                        if (arabic.test(src_str)) {
+                            $tiles_comments.append('<div class="ca-item verified" ><div class="ca-item-main" style="background-color: #95B8D1"><span style="direction:rtl;text-align: right" class="value">' + src_str + '</span>' + translate_dom + '<p class="user_comment"><span style="font-weight: normal;font-size: 12px">by  </span><a href="' + json_inner.comments[c].authorURL + '" target="_blank">' + json_inner.comments[c].authorDisplayName + '</a></p><p class="time_comment">' + json_inner.comments[c].publishedAt + '</p></div></div>');
+                        }
+                        else {
+                            $tiles_comments.append('<div class="ca-item verified" ><div class="ca-item-main" style="background-color: #95B8D1"><span class="value">' + src_str + '</span>' + translate_dom + '<p class="user_comment"><span style="font-weight: normal;font-size: 12px">by  </span><a href="' + json_inner.comments[c].authorURL + '" target="_blank">' + json_inner.comments[c].authorDisplayName + '</a></p><p class="time_comment">' + json_inner.comments[c].publishedAt + '</p></div></div>');
+                        }
+                    }
+                    else {
+                        if (arabic.test(src_str)) {
+                            $tiles_comments.append('<div class="ca-item verified" ><div class="ca-item-main" style="background-color: #95B8D1"><span style="direction:rtl;text-align: right" class="value">' + src_str + '</span>' + translate_dom + '<p class="time_comment">' + json_inner.comments[c].publishedAt + '</p></div></div>');
+                        }
+                        else {
+                            $tiles_comments.append('<div class="ca-item verified" ><div class="ca-item-main" style="background-color: #95B8D1"><span class="value">' + src_str + '</span>' + translate_dom + '<p class="time_comment">' + json_inner.comments[c].publishedAt + '</p></div></div>');
+                        }
+                    }
+
+                });
+            }
+            if (json_inner.comments.length < 10) {
+                $('.more_search').hide();
+            }
+            else {
+                $('.more_search').attr('data-url', json_inner.pagination.next).show();
+            }
+
+            var options_comments = {
+                autoResize: true,
+                container: $tiles_comments,
+                offset: 15,
+                itemWidth: 330,
+                outerOffset: 0
+            };
+            setTimeout(function () {
+                $tiles_comments.find('.ca-item').wookmark(options_comments);
+            }, 10);
+        },
+        error: function (e) {
+        },
+        async: true
+    });
+})
 $(".output_expr").on("click", ".clear_search", function () {
     $('#comments_info').empty();
     $('.controls').show();
     $('#comments_table').slideUp(800);
-    $('.output_expr,#zero_comments,.more_search').hide();
-    if ($('.table_title').eq(0).text() === "TWEET") {
-        replies();
-    }
-    else if ($('.table_title').eq(1).text() === "CHANNEL") {
-        comments("-");
-    }
-    else {
-        comments("facebook");
-    }
+    $('.output_expr,#zero_comments,.more_search,#none_comments').hide();
+    $('.filter.active').removeClass('active').click();
 });
+//translate_wrapper_table
+$("#container").on("click", ".translate_wrapper_table", function () {
+    $this = $(this);
+    $.ajax({
+        type: 'GET',
+        url: 'https://www.googleapis.com/language/translate/v2?target=en&key=AIzaSyClIXyzpHO3vM3WETnKFK_IKiWZcZJBL8I&q=' + encodeURI($(this).siblings('span').text()) + '',
+        dataType: 'json',
+        success: function (json) {
+            $this.siblings('span').text(json.data.translations[0].translatedText);
+            $this.remove();
+        },
+        async: true
+    });
+});
+$("#comments_info").on("click", ".translate_wrapper", function () {
+    $this = $(this);
+    $.ajax({
+        type: 'GET',
+        url: 'https://www.googleapis.com/language/translate/v2?target=en&key=AIzaSyClIXyzpHO3vM3WETnKFK_IKiWZcZJBL8I&q=' + encodeURI($(this).siblings('.value').text().replace(/#/g, '').replace(/&/g, '')) + '',
+        dataType: 'json',
+        success: function (json) {
+            $this.siblings('.value').text(json.data.translations[0].translatedText);
+            $this.remove();
+            var $tiles_comments = $('#comments_info');
+            var options_comments = {
+                autoResize: true,
+                container: $tiles_comments,
+                offset: 15,
+                itemWidth: 330,
+                outerOffset: 0
+            };
+            setTimeout(function () {
+                $tiles_comments.find('.ca-item').wookmark(options_comments);
+            }, 10);
+        },
+        async: true
+    });
+});
+//
 $('.details').click(function () {
     if ($(this).text() === "Less Details") {
 
@@ -2787,6 +3126,9 @@ $('.details').click(function () {
         }
         else if ($(this).hasClass('video_fb')) {
             $('#video_fb_table_more').hide();
+        }
+        else if ($(this).hasClass('image_fb')) {
+            $('#image_fb_table_more').hide();
         }
         else if ($(this).hasClass('video_tw')) {
             $('#tweet_tw_table_more').hide();
@@ -2807,6 +3149,9 @@ $('.details').click(function () {
         else if ($(this).hasClass('video_fb')) {
             $('#video_fb_table_more').show();
         }
+        else if ($(this).hasClass('image_fb')) {
+            $('#image_fb_table_more').show();
+        }
         else if ($(this).hasClass('video_tw')) {
             $('#tweet_tw_table_more').show();
         }
@@ -2816,21 +3161,21 @@ $('.details').click(function () {
     }
 });
 var xhrPool_tw = [];
-var xhrPool_get = [];
+var xhrPool_jobs = [];
 $(document).ajaxSend(function (e, jqXHR, options) {
-    if (options.url.indexOf('get_twverificationV3') > -1) {
+    if (options.url.indexOf('tweets') > -1) {
         xhrPool_tw.push(jqXHR);
-    } else if (options.url.indexOf('get_verificationV3') > -1) {
-        xhrPool_get.push(jqXHR);
+    } else if (options.url.indexOf('jobs') > -1) {
+        xhrPool_jobs.push(jqXHR);
     }
 });
 $(document).ajaxComplete(function (e, jqXHR, options) {
-    if (options.url.indexOf('get_twverificationV3') > -1) {
+    if (options.url.indexOf('tweets') > -1) {
         xhrPool_tw = $.grep(xhrPool_tw, function (x) {
             return x != jqXHR
         });
-    } else if (options.url.indexOf('get_verificationV3') > -1) {
-        xhrPool_get = $.grep(xhrPool_get, function (x) {
+    } else if (options.url.indexOf('jobs') > -1) {
+        xhrPool_jobs = $.grep(xhrPool_jobs, function (x) {
             return x != jqXHR
         });
     }
@@ -2841,8 +3186,26 @@ var abort_tw = function () {
         jqXHR.abort();
     });
 };
-var abort_get = function () {
-    $.each(xhrPool_get, function (idx, jqXHR) {
+var abort_jobs = function () {
+    $.each(xhrPool_jobs, function (idx, jqXHR) {
         jqXHR.abort();
     });
 };
+
+function linkify(inputText) {
+    var replacedText, replacePattern1, replacePattern2, replacePattern3;
+
+    //URLs starting with http://, https://, or ftp://
+    replacePattern1 = /(\b(https?|ftp):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/gim;
+    replacedText = inputText.replace(replacePattern1, '<a href="$1" target="_blank">$1</a>');
+
+    //URLs starting with "www." (without // before it, or it'd re-link the ones done above).
+    replacePattern2 = /(^|[^\/])(www\.[\S]+(\b|$))/gim;
+    replacedText = replacedText.replace(replacePattern2, '$1<a href="http://$2" target="_blank">$2</a>');
+
+    //Change email addresses to mailto:: links.
+    replacePattern3 = /(([a-zA-Z0-9\-\_\.])+@[a-zA-Z\_]+?(\.[a-zA-Z]{2,6})+)/gim;
+    replacedText = replacedText.replace(replacePattern3, '<a href="mailto:$1">$1</a>');
+
+    return replacedText;
+}

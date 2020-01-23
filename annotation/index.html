@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>CAA annotation</title>
+    <meta charset="utf-8">
+    <meta name="description"
+          content="CAA annotation">
+    <meta name="robots" content="index, follow"/>
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="author" content="laaposto">
+    <link rel="shortcut icon" href="imgs/favicon.ico">
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans|Roboto"
+          rel="stylesheet" type="text/css">
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="css/main.css">
+    <!--END CSS -->
+
+</head>
+<body>
+<div id="search_container">
+    <div id="line">
+        <div id="search_wrapper">
+            <input id="search_input" placeholder="Email">
+        </div>
+        <button id="search_but"><img src="imgs/search-16-black.png"></button>
+        <label class="form-checkbox-label">
+            <input name="verification_label" class="form-checkbox-field" type="radio" value="H">
+            <i class="form-checkbox-button"></i>
+            <span>Home</span>
+        </label>
+        <label class="form-checkbox-label">
+            <input name="verification_label" class="form-checkbox-field" type="radio" value="C">
+            <i class="form-checkbox-button"></i>
+            <span>Course</span>
+        </label>
+        <label class="form-checkbox-label">
+            <input name="verification_label" class="form-checkbox-field" type="radio" value="AC">
+            <i class="form-checkbox-button"></i>
+            <span>After Course</span>
+        </label>
+    </div>
+</div>
+<div id="results_container">
+    <img src="imgs/main_bg.png" id="placeholder_img" alt="placeholder">
+    <p id="desc">Provide your email and get relevant videos fot annotation....</p>
+    <div id="results_wrapper">
+        <div class="title-header">
+            <h1>Results</h1>
+        </div>
+        <ul class="tiles" id="video_examples">
+
+        </ul>
+    </div>
+</div>
+<!-- JS -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script src="js/jquery.wookmark.js"></script>
+<script src="js/main.js"></script>
+<!-- END JS -->
+
+</body>
+</html>

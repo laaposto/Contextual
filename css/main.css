@@ -109,11 +109,14 @@ body, html {
 }
 
 .input_title {
-    width: 876px;
-    text-align: left;
     font-family: 'Bitter', sans-serif;
     font-weight: bold;
     margin: 0 auto -23px;
+    z-index: 1;
+    position: relative;
+    display: inline-block;
+    width: 50%;
+    text-align: left;
 }
 
 .input_box {
@@ -250,7 +253,7 @@ ul li {
 }
 
 .controls .active {
-    background-color: #AF0E09;
+    background-color: #4381C1;
 }
 
 .more div, .more_search div {
@@ -282,7 +285,7 @@ ul li {
 
 .filter {
     color: #fff;
-    background-color: #8693AB;
+    background-color: #424B54;
     letter-spacing: .5px;
     -webkit-transition: .2s ease-out;
     -moz-transition: .2s ease-out;
@@ -298,7 +301,7 @@ ul li {
 }
 
 .filter:hover {
-    background-color: #AF0E09;
+    background-color: #4381C1;
     box-shadow: 0 5px 11px 0 rgba(0, 0, 0, 0.18), 0 4px 15px 0 rgba(0, 0, 0, 0.15);
 }
 
@@ -317,6 +320,13 @@ ul li {
 
 .link a {
     color: #AF0E09;
+}
+
+.locations_link a {
+    text-decoration: underline;
+    color: #AF0E09;
+    font-weight: bold;
+    cursor: pointer;
 }
 
 .google {
@@ -487,15 +497,20 @@ iframe {
     box-sizing: border-box;
 }
 
-#cover, #cover_info, #cover_timeline {
+#cover, #cover_info, #cover_timeline, #cover_metadata, #cover_comments, #cover_thumbs {
     width: 100%;
     height: 100%;
     position: absolute;
     background-color: rgba(10, 10, 10, 0.6);
-    z-index: 1;
+    z-index: 2;
     top: 0;
     display: none;
     min-height: 250px;
+}
+
+#cover_comments {
+    min-height: inherit;
+    height: 122px;
 }
 
 .container_loading {
@@ -571,6 +586,10 @@ iframe {
     margin-left: -128px;
 }
 
+.metadata_tab, .comments_tab, .thumbs_tab {
+    position: relative;
+}
+
 #loading_timeline .circle {
     margin-left: 87px;
 }
@@ -619,7 +638,14 @@ iframe {
     font-size: 12px;
 }
 
-.powered a {
+.powered_loc {
+    position: relative;
+    margin: 0 -8px 0 0;
+    padding-bottom: 5px;
+    font-size: 12px;
+}
+
+.powered a, .powered_loc a {
     color: #777;
     font-weight: bold;
 }
@@ -732,7 +758,7 @@ iframe {
 
 .comments_but {
     color: #fff;
-    background-color: #8693AB;
+    background-color: #424B54;
     letter-spacing: .5px;
     -webkit-transition: .2s ease-out;
     -moz-transition: .2s ease-out;
@@ -748,7 +774,7 @@ iframe {
 }
 
 .comments_but:hover {
-    background-color: #AF0E09;
+    background-color: #4381C1;
     box-shadow: 0 5px 11px 0 rgba(0, 0, 0, 0.18), 0 4px 15px 0 rgba(0, 0, 0, 0.15);
 }
 
@@ -1106,7 +1132,7 @@ iframe {
 
 .time_comment {
     margin: 0;
-    width: 135px;
+    width: 151px;
     display: inline-block;
     background-color: #8693AB;
     font-size: 13px;
@@ -1117,7 +1143,7 @@ iframe {
 
 .user_comment {
     display: inline-block;
-    width: 190px;
+    width: 174px;
     text-align: left;
     font-size: 13px;
     font-weight: bold;
@@ -1187,7 +1213,7 @@ iframe {
     bottom: 10px;
     right: 20px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
-    background: #40798C url(https://codyhouse.co/demo/back-to-top/img/cd-top-arrow.svg) no-repeat center 50%;
+    background: #40798C url("../imgs/cd-top-arrow.svg") no-repeat center 50%;
 }
 
 #imgtab, #imgtab2 {
@@ -1244,11 +1270,11 @@ iframe {
     display: none;
 }
 
-#video_yt_table, #video_fb_table, #tweet_tw_table, #channel_yt_table, #user_fb_table, #user_tw_table, #video_yt_table_more, #channel_yt_table_more, .video_yt, .channel_yt, #video_fb_table_more, .video_fb, #tweet_tw_table_more, .video_tw, #user_tw_table_more, .user_tw {
+#video_yt_table, #video_fb_table, #image_fb_table, #tweet_tw_table, #channel_yt_table, #user_fb_table, #user_tw_table, #video_yt_table_more, #channel_yt_table_more, .video_yt, .channel_yt, #video_fb_table_more, #image_fb_table_more, .video_fb, .image_fb, #tweet_tw_table_more, .video_tw, #user_tw_table_more, .user_tw {
     display: none;
 }
 
-#video_yt_table_more, #video_fb_table_more, #tweet_tw_table_more, #channel_yt_table_more, #user_tw_table_more {
+#video_yt_table_more, #video_fb_table_more, #image_fb_table_more, #tweet_tw_table_more, #channel_yt_table_more, #user_tw_table_more {
     border-top: 1px solid #888;
 }
 
@@ -1342,9 +1368,10 @@ iframe {
 }
 
 .checkbox_wrapper {
-    width: 960px;
     text-align: right;
     margin: 0 auto;
+    display: inline-block;
+    width: 49%;
 }
 
 #forecast ul li span {
@@ -1401,7 +1428,7 @@ iframe {
     font-style: italic;
 }
 
-#alert_twitter, #alert_twitter_user {
+#alert_twitter, #alert_twitter_user, #alert_twitter_500 {
     margin-bottom: 10px;
     max-width: 500px;
 }
@@ -1437,7 +1464,7 @@ iframe {
 }
 
 .sticky_tab {
-    display: block;
+    display: none;
     position: fixed;
     margin: 0 auto;
     width: 100%;
@@ -1552,7 +1579,7 @@ iframe {
     color: #D63230;
 }
 
-#zero_comments {
+#zero_comments, #none_comments {
     text-align: center;
     font-size: 22px;
     display: none;
@@ -1578,11 +1605,13 @@ iframe {
     cursor: pointer;
     display: none;
 }
-#fb_but,#fb_desc,#fb_but_2{
+
+#fb_but, #fb_desc, #fb_but_2,#checkbox_error {
     display: none;
     text-align: center;
 }
-#fb_desc{
+
+#fb_desc,#checkbox_error {
     padding: 15px;
     border: 1px solid #bce8f1;
     border-radius: 4px;
@@ -1592,4 +1621,212 @@ iframe {
     max-width: 470px;
     margin: -10px auto 15px;
     text-align: left;
+}
+
+
+#all:before {
+    position: absolute;
+    /*background: linear-gradient(to right, #95B8D1 0, #95B8D1 33%, #9593D9 33%, #9593D9 66%, #8AA399 66%, #8AA399 100%);*/
+    background: #95B8D1;
+    height: 6px;
+    content: '';
+    bottom: 0;
+    right: 0;
+    left: 0;
+}
+
+#all {
+    padding-bottom: 6px;
+    position: relative;
+}
+
+/*
+#cover_timeline, #loading_timeline {
+    display: none !important;
+}*/
+
+#container > div:nth-child(2) {
+    margin-bottom: 100px;
+}
+
+.translate_wrapper {
+    margin: 0;
+    font-size: 14px;
+    text-align: right;
+    cursor: pointer;
+    border-top: 1px solid #ddd;
+}
+
+.translate_wrapper img {
+    width: 20px;
+    margin-right: 10px;
+    vertical-align: bottom;
+    position: relative;
+    top: 1px;
+}
+
+.translate_wrapper span {
+    position: relative;
+    top: -3px;
+    font-style: italic;
+    font-size: 13px;
+}
+
+.translate_wrapper_table img {
+    width: 20px;
+    vertical-align: bottom;
+    position: relative;
+    top: 1px;
+    margin: 0 5px 0 5px;
+}
+
+.translate_wrapper_table {
+    margin: 0;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.translate_wrapper_table span {
+    position: relative;
+    top: -5px;
+    font-style: italic;
+    font-size: 13px;
+}
+
+#analysis_info {
+    margin: 10px auto;
+}
+
+.form-checkbox-inline .form-checkbox-label,
+.form-radio-inline .form-radio-label {
+    display: inline-block;
+    margin-right: 1rem;
+    margin-top: 10px;
+}
+
+.form-checkbox-legend,
+.form-radio-legend {
+    margin: 0 0 0.125rem 0;
+    font-weight: 500;
+    font-size: 1rem;
+    color: #333;
+}
+
+.form-checkbox-label,
+.form-radio-label {
+    position: relative;
+    cursor: pointer;
+    padding-left: 1.5rem;
+    text-align: left;
+    color: #333;
+    display: block;
+    margin-bottom: 0.5rem;
+}
+
+.form-checkbox-label:hover i,
+.form-radio-label:hover i {
+    color: #AF0E09;
+}
+
+.form-checkbox-label span,
+.form-radio-label span {
+    display: block;
+    font-weight: bold;
+    margin-top: 7px;
+}
+
+.form-checkbox-label input,
+.form-radio-label input {
+    width: auto;
+    opacity: 0.0001;
+    position: absolute;
+    left: 0.25rem;
+    top: 0.25rem;
+    margin: 0;
+    padding: 0;
+}
+
+.form-checkbox-button {
+    position: absolute;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    display: block;
+    color: #999;
+    left: 0;
+    top: 0.25rem;
+    width: 1rem;
+    height: 1rem;
+    z-index: 0;
+    border: 0.125rem solid currentColor;
+    border-radius: 0.0625rem;
+    transition: color 0.28s ease;
+    will-change: color;
+}
+
+.form-checkbox-button::before,
+.form-checkbox-button::after {
+    position: absolute;
+    height: 0;
+    width: 0.2rem;
+    background-color: #AF0E09;
+    display: block;
+    transform-origin: left top;
+    border-radius: 0.25rem;
+    content: "";
+    transition: opacity 0.28s ease, height 0s linear 0.28s;
+    opacity: 0;
+    will-change: opacity, height;
+}
+
+.form-checkbox-button::before {
+    top: 0.65rem;
+    left: 0.38rem;
+    transform: rotate(-135deg);
+    box-shadow: 0 0 0 0.0625rem #fff;
+}
+
+.form-checkbox-button::after {
+    top: 0.3rem;
+    left: 0;
+    transform: rotate(-45deg);
+}
+
+.form-checkbox-field:checked ~ .form-checkbox-button {
+    color: #AF0E09;
+}
+
+.form-checkbox-field:checked ~ .form-checkbox-button::after,
+.form-checkbox-field:checked ~ .form-checkbox-button::before {
+    opacity: 1;
+    transition: height 0.28s ease;
+}
+
+.form-checkbox-field:checked ~ .form-checkbox-button::after {
+    height: 0.5rem;
+}
+
+.form-checkbox-field:checked ~ .form-checkbox-button::before {
+    height: 1.2rem;
+    transition-delay: 0.28s;
+}
+
+.form-radio-button {
+    position: absolute;
+    left: 0;
+    cursor: pointer;
+    display: block;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    color: #999;
+}
+
+.input_wrapper {
+    width: 921px;
+    margin: 0 auto;
+    position: relative;
+    left: 20px;
 }

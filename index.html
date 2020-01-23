@@ -53,17 +53,36 @@
                 if (response.status === 'connected') {
                     var iframe_url = "https://www.facebook.com/v2.3/plugins/video.php?allowfullscreen=true&autoplay=false&container_width=360&height=305&href=" + video_verify + "&locale=en_US&sdk=joey";
                     $('#iframe').attr('src', iframe_url);
-                    $('.twitter_p').remove();
                     $('.table_title').eq(1).text("USER");
                     fb_access_token = response.authResponse.accessToken;
-                    start_video_calls_facebook();
+                    start_video_calls_facebook("video");
                 } else if (response.status === 'not_authorized') {
                     $('#analysis_fb').slideDown();
                     $('#fb_but_2').show();
                     $('#loading_all,#cover,#cover_info,#loading_info,#cover_timeline,#loading_timeline,.controls,.table,.table_title,#weather_input,.comments_search').remove();
                 } else {
+                    $('#analysis_fb').slideDown();
+                    $('#fb_but_2').show();
+                    $('#loading_all,#cover,#cover_info,#loading_info,#cover_timeline,#loading_timeline,.controls,.table,.table_title,#weather_input,.comments_search').remove();
                 }
 
+            }
+            else if (source === "image") {
+                if (response.status === 'connected') {
+                    var iframe_url = "https://www.facebook.com/v2.3/plugins/post.php?container_width=360&height=305&href=" + image_verify + "&show_text=true";
+                    $('#iframe').attr('src', iframe_url);
+                    $('.table_title').eq(1).text("USER");
+                    fb_access_token = response.authResponse.accessToken;
+                    start_video_calls_facebook("image");
+                } else if (response.status === 'not_authorized') {
+                    $('#analysis_fb').slideDown();
+                    $('#fb_but_2').show();
+                    $('#loading_all,#cover,#cover_info,#loading_info,#cover_timeline,#loading_timeline,.controls,.table,.table_title,#weather_input,.comments_search').remove();
+                } else {
+                    $('#analysis_fb').slideDown();
+                    $('#fb_but_2').show();
+                    $('#loading_all,#cover,#cover_info,#loading_info,#cover_timeline,#loading_timeline,.controls,.table,.table_title,#weather_input,.comments_search').remove();
+                }
             }
             else {
                 $('#fb_but,#fb_desc').hide();
@@ -101,27 +120,39 @@
 <div id="wrapper">
     <h1>Context Aggregation and Analysis</h1>
 
-    <p class="desc_title">This is a demo platform aimed to facilitate
-        the verification of UGC video content posted on YouTube, Twitter and Facebook. In
-        contrast to other approaches, which attempt to analyze the videos themselves
-        for traces of forgery, this platform analyzes the video context: The
-        characteristics of the poster, any relevant user comments, the local weather
-        reports at the time of the event, and other contextual pieces of information are
-        aggregated and presented to the user for analysis. To test the service, simply copy and paste a YouTube,
-        Facebook* or Twitter URL into the box, then click &quot;Verify&quot;</p>
+    <p class="desc_title">This is a demo platform aimed to facilitate the verification of UGC image and video content
+        posted on YouTube, Twitter and Facebook. In contrast to other approaches, which attempt to analyze the media
+        items themselves for traces of forgery, this platform analyzes the media context: The characteristics of the
+        poster, any relevant user comments, the local weather reports at the time of the event, and other contextual
+        pieces of information are aggregated and presented to the user for analysis. To test the service, simply copy
+        and paste a YouTube, Facebook* or Twitter URL for videos into the box or a Facebook URL for images, then click
+        &quot;Verify&quot;</p>
 
     <p class="note">*Right click on the Facebook video and copy the video URL</p>
 
     <p class="desc">Contact: <span class="bolded">{olgapapa,papadop}@iti.gr</span></p>
 
+    <div class="input_wrapper">
+        <div class="input_title">
+            <label class="form-checkbox-label">
+                <input class="form-checkbox-field" name="media_id" type="radio" value="video">
+                <i class="form-checkbox-button"></i>
+                <span>{Facebook, Youtube, Twitter} Video</span>
+            </label>
+            <label class="form-checkbox-label">
+                <input class="form-checkbox-field" name="media_id" type="radio" value="image">
+                <i class="form-checkbox-button"></i>
+                <span>{Facebook} Image</span>
+            </label>
+        </div>
+        <div class="checkbox_wrapper">
+            <label class="control control--checkbox">Force Reprocess
+                <input type="checkbox" id="reprocess_check">
 
-    <div class="input_title">Input Video:
+                <div class="control__indicator"></div>
+            </label>
+        </div>
     </div>
-    <div class="checkbox_wrapper"><label class="control control--checkbox">Force Reprocess
-        <input type="checkbox" id="reprocess_check">
-
-        <div class="control__indicator"></div>
-    </label></div>
     <ul class="input_box">
         <li>
             <input id="video_verify" type="text"
@@ -135,6 +166,9 @@
     <p class="back"><a href="index.html">Back to examples</a></p>
 
 </div>
+<div id="checkbox_error" style="margin-top: 20px;">
+    <strong>Info!</strong> You have to select type {image/video} of input
+</div>
 <p class="desc_p">or have a look at some explanatory examples below</p>
 
 <div id="links_wrapper">
@@ -146,6 +180,7 @@
 </div>
 <hr>
 <h3 class="title_example">FACEBOOK EXAMPLES</h3>
+
 <div class="tiles" id="video_examples_facebook">
     <div id="fb_desc">
         <strong>Info!</strong> In order to process Facebook videos you have to login first!
@@ -159,12 +194,12 @@
     <div class="video">
         <img src="imgs/facebook-placeholder.jpg">
         <iframe width="360" height="305" frameborder="0"
-                src="https://www.facebook.com/v2.3/plugins/video.php?allowfullscreen=true&autoplay=false&container_width=360&height=305&href=https://www.facebook.com/Dawahofislamuk/videos/796804540380035/&locale=en_US&sdk=joey">
+                src="https://www.facebook.com/v2.3/plugins/video.php?allowfullscreen=true&autoplay=false&container_width=360&height=305&href=https://www.facebook.com/uniladmag/videos/2293398324016547/&locale=en_US&sdk=joey">
         </iframe>
-        <p class="video_desc">The "Syrian boy" video claiming to depict a heroic act, was actually filmed in a
-            studio.</p>
+        <p class="video_desc">Lion Takes Revenge On Trophy Hunter. Video has been edited by Woolshed Company as part of
+            the viral experiment project.</p>
         <button type="button"
-                onclick="verify_example('https://www.facebook.com/Dawahofislamuk/videos/796804540380035/');return false;"
+                onclick="verify_example('https://www.facebook.com/uniladmag/videos/2293398324016547/');return false;"
                 class="btn btn_small">
             Verify
         </button>
@@ -172,12 +207,12 @@
     <div class="video">
         <img src="imgs/facebook-placeholder.jpg">
         <iframe width="360" height="305" frameborder="0"
-                src="https://www.facebook.com/v2.3/plugins/video.php?allowfullscreen=true&autoplay=false&container_width=360&height=305&href=https://www.facebook.com/uniladmag/videos/2293398324016547/&locale=en_US&sdk=joey">
+                src="https://www.facebook.com/v2.3/plugins/video.php?allowfullscreen=true&autoplay=false&container_width=360&height=305&href=https://www.facebook.com/FerCanalesRadio/videos/1342653159093880/&locale=en_US&sdk=joey">
         </iframe>
-        <p class="video_desc">Lion Takes Revenge On Trophy Hunter. Video has been edited by Woolshed Company as part of
-            the viral experiment project.</p>
+        <p class="video_desc">CCTV Footage claimed to depict the 2016 Brussels Airport explosion. The video is in truth
+            from a 2011 attack in Moscow.</p>
         <button type="button"
-                onclick="verify_example('https://www.facebook.com/uniladmag/videos/2293398324016547/');return false;"
+                onclick="verify_example('https://www.facebook.com/FerCanalesRadio/videos/1342653159093880/');return false;"
                 class="btn btn_small">
             Verify
         </button>
@@ -193,39 +228,6 @@
         <p class="video_desc">Video depicting youths vandalizing a car in a metro station in Brussels. The cry "Allahu
             akhbar" has been digitally added to give the impression that the youth are muslim extremists.</p>
         <button type="button" onclick="verify_example('https://www.youtube.com/watch?v=MsrcqbQeLUA');return false;"
-                class="btn btn_small">
-            Verify
-        </button>
-    </div>
-    <div class="video">
-        <img src="imgs/youtube-placeholder.jpg">
-        <iframe width="360" height="305" frameborder="0" src="https://www.youtube.com/embed/nkQ-ij3LTTM">
-        </iframe>
-        <p class="video_desc">Video claiming to depict a Hezbollah sniper killing ISIS combatants. In truth, this is a
-            gameplay video from the Medal of Honor game.</p>
-        <button type="button" onclick="verify_example('https://www.youtube.com/watch?v=nkQ-ij3LTTM');return false;"
-                class="btn btn_small">
-            Verify
-        </button>
-    </div>
-    <div class="video">
-        <img src="imgs/youtube-placeholder.jpg">
-        <iframe width="360" height="305" frameborder="0" src="https://www.youtube.com/embed/mZes8-tzZ0w">
-        </iframe>
-        <p class="video_desc">CCTV Footage claimed to depict the 2016 Brussels Airport explosion. The video is in truth
-            from a 2011 attack in Moscow.</p>
-        <button type="button" onclick="verify_example('https://www.youtube.com/watch?v=mZes8-tzZ0w');return false;"
-                class="btn btn_small">
-            Verify
-        </button>
-    </div>
-    <div class="video">
-        <img src="imgs/youtube-placeholder.jpg">
-        <iframe width="360" height="305" frameborder="0" src="https://www.youtube.com/embed/mSFf2mzCrTg">
-        </iframe>
-        <p class="video_desc">Another CCTV Footage, also claimed to depict the 2016 Brussels Airport explosion but in
-            truth originating from a 2011 attack in Moscow.</p>
-        <button type="button" onclick="verify_example('https://www.youtube.com/watch?v=mSFf2mzCrTg');return false;"
                 class="btn btn_small">
             Verify
         </button>
@@ -290,13 +292,10 @@
 <h3 class="title_example">TWITTER EXAMPLES</h3>
 <ul class="tiles" id="video_examples_twitter">
     <div id="tweet1" class="video" data-tweetID="905257372066750466"></div>
-    <div id="tweet2" class="video" data-tweetID="712402767113953281"></div>
+    <!--<div id="tweet2" class="video" data-tweetID="712402767113953281"></div>-->
     <div id="tweet3" class="video" data-tweetID="834326652360458241"></div>
 </ul>
-<div class="alert" id="analysis_info">
-    <span class="close_alert">×</span>
-    <strong>Info!</strong> <span id="analysis_info_msg"></span>
-</div>
+
 <div class="alert" id="analysis_fb">
     <strong>Info!</strong> In order to process Facebook videos you have to login first!
 </div>
@@ -313,6 +312,10 @@
 <p class="embedded_yt">Tweet contains embedded YouTube video. Submit the YouTube video to CAA for analysis <a href="#">here</a>
 </p>
 
+<div class="alert" id="analysis_info">
+    <span class="close_alert">×</span>
+    <strong>Info!</strong> <span id="analysis_info_msg"></span>
+</div>
 <p class="debunked"></p>
 
 <div class="tab">
@@ -331,540 +334,597 @@
             <p>Loading general...</p>
         </div>
         <div id="cover_info"></div>
+
         <div class="section_title" style="margin-bottom: 20px;">GENERAL<img src="imgs/info.png" class="tooltip"
                                                                             data-tooltip-content="#tooltip_general"/>
         </div>
-        <p class="table_title">VIDEO</p>
+        <div class="metadata_tab">
+            <p class="table_title">VIDEO</p>
 
-        <table class="table" id="video_yt_table">
-            <thead>
-            <tr>
-                <th>Name</th>
-                <th>Value</th>
-            </tr>
-            </thead>
-            <tbody>
+            <table class="table" id="video_yt_table">
+                <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Value</th>
+                </tr>
+                </thead>
+                <tbody>
 
-            <tr>
-                <td>Title</td>
-                <td id="video_title"></td>
-            </tr>
-            <tr>
-                <td>Description</td>
-                <td id="video_description"></td>
-            </tr>
-            <tr>
-                <td>Description Mentioned Locations</td>
-                <td id="video_locations"></td>
-            </tr>
-            <tr>
-                <td>Upload Time</td>
-                <td id="video_upload_time"></td>
-            </tr>
-            <tr>
-                <td>View Count</td>
-                <td id="video_view_count"></td>
-            </tr>
-            <tr>
-                <td>Duration</td>
-                <td id="video_duration"></td>
-            </tr>
-            <tr>
-                <td>Verification comment count</td>
-                <td id="video_verification_comment_count"></td>
-            </tr>
-            </tbody>
-        </table>
-        <table class="table" id="video_yt_table_more">
-            <thead>
-            </thead>
-            <tbody>
-            <tr>
-                <td>ID</td>
-                <td id="video_id"></td>
-            </tr>
-            <tr>
-                <td>Like Count</td>
-                <td id="video_like_count"></td>
-            </tr>
-            <tr>
-                <td>Dislike Count</td>
-                <td id="video_dislike_count"></td>
-            </tr>
-            <tr>
-                <td>Comment Count</td>
-                <td id="video_comment_count"></td>
-            </tr>
-            <tr>
-                <td>Dimension<img src="imgs/info_color.png" class="tooltip"
-                                  data-tooltip-content="#tooltip_dimension"/></td>
-                <td id="video_dimension"></td>
-            </tr>
-            <tr>
-                <td>Definition<img src="imgs/info_color.png" class="tooltip"
-                                   data-tooltip-content="#tooltip_definition"/></td>
-                <td id="video_definition"></td>
-            </tr>
-            <tr>
-                <td>Licensed Content<img src="imgs/info_color.png" class="tooltip"
-                                         data-tooltip-content="#tooltip_licensed"/></td>
-                <td id="video_licensed_content"></td>
-            </tr>
-            <tr>
-                <td>Recording Location Description</td>
-                <td id="video_recording_location_description"></td>
-            </tr>
-            <tr>
-                <td>Recording Time</td>
-                <td id="video_recording_time"></td>
-            </tr>
-            </tbody>
-        </table>
-        <p class="details video_yt">More Details<img src="imgs/down_arrow.png"></p>
+                <tr>
+                    <td>Title</td>
+                    <td id="video_title"></td>
+                </tr>
+                <tr>
+                    <td>Description</td>
+                    <td id="video_description"></td>
+                </tr>
+                <tr>
+                    <td>Mentioned Locations
+                        <br>
 
-        <table class="table" id="video_fb_table">
-            <thead>
-            <tr>
-                <th>Name</th>
-                <th>Value</th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr>
-                <td>Title</td>
-                <td id="fb_video_title"></td>
-            </tr>
-            <tr>
-                <td>Description</td>
-                <td id="fb_video_description"></td>
-            </tr>
-            <tr>
-                <td>Description Mentioned Locations</td>
-                <td id="fb_video_locations"></td>
-            </tr>
-            <tr>
-                <td>Updated Time<img src="imgs/info_color.png" class="tooltip"
-                                     data-tooltip-content="#tooltip_updated_time"/></td>
-                <td id="fb_updated_time"></td>
-            </tr>
-            <tr>
-                <td>Verification Comments</td>
-                <td id="fb_total_verification_comment_count"></td>
-            </tr>
-            </tbody>
-        </table>
-        <table class="table" id="video_fb_table_more">
-            <thead>
+                        <p class="powered_loc">
+                            <a href="https://cloud.gate.ac.uk/shopfront/displayItem/yodie-en" target="_blank">Powered by
+                                GATE Cloud on-line API</a>
+                        </p>
+                    </td>
+                    <td id="video_locations" class="locations_link"></td>
+                </tr>
+                <tr>
+                    <td>Upload Time</td>
+                    <td id="video_upload_time"></td>
+                </tr>
+                <tr>
+                    <td>View Count</td>
+                    <td id="video_view_count"></td>
+                </tr>
+                <tr>
+                    <td>Duration</td>
+                    <td id="video_duration"></td>
+                </tr>
+                </tbody>
+            </table>
+            <table class="table" id="video_yt_table_more">
+                <thead>
+                </thead>
+                <tbody>
+                <tr>
+                    <td>ID</td>
+                    <td id="video_id"></td>
+                </tr>
+                <tr>
+                    <td>Like Count</td>
+                    <td id="video_like_count"></td>
+                </tr>
+                <tr>
+                    <td>Dislike Count</td>
+                    <td id="video_dislike_count"></td>
+                </tr>
+                <tr>
+                    <td>Dimension<img src="imgs/info_color.png" class="tooltip"
+                                      data-tooltip-content="#tooltip_dimension"/></td>
+                    <td id="video_dimension"></td>
+                </tr>
+                <tr>
+                    <td>Definition<img src="imgs/info_color.png" class="tooltip"
+                                       data-tooltip-content="#tooltip_definition"/></td>
+                    <td id="video_definition"></td>
+                </tr>
+                <tr>
+                    <td>Licensed Content<img src="imgs/info_color.png" class="tooltip"
+                                             data-tooltip-content="#tooltip_licensed"/></td>
+                    <td id="video_licensed_content"></td>
+                </tr>
+                </tbody>
+            </table>
+            <p class="details video_yt">More Details<img src="imgs/down_arrow.png"></p>
 
-            </thead>
-            <tbody>
-            <tr>
-                <td>ID</td>
-                <td id="fb_video_id"></td>
-            </tr>
-            <tr>
-                <td>Content Category</td>
-                <td id="fb_content_category"></td>
-            </tr>
-            <tr>
-                <td>Content Tags</td>
-                <td id="fb_content_tags"></td>
-            </tr>
-            <tr>
-                <td>Created Time</td>
-                <td id="fb_created_time"></td>
-            </tr>
-            <tr>
-                <td>Comments</td>
-                <td id="fb_total_comment_count"></td>
-            </tr>
-            <tr>
-                <td>Embeddable</td>
-                <td id="fb_embeddable"></td>
-            </tr>
-            <tr>
-                <td>Length</td>
-                <td id="fb_length"></td>
-            </tr>
-            <tr>
-                <td>Picture</td>
-                <td id="fb_picture"></td>
-            </tr>
-            <tr>
-                <td>Privacy</td>
-                <td id="fb_privacy"></td>
-            </tr>
-            </tbody>
-        </table>
-        <p class="details video_fb">More Details<img src="imgs/down_arrow.png"></p>
+            <table class="table" id="video_fb_table">
+                <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Value</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td>Title</td>
+                    <td id="fb_video_title"></td>
+                </tr>
+                <tr>
+                    <td>Description</td>
+                    <td id="fb_video_description"></td>
+                </tr>
+                <tr>
+                    <td>Updated Time<img src="imgs/info_color.png" class="tooltip"
+                                         data-tooltip-content="#tooltip_updated_time"/></td>
+                    <td id="fb_updated_time"></td>
+                </tr>
+                <tr>
+                    <td>Mentioned Locations
+                        <br>
 
+                        <p class="powered_loc">
+                            <a href="https://cloud.gate.ac.uk/shopfront/displayItem/yodie-en" target="_blank">Powered by
+                                GATE Cloud on-line API</a>
+                        </p>
+                    </td>
+                    <td id="fb_video_locations" class="locations_link"></td>
+                </tr>
+                </tbody>
+            </table>
+            <table class="table" id="video_fb_table_more">
+                <thead>
 
-        <table class="table" id="tweet_tw_table">
-            <thead>
-            <tr>
-                <th>Name</th>
-                <th>Value</th>
-            </tr>
-            </thead>
-            <tbody>
+                </thead>
+                <tbody>
+                <tr>
+                    <td>ID</td>
+                    <td id="fb_video_id"></td>
+                </tr>
+                <tr>
+                    <td>Content Category</td>
+                    <td id="fb_content_category"></td>
+                </tr>
+                <tr>
+                    <td>Content Tags</td>
+                    <td id="fb_content_tags"></td>
+                </tr>
+                <tr>
+                    <td>Created Time</td>
+                    <td id="fb_created_time"></td>
+                </tr>
+                <tr>
+                    <td>Embeddable</td>
+                    <td id="fb_embeddable"></td>
+                </tr>
+                <tr>
+                    <td>Length</td>
+                    <td id="fb_length"></td>
+                </tr>
+                <tr>
+                    <td>Likes</td>
+                    <td id="fb_likes"></td>
+                </tr>
+                <tr>
+                    <td>Privacy</td>
+                    <td id="fb_privacy"></td>
+                </tr>
+                </tbody>
+            </table>
+            <p class="details video_fb">More Details<img src="imgs/down_arrow.png"></p>
 
-            <tr>
-                <td>Text</td>
-                <td id="tw_tweet_text"></td>
-            </tr>
-            <tr>
-                <td>Created Time</td>
-                <td id="tw_tweet_created_time"></td>
-            </tr>
-            <tr>
-                <td>Text Mentioned Locations</td>
-                <td id="tw_tweet_mentioned_locations"></td>
-            </tr>
-            <tr>
-                <td>Retweet Count</td>
-                <td id="tw_tweet_rt"></td>
-            </tr>
-            <tr>
-                <td>Favorite Count</td>
-                <td id="tw_tweet_fav"></td>
-            </tr>
-            <tr>
-                <td>Video Duration</td>
-                <td id="tw_tweet_duration"></td>
-            </tr>
-            <tr>
-                <td>Verification Replies</td>
-                <td id="tw_tweet_ver_comments"></td>
-            </tr>
-            </tbody>
-        </table>
-        <table class="table" id="tweet_tw_table_more">
-            <thead>
+            <table class="table" id="image_fb_table">
+                <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Value</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td>Caption</td>
+                    <td id="fb_image_title"></td>
+                </tr>
+                <tr>
+                    <td>Updated Time<img src="imgs/info_color.png" class="tooltip"
+                                         data-tooltip-content="#tooltip_updated_time"/></td>
+                    <td id="fb_updated_time_image"></td>
+                </tr>
+                <tr>
+                    <td>Mentioned Locations
+                        <br>
 
-            </thead>
-            <tbody>
-            <tr>
-                <td>ID</td>
-                <td id="tw_tweet_id"></td>
-            </tr>
-            <tr>
-                <td>Source</td>
-                <td id="tw_tweet_source" class="link"></td>
-            </tr>
-            <tr>
-                <td>Hashtags</td>
-                <td id="tw_tweet_hashtags"></td>
-            </tr>
-            <tr>
-                <td>URLs</td>
-                <td id="tw_tweet_urls" class="link"></td>
-            </tr>
-            <tr>
-                <td>Users Mentions</td>
-                <td id="tw_tweet_users_mentions"></td>
-            </tr>
-            <tr>
-                <td>Language</td>
-                <td id="tw_tweet_lang"></td>
-            </tr>
-            <tr>
-                <td>Video Aspect Ratio</td>
-                <td id="tw_tweet_aspect"></td>
-            </tr>
+                        <p class="powered_loc">
+                            <a href="https://cloud.gate.ac.uk/shopfront/displayItem/yodie-en" target="_blank">Powered by
+                                GATE Cloud on-line API</a>
+                        </p>
+                    </td>
+                    <td id="fb_image_locations" class="locations_link"></td>
+                </tr>
+                </tbody>
+            </table>
+            <table class="table" id="image_fb_table_more">
+                <thead>
 
-            <tr>
-                <td>Video Url</td>
-                <td id="tw_tweet_url" class="link"></td>
-            </tr>
-            <tr>
-                <td>Video Bitrate</td>
-                <td id="tw_tweet_bitrate"></td>
-            </tr>
-            <tr>
-                <td>Verification Label</td>
-                <td id="tw_tweet_verification"></td>
-            </tr>
-            </tbody>
-        </table>
-        <p class="details video_tw">More Details<img src="imgs/down_arrow.png"></p>
+                </thead>
+                <tbody>
+                <tr>
+                    <td>ID</td>
+                    <td id="fb_image_id"></td>
+                </tr>
+                <tr>
+                    <td>Can Tag</td>
+                    <td id="fb_image_tag"></td>
+                </tr>
+                <tr>
+                    <td>Created Time</td>
+                    <td id="fb_image_created"></td>
+                </tr>
+                <tr>
+                    <td>Width</td>
+                    <td id="fb_image_width"></td>
+                </tr>
+                <tr>
+                    <td>Height</td>
+                    <td id="fb_image_height"></td>
+                </tr>
+                <tr>
+                    <td>Alt Text</td>
+                    <td id="fb_image_alt"></td>
+                </tr>
+
+                </tbody>
+            </table>
+            <p class="details image_fb">More Details<img src="imgs/down_arrow.png"></p>
 
 
-        <p class="table_title">CHANNEL</p>
+            <table class="table" id="tweet_tw_table">
+                <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Value</th>
+                </tr>
+                </thead>
+                <tbody>
 
-        <table class="table" id="channel_yt_table">
-            <thead>
-            <tr>
-                <th>Name</th>
-                <th>Value</th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr>
-                <td>Description</td>
-                <td id="channel_description"></td>
-            </tr>
-            <tr>
-                <td>Created Time</td>
-                <td id="channel_created_time"></td>
-            </tr>
-            </tbody>
-        </table>
-        <table class="table" id="channel_yt_table_more">
-            <thead>
+                <tr>
+                    <td>Text</td>
+                    <td id="tw_tweet_text"></td>
+                </tr>
+                <tr>
+                    <td>Created Time</td>
+                    <td id="tw_tweet_created_time"></td>
+                </tr>
+                <tr>
+                    <td>Mentioned Locations
+                        <br>
 
-            </thead>
-            <tbody>
-            <tr>
-                <td>ID</td>
-                <td id="channel_id"></td>
-            </tr>
-            <tr>
-                <td>Description Mentioned Locations</td>
-                <td id="channel_locations"></td>
-            </tr>
-            <tr>
-                <td>Location</td>
-                <td id="channel_location"></td>
-            </tr>
-            <tr>
-                <td>View Count</td>
-                <td id="channel_view_count"></td>
-            </tr>
-            <tr>
-                <td>Comment Count</td>
-                <td id="channel_comment_count"></td>
-            </tr>
-            <tr>
-                <td>Subscriber Count</td>
-                <td id="channel_subscriber_count"></td>
-            </tr>
-            <tr>
-                <td>Video Count</td>
-                <td id="channel_video_count"></td>
-            </tr>
-            <tr>
-                <td>Video Per Month</td>
-                <td id="channel_videos_per_month"></td>
-            </tr>
-            <tr>
-                <td>Url</td>
-                <td class="link" id="channel_url"></td>
-            </tr>
-            <tr>
-                <td>About Page</td>
-                <td class="link" id="channel_about_page"></td>
-            </tr>
-            </tbody>
-        </table>
-        <p class="details channel_yt">More Details<img src="imgs/down_arrow.png"></p>
+                        <p class="powered_loc">
+                            <a href="https://cloud.gate.ac.uk/shopfront/displayItem/yodie-en" target="_blank">Powered by
+                                GATE Cloud on-line API</a>
+                        </p>
+                    </td>
+                    <td id="tw_tweet_mentioned_locations" class="locations_link"></td>
+                </tr>
+                <tr>
+                    <td>Retweet Count</td>
+                    <td id="tw_tweet_rt"></td>
+                </tr>
+                <tr>
+                    <td>Favorite Count</td>
+                    <td id="tw_tweet_fav"></td>
+                </tr>
+                <tr>
+                    <td>Video Duration</td>
+                    <td id="tw_tweet_duration"></td>
+                </tr>
+                </tbody>
+            </table>
+            <table class="table" id="tweet_tw_table_more">
+                <thead>
 
-        <table class="table" id="user_fb_table">
-            <thead>
-            <tr>
-                <th>Name</th>
-                <th>Value</th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr>
-                <td>Source</td>
-                <td id="fb_source"></td>
-            </tr>
-            </tbody>
-        </table>
+                </thead>
+                <tbody>
+                <tr>
+                    <td>ID</td>
+                    <td id="tw_tweet_id"></td>
+                </tr>
+                <tr>
+                    <td>Source</td>
+                    <td id="tw_tweet_source" class="link"></td>
+                </tr>
+                <tr>
+                    <td>Hashtags</td>
+                    <td id="tw_tweet_hashtags"></td>
+                </tr>
+                <tr>
+                    <td>URLs</td>
+                    <td id="tw_tweet_urls" class="link"></td>
+                </tr>
+                <tr>
+                    <td>Users Mentions</td>
+                    <td id="tw_tweet_users_mentions"></td>
+                </tr>
+                <tr>
+                    <td>Language</td>
+                    <td id="tw_tweet_lang"></td>
+                </tr>
+                <tr>
+                    <td>Video Aspect Ratio</td>
+                    <td id="tw_tweet_aspect"></td>
+                </tr>
+
+                <tr>
+                    <td>Video Url</td>
+                    <td id="tw_tweet_url" class="link"></td>
+                </tr>
+                <tr>
+                    <td>Video Bitrate</td>
+                    <td id="tw_tweet_bitrate"></td>
+                </tr>
+                <tr>
+                    <td>Verification Label</td>
+                    <td id="tw_tweet_verification"></td>
+                </tr>
+                </tbody>
+            </table>
+            <p class="details video_tw">More Details<img src="imgs/down_arrow.png"></p>
 
 
-        <table class="table" id="user_tw_table">
-            <thead>
-            <tr>
-                <th>Name</th>
-                <th>Value</th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr>
-                <td>Description Mentioned Locations</td>
-                <td id="tw_user_description_locations"></td>
-            </tr>
-            <tr>
-                <td>Description</td>
-                <td id="tw_user_desc"></td>
-            </tr>
-            <tr>
-                <td>Created Time</td>
-                <td id="tw_user_created"></td>
-            </tr>
+            <p class="table_title">CHANNEL</p>
 
-            </tbody>
-        </table>
-        <table class="table" id="user_tw_table_more">
-            <thead>
+            <table class="table" id="channel_yt_table">
+                <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Value</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td>Title</td>
+                    <td id="channel_title"></td>
+                </tr>
+                <tr>
+                    <td>Description</td>
+                    <td id="channel_description"></td>
+                </tr>
+                <tr>
+                    <td>Created Time</td>
+                    <td id="channel_created_time"></td>
+                </tr>
+                </tbody>
+            </table>
+            <table class="table" id="channel_yt_table_more">
+                <thead>
 
-            </thead>
-            <tbody>
-            <tr>
-                <td>Username</td>
-                <td id="tw_user_username"></td>
-            </tr>
-            <tr>
-                <td>Screen Name</td>
-                <td id="tw_user_screenname" class="link"></td>
-            </tr>
-            <tr>
-                <td>Location</td>
-                <td id="tw_user_location"></td>
-            </tr>
-            <tr>
-                <td>URL</td>
-                <td id="tw_user_url" class="link"></td>
-            </tr>
-            <tr>
-                <td>Protected</td>
-                <td id="tw_user_protected"></td>
-            </tr>
-            <tr>
-                <td>Verified</td>
-                <td id="tw_user_verified"></td>
-            </tr>
-            <tr>
-                <td>Followers</td>
-                <td id="tw_user_followers"></td>
-            </tr>
-            <tr>
-                <td>Friends</td>
-                <td id="tw_user_friends"></td>
-            </tr>
-            <tr>
-                <td>Listed</td>
-                <td id="tw_user_listed"></td>
-            </tr>
-            <tr>
-                <td>Favorites</td>
-                <td id="tw_user_favourites"></td>
-            </tr>
-            <tr>
-                <td>Statuses</td>
-                <td id="tw_user_statuses"></td>
-            </tr>
-            <tr>
-                <td>Language</td>
-                <td id="tw_user_lang"></td>
-            </tr>
-            <tr>
-                <td>Profile Image</td>
-                <td id="tw_user_profile_img"></td>
-            </tr>
-            </tbody>
-        </table>
-        <p class="details user_tw">More Details<img src="imgs/down_arrow.png"></p>
+                </thead>
+                <tbody>
+                <tr>
+                    <td>ID</td>
+                    <td id="channel_id"></td>
+                </tr>
+                <tr>
+                    <td>Location</td>
+                    <td id="channel_location"></td>
+                </tr>
+                <tr>
+                    <td>View Count</td>
+                    <td id="channel_view_count"></td>
+                </tr>
+                <tr>
+                    <td>Comment Count</td>
+                    <td id="channel_comment_count"></td>
+                </tr>
+                <tr>
+                    <td>Subscriber Count</td>
+                    <td id="channel_subscriber_count"></td>
+                </tr>
+                <tr>
+                    <td>Video Count</td>
+                    <td id="channel_video_count"></td>
+                </tr>
+                <tr>
+                    <td>Video Per Month</td>
+                    <td id="channel_videos_per_month"></td>
+                </tr>
+                <tr>
+                    <td>Url</td>
+                    <td class="link" id="channel_url"></td>
+                </tr>
+                <tr>
+                    <td>About Page</td>
+                    <td class="link" id="channel_about_page"></td>
+                </tr>
+                </tbody>
+            </table>
+            <p class="details channel_yt">More Details<img src="imgs/down_arrow.png"></p>
 
+            <table class="table" id="user_fb_table">
+                <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Value</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td>Source</td>
+                    <td id="fb_source"></td>
+                </tr>
+                </tbody>
+            </table>
+
+
+            <table class="table" id="user_tw_table">
+                <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Value</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td>Description</td>
+                    <td id="tw_user_desc"></td>
+                </tr>
+                <tr>
+                    <td>Created Time</td>
+                    <td id="tw_user_created"></td>
+                </tr>
+
+                </tbody>
+            </table>
+            <table class="table" id="user_tw_table_more">
+                <thead>
+
+                </thead>
+                <tbody>
+                <tr>
+                    <td>Username</td>
+                    <td id="tw_user_username"></td>
+                </tr>
+                <tr>
+                    <td>Screen Name</td>
+                    <td id="tw_user_screenname" class="link"></td>
+                </tr>
+                <tr>
+                    <td>Location</td>
+                    <td id="tw_user_location"></td>
+                </tr>
+                <tr>
+                    <td>URL</td>
+                    <td id="tw_user_url" class="link"></td>
+                </tr>
+                <tr>
+                    <td>Protected</td>
+                    <td id="tw_user_protected"></td>
+                </tr>
+                <tr>
+                    <td>Verified</td>
+                    <td id="tw_user_verified"></td>
+                </tr>
+                <tr>
+                    <td>Followers</td>
+                    <td id="tw_user_followers"></td>
+                </tr>
+                <tr>
+                    <td>Friends</td>
+                    <td id="tw_user_friends"></td>
+                </tr>
+                <tr>
+                    <td>Listed</td>
+                    <td id="tw_user_listed"></td>
+                </tr>
+                <tr>
+                    <td>Favorites</td>
+                    <td id="tw_user_favourites"></td>
+                </tr>
+                <tr>
+                    <td>Statuses</td>
+                    <td id="tw_user_statuses"></td>
+                </tr>
+                <tr>
+                    <td>Profile Image</td>
+                    <td id="tw_user_profile_img"></td>
+                </tr>
+                </tbody>
+            </table>
+            <p class="details user_tw">More Details<img src="imgs/down_arrow.png"></p>
+        </div>
 
         <div class="section_title">COMMENTS <img src="imgs/info.png" class="tooltip"
                                                  data-tooltip-content="#tooltip_comments"/></div>
-        <div class="alert" id="alert_comments">
-            <span class="close_alert">×</span>
-            <strong>Info!</strong> Fetching more comments... Once all comments are fetched, you'll be able to perform
-            free-text search on them.
-        </div>
-        <div class="alert" id="alert_comments_overflow">
-            <span class="close_alert">×</span>
-            <strong>Info!</strong> Due to Twitter API limitations, it is impossible to retrieve replies to this
-            particular tweet
-        </div>
-        <div class="controls">
-            <div class="filter" id="all"></div>
-            <div class="filter active" id="verified">
+        <div class="comments_tab">
+            <div class="alert" id="alert_comments">
+                <span class="close_alert">×</span>
+                <strong>Info!</strong> Fetching more comments... Once all comments are fetched, you'll be able to
+                perform
+                free-text search on them.
             </div>
-        </div>
-        <p class="comments_search"><img src="imgs/search-12.png">Search in comments</p>
-
-        <p class="output_expr"></p>
-
-        <p id="zero_comments">Zero comments found</p>
-
-        <div id="comments_table">
-            <div id="comments_table_wrapper">
-                <p class="comments_title">Search in comments <img src="imgs/close-black.png"></p>
-
-                <div class="search_section">
-                    <p class="search_title">Match <span>ANY</span> of the following keywords</p>
-
-                    <div class="keyword_wrapper keyword_wrapper_or">
-                        <label for="or_1">1</label>
-                        <input id="or_1" type="text" value="" name="or">
-
-                        <p class="search_remove remove_or">Remove<img src="imgs/close_cross.png"></p>
-                    </div>
-                    <div class="keyword_wrapper keyword_wrapper_or">
-                        <label for="or_2">2</label>
-                        <input id="or_2" type="text" value="" name="or">
-
-                        <p class="search_remove remove_or">Remove<img src="imgs/close_cross.png"></p>
-                    </div>
-                    <div class="keyword_wrapper keyword_wrapper_or">
-                        <label for="or_3">3</label>
-                        <input id="or_3" type="text" value="" name="or">
-
-                        <p class="search_remove remove_or">Remove<img src="imgs/close_cross.png"></p>
-                    </div>
-                    <p class="search_add add_or">Add more <img src="imgs/add_icon.png"></p>
-                </div>
-                <div class="search_section">
-                    <p class="search_title">Match <span>ALL</span> of the following keywords</p>
-
-                    <div class="keyword_wrapper keyword_wrapper_and">
-                        <label for="and_1">1</label>
-                        <input id="and_1" type="text" value="" name="and">
-
-                        <p class="search_remove">Remove<img src="imgs/close_cross.png"></p>
-                    </div>
-                    <div class="keyword_wrapper keyword_wrapper_and">
-                        <label for="and_2">2</label>
-                        <input id="and_2" type="text" value="" name="and">
-
-                        <p class="search_remove">Remove<img src="imgs/close_cross.png"></p>
-                    </div>
-                    <div class="keyword_wrapper keyword_wrapper_and">
-                        <label for="and_3">3</label>
-                        <input id="and_3" type="text" value="" name="and">
-
-                        <p class="search_remove">Remove<img src="imgs/close_cross.png"></p>
-                    </div>
-                    <p class="search_add">Add more <img src="imgs/add_icon.png"></p>
-                </div>
-                <p id="comments_calculate">Show the expression</p>
-
-                <p id="comments_output"></p>
-
-                <div style="text-align: center;padding-bottom: 10px">
-                    <div class="comments_but" id="search_but">Search</div>
-                    <div class="comments_but" id="cancel_but">Cancel</div>
+            <div class="controls">
+                <div class="filter" id="all">ALL (-)</div>
+                <div class="filter " id="extr_links" style="border-bottom: 6px solid #9593D9;">LINKS (-)</div>
+                <div class="filter active" id="verified" style="border-bottom: 6px solid #8AA399;">VERIFICATION (-)
                 </div>
             </div>
-        </div>
-        <ul class="tiles" id="comments_info">
+            <p class="comments_search"><img src="imgs/search-12.png">Search in comments</p>
 
-        </ul>
-        <div id="loading">Loading comments, please wait.....
-            <img id="loadimg" src="imgs/loading.gif" alt="loading..">
+            <p class="output_expr"></p>
+
+            <p id="zero_comments">Zero comments found</p>
+
+            <p id="none_comments">No comments at the moment</p>
+
+            <div id="comments_table">
+                <div id="comments_table_wrapper">
+                    <p class="comments_title">Search in comments <img src="imgs/close-black.png"></p>
+
+                    <div class="search_section">
+                        <p class="search_title">Match <span>ANY</span> of the following keywords</p>
+
+                        <div class="keyword_wrapper keyword_wrapper_or">
+                            <label for="or_1">1</label>
+                            <input id="or_1" type="text" value="" name="or">
+
+                            <p class="search_remove remove_or">Remove<img src="imgs/close_cross.png"></p>
+                        </div>
+                        <div class="keyword_wrapper keyword_wrapper_or">
+                            <label for="or_2">2</label>
+                            <input id="or_2" type="text" value="" name="or">
+
+                            <p class="search_remove remove_or">Remove<img src="imgs/close_cross.png"></p>
+                        </div>
+                        <div class="keyword_wrapper keyword_wrapper_or">
+                            <label for="or_3">3</label>
+                            <input id="or_3" type="text" value="" name="or">
+
+                            <p class="search_remove remove_or">Remove<img src="imgs/close_cross.png"></p>
+                        </div>
+                        <p class="search_add add_or">Add more <img src="imgs/add_icon.png"></p>
+                    </div>
+                    <div class="search_section">
+                        <p class="search_title">Match <span>ALL</span> of the following keywords</p>
+
+                        <div class="keyword_wrapper keyword_wrapper_and">
+                            <label for="and_1">1</label>
+                            <input id="and_1" type="text" value="" name="and">
+
+                            <p class="search_remove">Remove<img src="imgs/close_cross.png"></p>
+                        </div>
+                        <div class="keyword_wrapper keyword_wrapper_and">
+                            <label for="and_2">2</label>
+                            <input id="and_2" type="text" value="" name="and">
+
+                            <p class="search_remove">Remove<img src="imgs/close_cross.png"></p>
+                        </div>
+                        <div class="keyword_wrapper keyword_wrapper_and">
+                            <label for="and_3">3</label>
+                            <input id="and_3" type="text" value="" name="and">
+
+                            <p class="search_remove">Remove<img src="imgs/close_cross.png"></p>
+                        </div>
+                        <p class="search_add">Add more <img src="imgs/add_icon.png"></p>
+                    </div>
+                    <p id="comments_calculate">Show the expression</p>
+
+                    <p id="comments_output"></p>
+
+                    <div style="text-align: center;padding-bottom: 10px">
+                        <div class="comments_but" id="search_but">Search</div>
+                        <div class="comments_but" id="cancel_but">Cancel</div>
+                    </div>
+                </div>
+            </div>
+            <ul class="tiles" id="comments_info">
+
+            </ul>
+            <div id="loading">Loading comments, please wait.....
+                <img id="loadimg" src="imgs/loading.gif" alt="loading..">
+            </div>
+            <div class="more">
+                <div>More Comments...</div>
+            </div>
+            <div class="more_search">
+                <div>More Comments...</div>
+            </div>
         </div>
-        <div class="more">
-            <div>More Comments...</div>
-        </div>
-        <div class="more_search">
-            <div>More Comments...</div>
-        </div>
+
         <div class="section_title">THUMBNAILS <img src="imgs/info.png" class="tooltip"
                                                    data-tooltip-content="#tooltip_thumbnails"/></div>
-        <div class="alert" id="alert_thumbs">
-            <span class="close_alert">×</span>
-            <strong>Info!</strong> The tweet contains embedded YouTube video thus no thumbnail images can be retrieved.
-            Submit the YouTube video to CAA for analysis <a href="#">here</a>
+        <div class="thumbs_tab">
+            <div class="alert" id="alert_clickbait">
+                <span class="close_alert">×</span>
+                <strong>Warning!</strong> Video thumbnail set by uploader (in red border) is not present at the video.
+                This
+                tactic is common in clickbaiting.
+            </div>
+            <ul class="tiles" id="thumb_info"></ul>
         </div>
-        <ul class="tiles" id="thumb_info"></ul>
+
         <div class="section_title">WEATHER CONTEXT <img src="imgs/info.png" class="tooltip"
                                                         data-tooltip-content="#tooltip_weather"/></div>
-        <div id="weather">
+        <div id="weather" style="display: none">
             <div id="weather_input">
                 <div id="location">
                     <div class="weather_title">Location:</div>
@@ -1002,9 +1062,14 @@
         </div>
         <div class="alert" id="alert_twitter_overflow">
             <span class="close_alert">×</span>
-            <strong>Info!</strong> Due to the large number of tweets, only a representative sample (10) is shown. While
-            we fetch more tweets only the bar at the bottom is being visual updated. If you want to see all the tweets
+            <strong>Info!</strong> Only a representative sample (10) is shown.If you want to see all the tweets
             in the timeline graph <b id="more_tweets">Click here</b>
+        </div>
+        <div class="alert" id="alert_twitter_500">
+            <span class="close_alert">×</span>
+            <strong>Info!</strong> Due to large number of tweets only 500 of them are displayed in the timeline. If you
+            want
+            to get next 500 <b id="more_tweets_500">Click here</b>
         </div>
         <div id="timeline">
             <div id="visualization">
@@ -1130,6 +1195,8 @@
 <!-- JS -->
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
 <script src="https://platform.twitter.com/widgets.js"></script>
+<script src="js/languageData.js"></script>
+<script src="js/guessLanguage.js"></script>
 <script src="js/main_timeline.js"></script>
 <script src="js/main.js"></script>
 <script src="js/jquery.imagesloaded.js"></script>
@@ -1139,7 +1206,7 @@
 <script src="js/jquery.reveal.js"></script>
 <script src="js/vis.js"></script>
 
-<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDOOPffhARnRWiCM2TyhJbHkmbDbpxrWec&libraries=places&callback=initMap"
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyClIXyzpHO3vM3WETnKFK_IKiWZcZJBL8I&libraries=places&callback=initMap"
         async defer></script>
 <script src="js/tooltipster.bundle.js"></script>
 </body>

@@ -1,0 +1,58 @@
+{
+  "_id": "khrenova@jour.auth.gr",
+  "videos": [
+    {
+      "stage": "AC",
+      "title": "plane saved by truck lol Nissan Frontier",
+      "url": "https://www.youtube.com/watch?v=_nWZKnzwG48",
+      "video_id": 10,
+      "annotated":"real"
+    },
+    {
+      "stage": "AC",
+      "title": "Exclusive Footage: Cyclone Ockhi Hits Kerala and Tamilnadu",
+      "url": "https://www.youtube.com/watch?v=qjLZodAG_Is",
+      "video_id": 19,
+      "annotated":"real"
+    },
+    {
+      "stage": "AC",
+      "title": "Crazy Tech: A ball that retrieves itself!",
+      "url": "https://www.facebook.com/tribe7s/videos/667333080091232/",
+      "video_id": 25,
+      "annotated":"real"
+    },
+    {
+      "stage": "AC",
+      "title": "See how the British divers went to the caves to save the Thai football team youngsters..",
+      "url": "https://www.youtube.com/watch?v=AcLytyNK6D8",
+      "video_id": 26,
+      "annotated":"fake"
+    },
+    {
+      "stage": "AC",
+      "title": "Dragon Air hit by typhoon in China ShenZhen.",
+      "url": "https://www.youtube.com/watch?v=XehgVtJIBMY",
+      "video_id": 31,
+      "annotated":"real"
+    },
+    {
+      "stage": "AC",
+      "title": "Muslims Push a Car Down Subway Station Stairs",
+      "url": "https://www.youtube.com/watch?v=hkmym8FclT4",
+      "video_id": 3
+    },
+    {
+      "stage": "AC",
+      "title": "Crashproof Motorbike",
+      "url": "https://www.youtube.com/watch?v=vTg7PUSVidI",
+      "video_id": 33
+    },
+    {
+      "stage": "C",
+      "title": "Time to shake up Brussels!",
+      "url": "https://www.facebook.com/kormanyzat/videos/1724947814301363/",
+      "video_id": 28
+    }
+  ]
+}

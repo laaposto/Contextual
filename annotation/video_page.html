@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>CAA annotation</title>
+    <meta charset="utf-8">
+    <meta name="description"
+          content="CAA annotation">
+    <meta name="robots" content="index, follow"/>
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="author" content="laaposto">
+    <link rel="shortcut icon" href="imgs/favicon.ico">
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans|Roboto"
+          rel="stylesheet" type="text/css">
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="css/main_video.css">
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.10.4/themes/flick/jquery-ui.css">
+    <link rel="stylesheet" href="css/jquery.slider.css">
+    <!--END CSS -->
+
+</head>
+<body>
+<div class="checkout">
+    <div class="credit-card-box" id="form">
+
+    </div>
+    <div id="success-box">
+
+        <div class="face">
+            <div class="eye"></div>
+            <div class="eye right"></div>
+            <div class="mouth happy"></div>
+        </div>
+        <div class="shadow scale"></div>
+        <div class="message">
+            <h1 class="alert">Success!</h1>
+
+            <p>yay, everything is working.</p>
+            <a id="message_a" href="">Back to search results</a>
+        </div>
+    </div>
+    <div class="form">
+        <p id="caa_link"><a href="#" target="_blank">CAA link</a></p>
+
+        <div id="timerContainer">
+            <div class="timer" onclick="startTimer()">00:00:00</div>
+            <div class="startTimer reset" onclick="startTimer()">
+                <img src="imgs/play_button.png">
+            </div>
+            <div class="pauseTimer reset" onclick="pauseTimer()">
+                <img src="imgs/pause_button.png">
+            </div>
+            <br>
+
+            <div class="resetTimer reset" onclick="resetTimer()" style="margin-left: 14px;margin-top: 5px;">Reset</div>
+        </div>
+        <div style="text-align: center" id="warning">
+            <img src="imgs/warning.png" class="warning_img">
+
+            <div class="alert_p">
+                <strong>Info!</strong> Don't forget to start the timer
+
+            </div>
+        </div>
+        <div class="form-checkbox form-checkbox-inline">
+            <div class="title-header">
+                <h1>Verification Label</h1>
+            </div>
+            <label class="form-checkbox-label">
+                <input name="verification_label" class="form-checkbox-field" type="radio" value="real">
+                <i class="form-checkbox-button"></i>
+                <span>Real</span>
+            </label>
+            <label class="form-checkbox-label">
+                <input name="verification_label" class="form-checkbox-field" type="radio" value="fake">
+                <i class="form-checkbox-button"></i>
+                <span>Fake</span>
+            </label>
+
+            <p class="error_p error_verification" style="margin-top: 10px">Fill Verification Label</p>
+
+            <div class="title-header" style="margin-top: 40px;">
+                <h1>Certain</h1>
+            </div>
+            <div id="double-label-slider"></div>
+            <p class="error_p error_certain">Fill Certain Scale</p>
+
+            <div class="title-header" style="margin-top: 80px;">
+                <h1>Verification Features</h1>
+            </div>
+            <div class="form-checkbox vertical list_buttons">
+
+                <label class="form-checkbox-label">
+                    <input value="metadata" class="form-checkbox-field" type="checkbox" name="list">
+                    <i class="form-checkbox-button"></i>
+                    <span>Metadata</span>
+                </label>
+                <label class="form-checkbox-label">
+                    <input value="comments" class="form-checkbox-field" type="checkbox" name="list">
+                    <i class="form-checkbox-button"></i>
+                    <span>All Comments</span>
+                </label>
+                <label class="form-checkbox-label">
+                    <input value="vercomments" class="form-checkbox-field" type="checkbox" name="list">
+                    <i class="form-checkbox-button"></i>
+                    <span>Verification Comments</span>
+                </label>
+                <label class="form-checkbox-label">
+                    <input value="linkcomments" class="form-checkbox-field" type="checkbox" name="list">
+                    <i class="form-checkbox-button"></i>
+                    <span>Link comments</span>
+                </label>
+                <label class="form-checkbox-label">
+                    <input value="freetext" class="form-checkbox-field" type="checkbox" name="list">
+                    <i class="form-checkbox-button"></i>
+                    <span>Comments Free text search</span>
+                </label>
+                <label class="form-checkbox-label">
+                    <input value="gimage" class="form-checkbox-field" type="checkbox" name="list">
+                    <i class="form-checkbox-button"></i>
+                    <span>Google reverse image search</span>
+                </label>
+                <label class="form-checkbox-label">
+                    <input value="yimage" class="form-checkbox-field" type="checkbox" name="list">
+                    <i class="form-checkbox-button"></i>
+                    <span>Yandex reverse image search</span>
+                </label>
+                <label class="form-checkbox-label">
+                    <input value="timeline" class="form-checkbox-field" type="checkbox" name="list">
+                    <i class="form-checkbox-button"></i>
+                    <span>Twitter timeline</span>
+                </label>
+                <label class="form-checkbox-label">
+                    <input value="ai" class="form-checkbox-field" type="checkbox" name="list">
+                    <i class="form-checkbox-button"></i>
+                    <span>Verification AI score</span>
+                </label>
+                <label class="form-checkbox-label">
+                    <input value="none" class="form-checkbox-field" type="checkbox" name="list">
+                    <i class="form-checkbox-button"></i>
+                    <span>None</span>
+                </label>
+
+                <p class="error_p error_list" style="margin-top: 25px">Select at least one</p>
+            </div>
+
+            <div class="title-header" style="margin-top: 60px;">
+                <h1>Description</h1>
+            </div>
+            <textarea name="text" class="validate[required,length[6,300]] feedback-input" id="comment"
+                      placeholder="Comment"></textarea>
+
+            <p class="error_p error_desc">Fill Description</p>
+
+        </div>
+        <button name="submit" type="submit" id="submit">Submit</button>
+        <p class="error_p error_time" style="margin-top: 25px">Timer hasn't started</p>
+
+        <p class="time_text">Aproximately time (in seconds) for this video: <input id="time_user" type="text"  placeholder="0"/></p>
+    </div>
+</div>
+<!-- JS -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script src="https://code.jquery.com/ui/1.11.1/jquery-ui.js"></script>
+<script src="js/main_video.js"></script>
+<script src="js/jquery.slider.js"></script>
+<!-- END JS -->
+
+</body>
+</html>
